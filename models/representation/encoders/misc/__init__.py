@@ -1,0 +1,2 @@
+from models.representation.encoders.misc.scalar_encoder import ScalarEncoder
+from models.representation.encoders.misc.categorical_encoder import CategoricalEncoder

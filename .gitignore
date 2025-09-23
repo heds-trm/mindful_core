@@ -1,0 +1,11 @@
+# IDEA folder
+.idea
+
+# VS folder
+.vscode
+
+# PyC
+*.pyc
+
+# Poetry
+poetry.lock
