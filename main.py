@@ -20,19 +20,6 @@ def main():
         experiment_series = ExperimentSeries(config)
         experiment_series.run()
 
-    # module_config: ModuleConfig = {
-    #     "class_name": "target",
-    #     "hparams": r"C:\tmp\mindful\target_hparams.json",
-    #
-    #     "sub_modules": {
-    #         "representation_model": {
-    #             "class_name": "encoder",
-    #             "hparams": r"C:\tmp\mindful\encoder_hparams.json",
-    #         }
-    #     }
-    # }
-    # model = get_model(module_config)
-
 
 if __name__ == "__main__":
     main()
