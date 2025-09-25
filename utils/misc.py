@@ -183,17 +183,18 @@ def check_package(name: str) -> bool:
 
 # region Tensorboard (Tensorflow / Torch)
 
-def initialize_tensorboard():
+def initialize_tensorboard(verbose: bool = False):
     try:
         # noinspection PyUnresolvedReferences, PyPackageRequirements
         import tensorflow as tf  # type:ignore
         import tensorboard as tb
         # noinspection PyUnresolvedReferences
         tf.io.gfile = tb.compat.tensorflow_stub.io.gfile  # type: ignore
-        print("Tensorflow found, using Tensorflow's base Tensorboard.")
+        if verbose:
+            print("Tensorflow found, using Tensorflow's base Tensorboard.")
     except ModuleNotFoundError:
-        print("Tensorflow not found, using PyTorch's base Tensorboard.")
-
+        if verbose:
+            print("Tensorflow not found, using PyTorch's base Tensorboard.")
 
 # endregion
 
