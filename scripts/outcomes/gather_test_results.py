@@ -10,7 +10,7 @@ import os
 from typing import Optional, Iterator
 
 
-from utils.metrics import format_metric
+from mindful_core.utils.metrics import format_metric
 
 
 def find_all_test_results_files(path: str | Path) -> list[str]:

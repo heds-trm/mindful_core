@@ -2,7 +2,7 @@ import torch
 import torch.nn as nn
 from typing import Sequence
 
-from models.model_output import ClassifierOutput
+from mindful_core.models.model_output import ClassifierOutput
 
 
 class DenseClassifier(nn.Module):

@@ -3,8 +3,8 @@ from monai.networks.nets import UNet, UNETR, SwinUNETR
 from monai.losses.dice import DiceCELoss, DiceFocalLoss
 from typing import Any, Sequence
 
-from models.model_output import SegmentationOutput
-from models.segmentation.abstract_segmentation_model import AbstractSegmentationModel
+from mindful_core.models.model_output import SegmentationOutput
+from mindful_core.models.segmentation.abstract_segmentation_model import AbstractSegmentationModel
 
 UNET_HPARAMS = ["kernel_size", "up_kernel_size", "num_res_units", "act", "norm", "dropout", "bias", "adn_ordering"]
 UNETR_HPARAMS = ["feature_size", "hidden_size", "mlp_dim", "num_heads", "pos_embed", "proj_type",

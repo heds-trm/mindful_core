@@ -2,7 +2,7 @@ from abc import ABCMeta, abstractmethod
 import inspect
 from typing import Type, Any, Iterable
 
-from utils.struct import AliasDict
+from mindful_core.utils.struct import AliasDict
 
 
 class ExperimentStage(metaclass=ABCMeta):

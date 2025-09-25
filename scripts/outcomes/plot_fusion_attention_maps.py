@@ -8,7 +8,7 @@ import argparse
 from enum import IntEnum
 from typing import Mapping, Hashable, Any
 
-from data.data_folds.data_fold import load_scalar_features, load_categorical_features
+from mindful_core.data.data_folds.data_fold import load_scalar_features, load_categorical_features
 
 
 class ModalityStatus(IntEnum):

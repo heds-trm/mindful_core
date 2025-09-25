@@ -4,9 +4,9 @@ from sklearn.utils.class_weight import compute_class_weight
 from pathlib import Path
 from typing import Sequence
 
-from data import Sample, SubsetID
-from utils.misc import is_defined, write_json
-from utils.data_constants import SCAN_ID, LABEL, SUBSET_ID, DEFAULT_IMAGE_COLUMN
+from mindful_core.data import Sample, SubsetID
+from mindful_core.utils.misc import is_defined, write_json
+from mindful_core.utils.data_constants import SCAN_ID, LABEL, SUBSET_ID, DEFAULT_IMAGE_COLUMN
 
 
 class DataFold(object):

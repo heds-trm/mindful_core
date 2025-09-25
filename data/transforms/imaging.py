@@ -37,10 +37,10 @@ from pathlib import Path
 import copy
 from typing import Sequence, Any, Callable, Literal
 
-from data import Sample
-from data.transforms.serializable_transform import SerializableTransform, TransformParameters
-from data.transforms.batch_transform import BatchTransform
-from utils.imaging import (
+from mindful_core.data import Sample
+from mindful_core.data.transforms.serializable_transform import SerializableTransform, TransformParameters
+from mindful_core.data.transforms.batch_transform import BatchTransform
+from mindful_core.utils.imaging import (
     adjust_brightness,
     adjust_contrast,
     adjust_sharpness_3d,
@@ -54,7 +54,7 @@ from utils.imaging import (
     get_center_of_mass,
     spacing_to_affine
 )
-from utils.tensor_utils import normalize, normal_pdf
+from mindful_core.utils.tensor_utils import normalize, normal_pdf
 
 
 # region Image loading

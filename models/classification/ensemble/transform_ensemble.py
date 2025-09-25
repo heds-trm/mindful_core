@@ -2,11 +2,11 @@ import torch
 from pathlib import Path
 from typing import Any
 
-from data.transforms.pipeline import TransformConfig, SerializableTransform
-from models.model_output import ClassifierOutput
-from models.classification.abstract_classifier import AbstractClassifier
-from models.classification.ensemble.ensemble_classifier import EnsembleClassifier
-from utils.misc import generate_binary_combinations
+from mindful_core.data.transforms.pipeline import TransformConfig, SerializableTransform
+from mindful_core.models.model_output import ClassifierOutput
+from mindful_core.models.classification.abstract_classifier import AbstractClassifier
+from mindful_core.models.classification.ensemble.ensemble_classifier import EnsembleClassifier
+from mindful_core.utils.misc import generate_binary_combinations
 
 
 class TransformEnsembleClassifier(EnsembleClassifier):

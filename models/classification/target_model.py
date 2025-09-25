@@ -2,11 +2,11 @@ import torch
 import torch.nn as nn
 from typing import Any, Iterator
 
-from data.subset_id import SubsetID
-from models.model_output import ClassifierOutput
-from models.classification import AbstractClassifier, DenseClassifier
-from models.representation.abstract_representation_model import AbstractRepresentationModel, RepresentationOutput
-from models.loss_aggregator import LossAggregator
+from mindful_core.data.subset_id import SubsetID
+from mindful_core.models.model_output import ClassifierOutput
+from mindful_core.models.classification import AbstractClassifier, DenseClassifier
+from mindful_core.models.representation.abstract_representation_model import AbstractRepresentationModel, RepresentationOutput
+from mindful_core.models.loss_aggregator import LossAggregator
 
 
 class TargetModel(AbstractClassifier):

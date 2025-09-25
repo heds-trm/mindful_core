@@ -3,7 +3,7 @@ from pytorch_lightning.loggers import TensorBoardLogger
 from abc import abstractmethod
 from typing import Union, Sequence, Optional, Callable
 
-from data.subset_id import SubsetID
+from mindful_core.data.subset_id import SubsetID
 
 RepresentationTensors = Union[torch.Tensor, list[torch.Tensor], tuple[torch.Tensor, ...]]
 

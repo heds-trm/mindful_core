@@ -6,9 +6,9 @@ from monai.transforms.utils import map_spatial_axes
 import numpy as np
 from typing import Any, Sequence
 
-from data import ModalityType, Sample, Modality
-from data.transforms.serializable_transform import SerializableTransform, TransformParameters
-from data.transforms.vector_data import RandDropout
+from mindful_core.data import ModalityType, Sample, Modality
+from mindful_core.data.transforms.serializable_transform import SerializableTransform, TransformParameters
+from mindful_core.data.transforms.vector_data import RandDropout
 
 
 class InferModalityMask(SerializableTransform):

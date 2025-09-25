@@ -3,7 +3,7 @@ from pathlib import Path
 from shutil import copy2
 import argparse
 
-from utils.dataset_preprocessing.anonymize import randomize_ids
+from mindful_core.utils.dataset_preprocessing.anonymize import randomize_ids
 
 
 def list_ids_in_folder(source: Path,

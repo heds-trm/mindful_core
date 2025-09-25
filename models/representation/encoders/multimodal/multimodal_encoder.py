@@ -3,7 +3,7 @@ import torch.nn as nn
 import pytorch_lightning as pl
 from typing import Optional, Union, Sequence
 
-from models.representation.encoders.multimodal.fusion_module import FusionModule
+from mindful_core.models.representation.encoders.multimodal.fusion_module import FusionModule
 
 
 class MultiModalEncoder(pl.LightningModule):

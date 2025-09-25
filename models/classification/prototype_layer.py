@@ -12,7 +12,7 @@ import torch
 import torch.nn as nn
 from typing import Literal, Callable
 
-from models.model_output import PrototypeOutput
+from mindful_core.models.model_output import PrototypeOutput
 
 
 class PrototypeLayer(nn.Module):

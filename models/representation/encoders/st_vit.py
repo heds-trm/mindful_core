@@ -5,7 +5,7 @@ from monai.utils import ensure_tuple_rep
 import numpy as np
 from typing import Sequence, Literal
 
-from models.representation.encoders.vit_encoder import ViTEncoder
+from mindful_core.models.representation.encoders.vit_encoder import ViTEncoder
 
 
 class STViT(ViTEncoder):

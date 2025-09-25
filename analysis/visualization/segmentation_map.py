@@ -4,10 +4,10 @@ import cv2
 from pathlib import Path
 from typing import Sequence
 
-from data import ModalitySet
-from analysis.visualization.visualizer import Visualizer
-from models.segmentation.segmentation_unet import SegmentationUNet, SegmentationOutput
-from utils.imaging import apply_palette
+from mindful_core.data import ModalitySet
+from mindful_core.analysis.visualization.visualizer import Visualizer
+from mindful_core.models.segmentation.segmentation_unet import SegmentationUNet, SegmentationOutput
+from mindful_core.utils.imaging import apply_palette
 
 
 class SegmentationMap(Visualizer):

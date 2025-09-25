@@ -1,2 +1,2 @@
-from data.sampling.torchsampler_imbalanced import ImbalancedDatasetSampler
-from data.sampling.difficulty_sampler import DifficultySampler
+from mindful_core.data.sampling.torchsampler_imbalanced import ImbalancedDatasetSampler
+from mindful_core.data.sampling.difficulty_sampler import DifficultySampler

@@ -1,4 +1,4 @@
-from models.representation.encoders.multimodal.fusion_module import (
+from mindful_core.models.representation.encoders.multimodal.fusion_module import (
     FusionModule,
 
     ConcatFusion,
@@ -15,8 +15,8 @@ from models.representation.encoders.multimodal.fusion_module import (
 
     HiNetFusion,
 )
-from models.representation.encoders.multimodal.multimodal_encoder import MultiModalEncoder
-from models.representation.encoders.multimodal.fusion_transformer import (
+from mindful_core.models.representation.encoders.multimodal.multimodal_encoder import MultiModalEncoder
+from mindful_core.models.representation.encoders.multimodal.fusion_transformer import (
     FusionTransformer,
     FusionTransformerEncoderLayer
 )

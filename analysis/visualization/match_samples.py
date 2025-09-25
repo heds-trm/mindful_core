@@ -4,11 +4,11 @@ import pandas as pd
 from pathlib import Path
 from enum import Enum
 
-from data import ModalitySet
-from models.model_output import ModelOutput, ClassifierOutput, PrototypeOutput, RepresentationOutput
-from analysis.visualization.visualizer import Visualizer
-from models.module import MindfulModule, ModelInput, unbatch_model_inputs
-from models.classification.prototype_layer import PrototypeLayer
+from mindful_core.data import ModalitySet
+from mindful_core.models.model_output import ModelOutput, ClassifierOutput, PrototypeOutput, RepresentationOutput
+from mindful_core.analysis.visualization.visualizer import Visualizer
+from mindful_core.models.module import MindfulModule, ModelInput, unbatch_model_inputs
+from mindful_core.models.classification.prototype_layer import PrototypeLayer
 
 
 class MatchMode(Enum):

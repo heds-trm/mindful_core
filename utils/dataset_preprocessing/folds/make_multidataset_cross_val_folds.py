@@ -2,12 +2,12 @@ import argparse
 import os
 from typing import Optional
 
-from utils.parsing import safe_int
-from data.data_folds.preset_fold import PresetFold
-from utils.dataset_preprocessing.folds.make_cross_validation_folds import (
+from mindful_core.utils.parsing import safe_int
+from mindful_core.data.data_folds.preset_fold import PresetFold
+from mindful_core.utils.dataset_preprocessing.folds.make_cross_validation_folds import (
     make_multi_part_cross_validation_folds,
     save_folds)
-from utils.dataset_preprocessing.folds.join_folds import load_and_join_additional_features
+from mindful_core.utils.dataset_preprocessing.folds.join_folds import load_and_join_additional_features
 
 
 def add_dataset_name_to_scan_id(fold: PresetFold, dataset_name: str) -> PresetFold:

@@ -5,10 +5,10 @@ import matplotlib.pyplot as plt
 from pathlib import Path
 import argparse
 
-from analysis.statistics.roc_compare import compute_roc_curve, compute_kfolds_roc_distribution
-from analysis.statistics.classification_summary import compute_auroc
-from scripts.outcomes.compare_experiments_delong import load_test_inferences_from_config
-from utils.misc import load_json
+from mindful_core.analysis.statistics.roc_compare import compute_roc_curve, compute_kfolds_roc_distribution
+from mindful_core.analysis.statistics.classification_summary import compute_auroc
+from mindful_core.scripts.outcomes.compare_experiments_delong import load_test_inferences_from_config
+from mindful_core.utils.misc import load_json
 
 
 def get_test_partitions(folds_folder: str) -> list[pd.Index]:

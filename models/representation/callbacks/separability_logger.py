@@ -4,8 +4,8 @@ import torch
 import umap
 from typing import Optional, Sequence, Union
 
-from data import SubsetID
-from models.representation.callbacks.representation_model_callback import RepresentationModelCallback
+from mindful_core.data import SubsetID
+from mindful_core.models.representation.callbacks.representation_model_callback import RepresentationModelCallback
 
 
 class SeparabilityLogger(RepresentationModelCallback):

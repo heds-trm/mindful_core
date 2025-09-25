@@ -6,10 +6,10 @@ import matplotlib.pyplot as plt
 from pathlib import Path
 from typing import Callable
 
-from data.subset_id import SubsetID
-from data.data_folds import DataFold
-from analysis.statistics.classification_summary import ConfidenceThreshold, EERThreshold, logits_to_probabilities
-from utils.tensor_utils import linear_sample, get_kde, to_numpy
+from mindful_core.data.subset_id import SubsetID
+from mindful_core.data.data_folds import DataFold
+from mindful_core.analysis.statistics.classification_summary import ConfidenceThreshold, EERThreshold, logits_to_probabilities
+from mindful_core.utils.tensor_utils import linear_sample, get_kde, to_numpy
 
 Classifier = Callable[[list[torch.Tensor] | torch.Tensor], tuple[torch.Tensor, torch.Tensor]]
 

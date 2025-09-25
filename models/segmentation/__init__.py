@@ -1,3 +1,3 @@
 # noinspection PyUnresolvedReferences
-from models.segmentation.abstract_segmentation_model import AbstractSegmentationModel, SegmentationOutput
-from models.segmentation.segmentation_unet import SegmentationUNet
+from mindful_core.models.segmentation.abstract_segmentation_model import AbstractSegmentationModel, SegmentationOutput
+from mindful_core.models.segmentation.segmentation_unet import SegmentationUNet

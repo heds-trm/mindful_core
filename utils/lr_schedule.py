@@ -6,7 +6,7 @@ import math
 import warnings
 from typing import Any
 
-from utils.tensor_utils import lerp
+from mindful_core.utils.tensor_utils import lerp
 
 """
 Implementation taken from pytorch-lightning-bolts, extracted because pl_bolts is not up-to-date with pytorch-lightning.

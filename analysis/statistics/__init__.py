@@ -1,3 +1,3 @@
-from analysis.statistics.classification_summary import ClassificationSummary, ClassificationMetric
-from analysis.statistics.classification_summary import logits_to_probabilities
-from analysis.statistics.confidence_summary import ConfidenceSummary
+from mindful_core.analysis.statistics.classification_summary import ClassificationSummary, ClassificationMetric
+from mindful_core.analysis.statistics.classification_summary import logits_to_probabilities
+from mindful_core.analysis.statistics.confidence_summary import ConfidenceSummary

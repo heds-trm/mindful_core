@@ -2,7 +2,7 @@ from pytorch_lightning.utilities.model_summary import summarize
 from pytorch_lightning.callbacks import ModelSummary
 import argparse
 
-from models.index import get_model, ModuleConfig
+from mindful_core.models.index import get_model, ModuleConfig
 
 
 def main():

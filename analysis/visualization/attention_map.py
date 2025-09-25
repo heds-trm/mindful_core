@@ -4,13 +4,13 @@ import numpy as np
 import cv2
 from pathlib import Path
 
-from data import ModalitySet, Modality, ModalityType
-from analysis.visualization.visualizer import Visualizer
-from analysis.visualization.attention_recorder import AttentionRecorder, AttentionModule
-from models.module import MindfulModule
-from models.model_output import ClassifierOutput
-from models.attention_interface import AttentionInterface
-from models.representation.encoders import ViTEncoder, ViT
+from mindful_core.data import ModalitySet, Modality, ModalityType
+from mindful_core.analysis.visualization.visualizer import Visualizer
+from mindful_core.analysis.visualization.attention_recorder import AttentionRecorder, AttentionModule
+from mindful_core.models.module import MindfulModule
+from mindful_core.models.model_output import ClassifierOutput
+from mindful_core.models.attention_interface import AttentionInterface
+from mindful_core.models.representation.encoders import ViTEncoder, ViT
 
 
 class AttentionMap(Visualizer):

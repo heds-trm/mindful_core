@@ -8,11 +8,11 @@ from pathlib import Path
 import warnings
 from typing import Any
 
-from models.classification import AbstractClassifier
-from models.index import get_model, ModuleConfig
-from data.transforms.pipeline import Pipeline
-from data.modalities import ModalityType, Modality
-from utils.misc import load_json
+from mindful_core.models.classification import AbstractClassifier
+from mindful_core.models.index import get_model, ModuleConfig
+from mindful_core.data.transforms.pipeline import Pipeline
+from mindful_core.data.modalities import ModalityType, Modality
+from mindful_core.utils.misc import load_json
 
 INPUT_SAMPLE_DATA = tuple[MetaTensor, ...] | MetaTensor
 INPUT_BATCH_DATA = list[INPUT_SAMPLE_DATA]

@@ -16,12 +16,12 @@ from abc import abstractmethod, ABCMeta
 import inspect
 from typing import Any, Iterator, Callable, Type
 
-from data.subset_id import SubsetID
-from models.loss_aggregator import LossAggregator
-from utils.lr_schedule import make_lr_schedule
-from utils.adams import AdamS
-from utils.struct import AliasDict
-from utils.misc import get_abstract_methods
+from mindful_core.data.subset_id import SubsetID
+from mindful_core.models.loss_aggregator import LossAggregator
+from mindful_core.utils.lr_schedule import make_lr_schedule
+from mindful_core.utils.adams import AdamS
+from mindful_core.utils.struct import AliasDict
+from mindful_core.utils.misc import get_abstract_methods
 
 ModelInput = torch.Tensor | list[torch.Tensor]
 

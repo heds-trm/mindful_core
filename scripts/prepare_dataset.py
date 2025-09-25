@@ -3,7 +3,7 @@ from pathlib import Path
 import shutil
 from typing import Optional
 
-from data.datasets.protoset import ProtoSet
+from mindful_core.data.datasets.protoset import ProtoSet
 
 
 def prepare_dataset(input_folds_folder: str,

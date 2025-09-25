@@ -1,9 +1,9 @@
-from analysis.visualization.visualizer import Visualizer
-from analysis.visualization.cam import CAMs
-from analysis.visualization.attention_map import AttentionMap, AttentionRecorder
-from analysis.visualization.saliency_map import SaliencyMap
-from analysis.visualization.occlusion_map import OcclusionMap
-from analysis.visualization.segmentation_map import SegmentationMap
-from analysis.visualization.match_samples import MatchSamples
+from mindful_core.analysis.visualization.visualizer import Visualizer
+from mindful_core.analysis.visualization.cam import CAMs
+from mindful_core.analysis.visualization.attention_map import AttentionMap, AttentionRecorder
+from mindful_core.analysis.visualization.saliency_map import SaliencyMap
+from mindful_core.analysis.visualization.occlusion_map import OcclusionMap
+from mindful_core.analysis.visualization.segmentation_map import SegmentationMap
+from mindful_core.analysis.visualization.match_samples import MatchSamples
 
-from analysis.visualization.visualizer_group import VisualizerGroup
+from mindful_core.analysis.visualization.visualizer_group import VisualizerGroup

@@ -3,10 +3,10 @@ import torch.nn as nn
 from pytorch_lightning.utilities.types import STEP_OUTPUT
 from typing import Any, Literal, Sequence
 
-from data.subset_id import SubsetID
-from models.module import MindfulModule
-from models.model_output import BoundingBoxOutput
-from models.loss_aggregator import LossAggregator
+from mindful_core.data.subset_id import SubsetID
+from mindful_core.models.module import MindfulModule
+from mindful_core.models.model_output import BoundingBoxOutput
+from mindful_core.models.loss_aggregator import LossAggregator
 
 
 # region ResNet blocks

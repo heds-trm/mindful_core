@@ -4,10 +4,10 @@ import cv2
 from pathlib import Path
 from typing import Callable
 
-from data import ModalitySet, ModalityType
-from analysis.visualization.visualizer import Visualizer
-from models.classification.monai_classifier import MonaiClassifier
-from utils.tensor_utils import normalize
+from mindful_core.data import ModalitySet, ModalityType
+from mindful_core.analysis.visualization.visualizer import Visualizer
+from mindful_core.models.classification.monai_classifier import MonaiClassifier
+from mindful_core.utils.tensor_utils import normalize
 
 
 class CAMs(Visualizer):

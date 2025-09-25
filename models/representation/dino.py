@@ -4,9 +4,9 @@ from pytorch_lightning.utilities.types import STEP_OUTPUT
 from copy import deepcopy
 from typing import Any, Iterator
 
-from models.representation import EncoderRepresentationModel, RepresentationOutput
-from data.subset_id import SubsetID
-from utils.tensor_utils import lerp
+from mindful_core.models.representation import EncoderRepresentationModel, RepresentationOutput
+from mindful_core.data.subset_id import SubsetID
+from mindful_core.utils.tensor_utils import lerp
 
 
 class DINO(EncoderRepresentationModel):

@@ -17,6 +17,30 @@ def parse_list(input_str: Sequence[int | str] | str
     return output_list
 
 
+def parse_last_number(text: str) -> int | None:
+    if not isinstance(text, str):
+        raise TypeError("Expected `test` to be string, got a {}".format(type(text)))
+
+    decimal_start = None
+    found_decimal = False
+    for i, character in reversed(list(enumerate(text))):
+        if not character.isdecimal():
+            decimal_start = i + 1
+            break
+        else:
+            found_decimal = True
+
+    if not found_decimal:
+        return None
+
+    if decimal_start is not None:
+        text = text[decimal_start:]
+
+    return int(text)
+
+
+# region Checkpoint path parsing
+
 def parse_checkpoint_path(checkpoint: str | Path | None,
                           monitor: str | None = None,
                           use_last: bool = False,
@@ -146,6 +170,8 @@ def get_best_checkpoint(folder: str | Path, monitors: list[str]) -> tuple[str | 
 
     return selected_filename, selected_value
 
+
+# endregion
 
 def parse_batch_size(batch_size: int | str | None,
                      default_batch_size: int | str | None

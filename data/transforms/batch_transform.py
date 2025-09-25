@@ -3,7 +3,7 @@ from pytorch_lightning.utilities.types import STEP_OUTPUT
 from abc import abstractmethod
 from typing import Any
 
-from data.transforms.serializable_transform import SerializableTransform
+from mindful_core.data.transforms.serializable_transform import SerializableTransform
 
 
 class BatchTransform(SerializableTransform):

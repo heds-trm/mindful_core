@@ -7,7 +7,7 @@ import argparse
 import copy
 from typing import Optional
 
-from utils.misc import load_json
+from mindful_core.utils.misc import load_json
 
 
 def gather_spatial_visualizations(trial_path: Path, sample_ids: list[str]) -> None:

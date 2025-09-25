@@ -1,4 +1,4 @@
-from models.model_output import RepresentationOutput
-from models.representation.abstract_representation_model import AbstractRepresentationModel
-from models.representation.encoders import EncoderRepresentationModel
-from models.representation.dino import DINO, DINOLoss
+from mindful_core.models.model_output import RepresentationOutput
+from mindful_core.models.representation.abstract_representation_model import AbstractRepresentationModel
+from mindful_core.models.representation.encoders import EncoderRepresentationModel
+from mindful_core.models.representation.dino import DINO, DINOLoss

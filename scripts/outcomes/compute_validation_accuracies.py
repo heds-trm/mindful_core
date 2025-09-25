@@ -3,8 +3,8 @@ from pathlib import Path
 from tqdm import tqdm
 import argparse
 
-from utils.misc import load_json, write_json
-from models.classification.ensemble.ensemble_classifier import EnsembleClassifier
+from mindful_core.utils.misc import load_json, write_json
+from mindful_core.models.classification.ensemble.ensemble_classifier import EnsembleClassifier
 
 
 def get_validation_accuracy(model_path: Path, threshold_name: str) -> float:

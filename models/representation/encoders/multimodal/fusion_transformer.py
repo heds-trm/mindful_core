@@ -3,9 +3,9 @@ import torch.nn as nn
 import einops
 from typing import Literal
 
-from utils.transformers import TransformerPooling, AddClsToken, AddPositionalEmbeddings, POOLING_OPTIONS
-from models.representation.encoders.multimodal.fusion_module import FusionModule
-from models.attention_interface import AttentionInterface
+from mindful_core.utils.transformers import TransformerPooling, AddClsToken, AddPositionalEmbeddings, POOLING_OPTIONS
+from mindful_core.models.representation.encoders.multimodal.fusion_module import FusionModule
+from mindful_core.models.attention_interface import AttentionInterface
 
 
 class FusionTransformer(FusionModule, AttentionInterface):

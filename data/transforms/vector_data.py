@@ -9,8 +9,8 @@ from monai.config.type_definitions import NdarrayOrTensor
 from copy import deepcopy
 from typing import Any
 
-from data import Sample
-from data.transforms import SerializableTransform, TransformParameters
+from mindful_core.data import Sample
+from mindful_core.data.transforms import SerializableTransform, TransformParameters
 
 
 # region Scalar data

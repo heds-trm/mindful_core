@@ -10,7 +10,7 @@ from monai.utils import ensure_tuple_rep, look_up_option
 import numpy as np
 from typing import Sequence, Literal
 
-from utils.transformers import TransformerPooling, AddClsToken
+from mindful_core.utils.transformers import TransformerPooling, AddClsToken
 
 
 class ViTEncoder(ViT):

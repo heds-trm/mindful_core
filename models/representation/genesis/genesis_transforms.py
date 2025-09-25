@@ -1,7 +1,7 @@
 import torch
 import torch.nn as nn
 
-from data.transforms.imaging import (
+from mindful_core.data.transforms.imaging import (
     get_random_block_coordinates, replace_block,
     random_apply, slice_select,
     RandomNDLocalShuffle

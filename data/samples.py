@@ -2,8 +2,8 @@ import numpy as np
 from pathlib import Path
 from typing import Any
 
-from data.modalities import ModalityType, Modality, ModalitySet
-from utils.data_constants import SCAN_ID, LABEL, DEFAULT_IMAGE_COLUMN
+from mindful_core.data.modalities import ModalityType, Modality, ModalitySet
+from mindful_core.utils.data_constants import SCAN_ID, LABEL, DEFAULT_IMAGE_COLUMN
 
 
 class Sample(object):

@@ -2,8 +2,8 @@ import argparse
 from pathlib import Path
 from typing import Union, Optional, Any
 
-from utils.misc import load_json, write_json
-from data.transforms.pipeline import PipelineConfig as PipelineConfigV2, StageConfig, TransformConfig
+from mindful_core.utils.misc import load_json, write_json
+from mindful_core.data.transforms.pipeline import PipelineConfig as PipelineConfigV2, StageConfig, TransformConfig
 
 """ V1
 {

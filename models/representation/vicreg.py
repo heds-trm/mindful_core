@@ -3,9 +3,9 @@ import torch
 import torch.nn as nn
 from typing import Any
 
-from data.subset_id import SubsetID
-from models.representation import EncoderRepresentationModel, RepresentationOutput
-from models.loss_aggregator import LossAggregator
+from mindful_core.data.subset_id import SubsetID
+from mindful_core.models.representation import EncoderRepresentationModel, RepresentationOutput
+from mindful_core.models.loss_aggregator import LossAggregator
 
 
 class VICReg(EncoderRepresentationModel):

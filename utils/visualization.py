@@ -5,9 +5,9 @@ from matplotlib.backends.backend_agg import FigureCanvasAgg
 import cv2
 from typing import Sequence
 
-from utils.tensor_utils import to_numpy
-from utils.tensor_utils import normalize as _normalize
-from utils.imaging import upscale_resolution
+from mindful_core.utils.tensor_utils import to_numpy
+from mindful_core.utils.tensor_utils import normalize as _normalize
+from mindful_core.utils.imaging import upscale_resolution
 
 
 # region Curves

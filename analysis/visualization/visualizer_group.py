@@ -3,12 +3,12 @@ from pathlib import Path
 from tqdm import tqdm
 from typing import Any, Sequence, Iterator, Generator
 
-from data import ModalitySet, Modality, Sample
-from models.module import MindfulModule, ModelInput
-from models.classification.abstract_classifier import AbstractClassifier, PrototypeLayer
-from models.classification.monai_classifier import MonaiClassifier
-from models.segmentation.segmentation_unet import SegmentationUNet
-from analysis.visualization import (
+from mindful_core.data import ModalitySet, Modality, Sample
+from mindful_core.models.module import MindfulModule, ModelInput
+from mindful_core.models.classification.abstract_classifier import AbstractClassifier, PrototypeLayer
+from mindful_core.models.classification.monai_classifier import MonaiClassifier
+from mindful_core.models.segmentation.segmentation_unet import SegmentationUNet
+from mindful_core.analysis.visualization import (
     Visualizer, 
     SaliencyMap, 
     CAMs, 
@@ -17,7 +17,7 @@ from analysis.visualization import (
     AttentionRecorder, 
     SegmentationMap,
     MatchSamples)
-from utils.misc import load_json
+from mindful_core.utils.misc import load_json
 
 DataLoaderOutput = tuple[list[Sample], ModelInput]
 

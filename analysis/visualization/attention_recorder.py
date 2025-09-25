@@ -5,9 +5,9 @@ from monai.networks.nets import ViT
 from monai.networks.blocks import SABlock
 from typing import Callable, Any
 
-from models.attention_interface import AttentionInterface
+from mindful_core.models.attention_interface import AttentionInterface
 
-# from models.representation.encoders.multimodal import FusionTransformer, FusionTransformerEncoderLayer
+# from mindful_core.models.representation.encoders.multimodal import FusionTransformer, FusionTransformerEncoderLayer
 
 AttentionModule = ViT | AttentionInterface
 ModuleRecordings = torch.Tensor | dict[str, torch.Tensor]

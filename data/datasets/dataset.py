@@ -5,9 +5,9 @@ from pathlib import Path
 from typing import Iterator, Sized
 import os
 
-from data import Subset, SubsetID, Sample
-from data.data_folds import DataFold, PresetFold
-from data.transforms.pipeline import Pipeline
+from mindful_core.data import Subset, SubsetID, Sample
+from mindful_core.data.data_folds import DataFold, PresetFold
+from mindful_core.data.transforms.pipeline import Pipeline
 
 
 class MindfulSampler(Sampler):
@@ -93,10 +93,10 @@ class MindfulDataset(object):
             if use_imbalanced_sampler:
                 if shuffle:
                     if use_imbalanced_sampler == "v2":
-                        from data.sampling.difficulty_sampler import DifficultySampler
+                        from mindful_core.data.sampling.difficulty_sampler import DifficultySampler
                         sampler = DifficultySampler(subset, trainer, model, batch_size)
                     else:
-                        from data.sampling.torchsampler_imbalanced import ImbalancedDatasetSampler
+                        from mindful_core.data.sampling.torchsampler_imbalanced import ImbalancedDatasetSampler
                         sampler = ImbalancedDatasetSampler(subset)
                 else:
                     sampler = SequentialSampler(subset)

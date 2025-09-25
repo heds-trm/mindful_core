@@ -24,8 +24,8 @@ import copy
 from abc import ABC, abstractmethod
 from typing import Any, Union, Optional
 
-from data import Sample
-from utils.misc import find_all_subclasses
+from mindful_core.data import Sample
+from mindful_core.utils.misc import find_all_subclasses
 
 TransformParameters = dict[str, Any]
 

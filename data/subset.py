@@ -3,8 +3,8 @@ import torch
 from torch.utils import data
 from pathlib import Path
 
-from data import Sample
-from data.transforms.pipeline import Pipeline
+from mindful_core.data import Sample
+from mindful_core.data.transforms.pipeline import Pipeline
 
 
 class Subset(data.Dataset):

@@ -1,6 +1,6 @@
 from monai.data import MetaTensor
 
-from data.transforms import SerializableTransform
+from mindful_core.data.transforms import SerializableTransform
 
 
 class Rename(SerializableTransform):

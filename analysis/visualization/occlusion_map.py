@@ -9,10 +9,10 @@ from pathlib import Path
 from tqdm import tqdm
 from typing import Union, Sequence, Iterator
 
-from data import ModalitySet, ModalityType, Modality
-from analysis.visualization.visualizer import Visualizer
-from models.model_output import ModelOutput, ClassifierOutput
-from models.module import MindfulModule, ModelInput
+from mindful_core.data import ModalitySet, ModalityType, Modality
+from mindful_core.analysis.visualization.visualizer import Visualizer
+from mindful_core.models.model_output import ModelOutput, ClassifierOutput
+from mindful_core.models.module import MindfulModule, ModelInput
 
 
 class OcclusionMap(Visualizer):

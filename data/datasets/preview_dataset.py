@@ -6,11 +6,11 @@ from pathlib import Path
 import argparse
 from tqdm import tqdm
 
-from data import Modality, ModalityType, Sample
-from data.transforms.pipeline import Pipeline
-from utils.misc import load_json
-from utils.imaging import write_slices
-from utils.tensor_utils import normalize
+from mindful_core.data import Modality, ModalityType, Sample
+from mindful_core.data.transforms.pipeline import Pipeline
+from mindful_core.utils.misc import load_json
+from mindful_core.utils.imaging import write_slices
+from mindful_core.utils.tensor_utils import normalize
 
 
 def get_pipeline(path: str) -> Pipeline:

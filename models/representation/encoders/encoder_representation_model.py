@@ -2,9 +2,9 @@ import torch
 from pytorch_lightning.utilities.types import STEP_OUTPUT
 from typing import Any
 
-from models.representation.abstract_representation_model import AbstractRepresentationModel, RepresentationOutput
-from models.representation.encoders.factory import make_encoder
-from data.subset_id import SubsetID
+from mindful_core.models.representation.abstract_representation_model import AbstractRepresentationModel, RepresentationOutput
+from mindful_core.models.representation.encoders.factory import make_encoder
+from mindful_core.data.subset_id import SubsetID
 
 
 class EncoderRepresentationModel(AbstractRepresentationModel):

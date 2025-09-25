@@ -3,7 +3,7 @@ import torch.nn as nn
 from abc import abstractmethod
 from typing import Iterator
 
-from utils.tensor_utils import lerp
+from mindful_core.utils.tensor_utils import lerp
 
 
 class ModelOutput(object):

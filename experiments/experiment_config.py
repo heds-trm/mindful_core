@@ -2,12 +2,12 @@ from pathlib import Path
 from enum import Enum
 from typing import Any, TypedDict
 
-from utils.parsing import parse_list, parse_checkpoint_path, parse_batch_size
-from utils.misc import load_json, write_json
-from data.subset_id import SubsetID
-from data.data_folds import DataFold, PresetFold
-from models.index import ModuleConfig, MindfulModule
-from experiments.experiment_stage import ExperimentStages
+from mindful_core.utils.parsing import parse_list, parse_checkpoint_path, parse_batch_size
+from mindful_core.utils.misc import load_json, write_json
+from mindful_core.data.subset_id import SubsetID
+from mindful_core.data.data_folds import DataFold, PresetFold
+from mindful_core.models.index import ModuleConfig, MindfulModule
+from mindful_core.experiments.experiment_stage import ExperimentStages
 
 
 class GradientClipConfig(TypedDict):

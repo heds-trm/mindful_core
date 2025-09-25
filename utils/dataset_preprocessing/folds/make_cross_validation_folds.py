@@ -2,8 +2,8 @@ import argparse
 from pathlib import Path
 from typing import Optional, Sequence
 
-from data.data_folds import DataFold, PresetFold
-from utils.parsing import safe_int
+from mindful_core.data.data_folds import DataFold, PresetFold
+from mindful_core.utils.parsing import safe_int
 
 
 def join_sub_folds(sub_folds: list[list[DataFold]]) -> list[DataFold]:

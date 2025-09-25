@@ -3,7 +3,7 @@ import pandas as pd
 from pathlib import Path
 import argparse
 
-from analysis.statistics.classification_summary import (
+from mindful_core.analysis.statistics.classification_summary import (
     ClassificationSummary,
 
     AUROC,
@@ -19,8 +19,8 @@ from analysis.statistics.classification_summary import (
     SensitivityAtSensitivity,
     SpecificityAtSensitivity,
 )
-from scripts.outcomes.gather_test_results import summarize_experiments
-from utils.misc import save_csv
+from mindful_core.scripts.outcomes.gather_test_results import summarize_experiments
+from mindful_core.utils.misc import save_csv
 
 
 def make_classification_summary(sensitivity_thresholds: list[float]

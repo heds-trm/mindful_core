@@ -6,8 +6,8 @@ from monai.networks.nets.efficientnet import EfficientNetBN
 from monai.networks.nets.senet import SEResNet50
 from typing import Any
 
-from models.model_output import ClassifierOutput
-from models.classification.abstract_classifier import AbstractClassifier
+from mindful_core.models.model_output import ClassifierOutput
+from mindful_core.models.classification.abstract_classifier import AbstractClassifier
 
 SUPPORTED_BACKBONES = ["resnet", "resnet50", "resnet101", "resnet152", "resnet200",
                        "vit",

@@ -4,11 +4,11 @@ import numpy as np
 from pathlib import Path
 from typing import Union
 
-from data import ModalitySet, Modality, ModalityType
-from analysis.visualization.visualizer import Visualizer
-from models.module import MindfulModule, ModelInput
-from models.model_output import ClassifierOutput
-from utils.tensor_utils import get_gradients, set_require_grads
+from mindful_core.data import ModalitySet, Modality, ModalityType
+from mindful_core.analysis.visualization.visualizer import Visualizer
+from mindful_core.models.module import MindfulModule, ModelInput
+from mindful_core.models.model_output import ClassifierOutput
+from mindful_core.utils.tensor_utils import get_gradients, set_require_grads
 
 
 class SaliencyMap(Visualizer):

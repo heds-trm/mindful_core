@@ -4,8 +4,8 @@ from functools import reduce
 from abc import abstractmethod
 from typing import Literal
 
-from models.representation.encoders.misc.modalities_attention_add import ModalitiesAttentionAdd
-from utils.transformers import TransformerPooling
+from mindful_core.models.representation.encoders.misc.modalities_attention_add import ModalitiesAttentionAdd
+from mindful_core.utils.transformers import TransformerPooling
 
 
 class FusionModule(nn.Module):

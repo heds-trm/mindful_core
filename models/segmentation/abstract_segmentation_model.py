@@ -7,11 +7,11 @@ from monai.data.utils import dense_patch_slices
 from abc import abstractmethod
 from typing import Type, Any, Sequence
 
-from utils.tensor_utils import normalize
-from utils.imaging import grayscale_to_rgb, index_to_tricolor, apply_palette
-from data.subset_id import SubsetID
-from models.model_output import SegmentationOutput
-from models.module import MindfulModule
+from mindful_core.utils.tensor_utils import normalize
+from mindful_core.utils.imaging import grayscale_to_rgb, index_to_tricolor, apply_palette
+from mindful_core.data.subset_id import SubsetID
+from mindful_core.models.model_output import SegmentationOutput
+from mindful_core.models.module import MindfulModule
 
 
 class AbstractSegmentationModel(MindfulModule):

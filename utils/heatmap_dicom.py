@@ -11,7 +11,7 @@ import json
 from pathlib import Path
 from typing import Iterable, Sequence
 
-from utils.misc import load_json
+from mindful_core.utils.misc import load_json
 
 
 class HeatmapDataset(pydicom.Dataset):

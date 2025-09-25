@@ -7,9 +7,9 @@ import copy
 import json
 from typing import Any
 
-from utils.misc import load_json
-from experiments.experiment_config import ExperimentRoundConfig, GradientClipConfig
-from experiments.experiment_round import ExperimentRound
+from mindful_core.utils.misc import load_json
+from mindful_core.experiments.experiment_config import ExperimentRoundConfig, GradientClipConfig
+from mindful_core.experiments.experiment_round import ExperimentRound
 
 
 class Experiment(object):

@@ -8,13 +8,13 @@ from pathlib import Path
 from abc import abstractmethod, ABC
 from typing import Literal, Sequence
 
-from data import ModalitySet, ModalityType, Modality
-from models.module import MindfulModule, ModelInput
-from models.model_output import ClassifierOutput
-from models.classification.abstract_classifier import AbstractClassifier
-from analysis.visualization.radar_chart import radar_from_data_frame
-from utils.imaging import get_3d_image_max_intensity_slice_index, get_center_of_mass
-from utils.visualization import format_image
+from mindful_core.data import ModalitySet, ModalityType, Modality
+from mindful_core.models.module import MindfulModule, ModelInput
+from mindful_core.models.model_output import ClassifierOutput
+from mindful_core.models.classification.abstract_classifier import AbstractClassifier
+from mindful_core.analysis.visualization.radar_chart import radar_from_data_frame
+from mindful_core.utils.imaging import get_3d_image_max_intensity_slice_index, get_center_of_mass
+from mindful_core.utils.visualization import format_image
 
 
 class Visualizer(ABC):

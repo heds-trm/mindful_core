@@ -1,11 +1,11 @@
 from pathlib import Path
 from typing import Any, TypedDict, NotRequired, Type, TypeVar
 
-from utils.misc import load_json
-from utils.parsing import parse_checkpoint_path
-from models.module import MindfulModule
-from models.classification.abstract_classifier import AbstractClassifier
-from models.representation.abstract_representation_model import AbstractRepresentationModel
+from mindful_core.utils.misc import load_json
+from mindful_core.utils.parsing import parse_checkpoint_path
+from mindful_core.models.module import MindfulModule
+from mindful_core.models.classification.abstract_classifier import AbstractClassifier
+from mindful_core.models.representation.abstract_representation_model import AbstractRepresentationModel
 
 _MM = TypeVar("_MM", bound=MindfulModule)
 

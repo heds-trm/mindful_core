@@ -7,12 +7,12 @@ from monai.networks.nets.densenet import DenseNet121
 import copy
 from typing import Any, Callable, Sequence, Literal
 
-from models.representation.encoders.vit_encoder import ViTEncoder, SwinEncoder
-from models.representation.encoders.st_vit import STViT
-from models.representation.encoders.vgg import VGGEncoder
-from models.representation.encoders.multimodal.multimodal_encoder import MultiModalEncoder
-from models.representation.encoders.misc import ScalarEncoder, CategoricalEncoder
-from models.representation.encoders.multimodal import (
+from mindful_core.models.representation.encoders.vit_encoder import ViTEncoder, SwinEncoder
+from mindful_core.models.representation.encoders.st_vit import STViT
+from mindful_core.models.representation.encoders.vgg import VGGEncoder
+from mindful_core.models.representation.encoders.multimodal.multimodal_encoder import MultiModalEncoder
+from mindful_core.models.representation.encoders.misc import ScalarEncoder, CategoricalEncoder
+from mindful_core.models.representation.encoders.multimodal import (
     FusionModule,
 
     ConcatFusion,
@@ -30,7 +30,7 @@ from models.representation.encoders.multimodal import (
 
     HiNetFusion,
 )
-from models.classification.monai_classifier import MonaiClassifier
+from mindful_core.models.classification.monai_classifier import MonaiClassifier
 
 
 # noinspection PyTypeChecker

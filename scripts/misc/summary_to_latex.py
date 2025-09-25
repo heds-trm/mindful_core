@@ -3,7 +3,7 @@ import pandas as pd
 import argparse
 from pathlib import Path
 
-from utils.misc import is_defined
+from mindful_core.utils.misc import is_defined
 
 
 def process_metric_value(value):

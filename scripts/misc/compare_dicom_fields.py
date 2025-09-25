@@ -1,7 +1,7 @@
 from pathlib import Path
 import argparse
 
-from utils.dicom import compare_dicom_fields
+from mindful_core.utils.dicom import compare_dicom_fields
 
 
 def main():

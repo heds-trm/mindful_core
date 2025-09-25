@@ -11,12 +11,12 @@ import cv2
 from abc import abstractmethod
 from typing import Union, Sequence, Callable, Any
 
-from models.model_output import RepresentationOutput
-from models.module import MindfulModule
-from data.subset_id import SubsetID
-from models.representation.callbacks import RepresentationModelCallback, Projector, SeparabilityLogger
-from models.loss_aggregator import LossAggregator
-from utils.tensor_utils import to_numpy
+from mindful_core.models.model_output import RepresentationOutput
+from mindful_core.models.module import MindfulModule
+from mindful_core.data.subset_id import SubsetID
+from mindful_core.models.representation.callbacks import RepresentationModelCallback, Projector, SeparabilityLogger
+from mindful_core.models.loss_aggregator import LossAggregator
+from mindful_core.utils.tensor_utils import to_numpy
 
 
 def map_mean(function: Callable, sequence: Sequence) -> torch.Tensor | float:

@@ -8,7 +8,7 @@ import cv2
 from pathlib import Path
 from typing import Sequence, Literal
 
-from utils.tensor_utils import lerp
+from mindful_core.utils.tensor_utils import lerp
 
 
 # region Blurring (Gaussian / Flat)

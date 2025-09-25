@@ -7,7 +7,7 @@ from tqdm import tqdm
 from typing import Sequence
 import warnings
 
-from analysis.statistics.roc_compare import delong_roc_variance
+from mindful_core.analysis.statistics.roc_compare import delong_roc_variance
 
 
 class BootstrappedMetric(object):

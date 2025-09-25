@@ -1,8 +1,8 @@
 import torch
 from typing import Sequence, Union
 
-from data.subset_id import SubsetID
-from models.representation.callbacks import RepresentationModelCallback
+from mindful_core.data.subset_id import SubsetID
+from mindful_core.models.representation.callbacks import RepresentationModelCallback
 
 
 class Projector(RepresentationModelCallback):

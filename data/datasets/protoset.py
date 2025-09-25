@@ -5,11 +5,11 @@ from pathlib import Path
 import shutil
 from typing import Any
 
-from data import Modality, ModalityType
-from data.samples import Sample
-from data.data_folds import PresetFold
-from data.transforms.pipeline import Pipeline
-from data.datasets.preview_dataset import get_pipeline, run_image_pipeline, preview_dataset
+from mindful_core.data import Modality, ModalityType
+from mindful_core.data.samples import Sample
+from mindful_core.data.data_folds import PresetFold
+from mindful_core.data.transforms.pipeline import Pipeline
+from mindful_core.data.datasets.preview_dataset import get_pipeline, run_image_pipeline, preview_dataset
 
 
 # Note : "prepared" here means the dataset has gone through a (pre-)preprocessing pipeline.

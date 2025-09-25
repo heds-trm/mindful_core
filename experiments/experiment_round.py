@@ -13,19 +13,19 @@ import copy
 import warnings
 from typing import Optional, Iterator
 
-from experiments import ExperimentRoundConfig
-from models import MindfulModule
-from models.index import get_model, is_representation_model, is_classification_model
-from models.model_output import ClassifierOutput
-from models.classification import AbstractClassifier
-from models.segmentation.segmentation_unet import SegmentationUNet, SegmentationOutput
-from analysis.visualization import VisualizerGroup
-from analysis.statistics import ConfidenceSummary, logits_to_probabilities, ClassificationSummary
-from data import SubsetID, MindfulDataset, Sample, ModalityType
-from data.data_folds import DataFold, PresetFold
-from data.transforms.pipeline import Pipeline
-from utils.callbacks import MilestoneCheckpoint
-from utils.parsing import get_monitor_mode
+from mindful_core.experiments import ExperimentRoundConfig
+from mindful_core.models import MindfulModule
+from mindful_core.models.index import get_model, is_representation_model, is_classification_model
+from mindful_core.models.model_output import ClassifierOutput
+from mindful_core.models.classification import AbstractClassifier
+from mindful_core.models.segmentation.segmentation_unet import SegmentationUNet, SegmentationOutput
+from mindful_core.analysis.visualization import VisualizerGroup
+from mindful_core.analysis.statistics import ConfidenceSummary, logits_to_probabilities, ClassificationSummary
+from mindful_core.data import SubsetID, MindfulDataset, Sample, ModalityType
+from mindful_core.data.data_folds import DataFold, PresetFold
+from mindful_core.data.transforms.pipeline import Pipeline
+from mindful_core.utils.callbacks import MilestoneCheckpoint
+from mindful_core.utils.parsing import get_monitor_mode
 
 
 class ExperimentRound(object):

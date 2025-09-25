@@ -1,7 +1,6 @@
-# noinspection PyUnresolvedReferences
-from models.representation.encoders.vit_encoder import ViT, ViTEncoder, SwinEncoder
-from models.representation.encoders.multimodal.fusion_module import FusionModule
-from models.representation.encoders.multimodal.fusion_transformer import FusionTransformer
-from models.representation.encoders.multimodal.multimodal_encoder import MultiModalEncoder
-from models.representation.encoders.encoder_representation_model import EncoderRepresentationModel
-from models.representation.encoders.factory import make_vit_encoder, make_resnet_encoder
+from mindful_core.models.representation.encoders.vit_encoder import ViT, ViTEncoder, SwinEncoder
+from mindful_core.models.representation.encoders.multimodal.fusion_module import FusionModule
+from mindful_core.models.representation.encoders.multimodal.fusion_transformer import FusionTransformer
+from mindful_core.models.representation.encoders.multimodal.multimodal_encoder import MultiModalEncoder
+from mindful_core.models.representation.encoders.encoder_representation_model import EncoderRepresentationModel
+from mindful_core.models.representation.encoders.factory import make_vit_encoder, make_resnet_encoder

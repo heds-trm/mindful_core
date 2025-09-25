@@ -5,9 +5,9 @@ import os
 import warnings
 from typing import Any, Iterator
 
-from models.model_output import ClassifierOutput
-from models.classification import AbstractClassifier
-from models.index import find_mindful_models, load_mindful_models
+from mindful_core.models.model_output import ClassifierOutput
+from mindful_core.models.classification import AbstractClassifier
+from mindful_core.models.index import find_mindful_models, load_mindful_models
 
 
 class EnsembleClassifier(AbstractClassifier):

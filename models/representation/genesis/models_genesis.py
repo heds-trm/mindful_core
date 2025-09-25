@@ -3,10 +3,10 @@ from monai.networks.blocks import Convolution
 from pytorch_lightning.utilities.types import STEP_OUTPUT
 from typing import Union, Sequence, Any
 
-from data.subset_id import SubsetID
-from models.representation import AbstractRepresentationModel, RepresentationOutput
-from models.loss_aggregator import LossAggregator
-from models.representation.genesis.genesis_modules import GenesisDown, GenesisUp
+from mindful_core.data.subset_id import SubsetID
+from mindful_core.models.representation import AbstractRepresentationModel, RepresentationOutput
+from mindful_core.models.loss_aggregator import LossAggregator
+from mindful_core.models.representation.genesis.genesis_modules import GenesisDown, GenesisUp
 
 
 class ModelsGenesis(AbstractRepresentationModel):

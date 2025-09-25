@@ -5,10 +5,10 @@ from torch.utils.data.sampler import Sampler, SequentialSampler
 import pandas as pd
 from typing import Union
 
-from data.subset import Subset
-from data.transforms.pipeline import Pipeline
-from models.model_output import ClassifierOutput
-from models.classification.abstract_classifier import AbstractClassifier
+from mindful_core.data.subset import Subset
+from mindful_core.data.transforms.pipeline import Pipeline
+from mindful_core.models.model_output import ClassifierOutput
+from mindful_core.models.classification.abstract_classifier import AbstractClassifier
 
 
 class DifficultySampler(Sampler):

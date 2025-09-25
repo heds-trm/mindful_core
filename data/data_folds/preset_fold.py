@@ -3,8 +3,8 @@ import json
 import pandas as pd
 from typing import Union
 
-from data import SubsetID, Sample, Modality, ModalityType
-from data.data_folds.data_fold import DataFold
+from mindful_core.data import SubsetID, Sample, Modality, ModalityType
+from mindful_core.data.data_folds.data_fold import DataFold
 
 
 class PresetFold(DataFold):

@@ -9,10 +9,10 @@ from pytorch_lightning.utilities.types import STEP_OUTPUT
 from abc import abstractmethod
 from typing import Union, Optional, Any, Type
 
-from models.model_output import ClassifierOutput, PrototypeOutput
-from models.module import MindfulModule, LossAggregator
-from models.classification.prototype_layer import PrototypeLayer
-from analysis.statistics.classification_summary import (
+from mindful_core.models.model_output import ClassifierOutput, PrototypeOutput
+from mindful_core.models.module import MindfulModule, LossAggregator
+from mindful_core.models.classification.prototype_layer import PrototypeLayer
+from mindful_core.analysis.statistics.classification_summary import (
     ClassificationSummary,
     ClassificationMetric,
 
@@ -33,9 +33,9 @@ from analysis.statistics.classification_summary import (
     ConfidenceThreshold,
     ConfidencePositivityCorrelation
 )
-from data.subset_id import SubsetID
-from utils.visualization import plot_line2d_to_array
-from utils.tensor_utils import lerp, get_gradients, set_require_grads
+from mindful_core.data.subset_id import SubsetID
+from mindful_core.utils.visualization import plot_line2d_to_array
+from mindful_core.utils.tensor_utils import lerp, get_gradients, set_require_grads
 
 
 class AbstractClassifier(MindfulModule):

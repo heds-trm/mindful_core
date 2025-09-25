@@ -1,8 +1,8 @@
 import torch
 import argparse
 
-from experiments import ExperimentSeries
-from utils.misc import initialize_tensorboard
+from mindful_core.experiments import ExperimentSeries
+from mindful_core.utils.misc import initialize_tensorboard
 
 
 def main():

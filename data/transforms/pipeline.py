@@ -12,10 +12,10 @@ import warnings
 from pathlib import Path
 from typing import Any, TypedDict, Optional
 
-from data import ModalitySet, Modality, ModalityType, Sample
-from data.transforms.batch_transform import BatchTransform
-from data.transforms.serializable_transform import SerializableTransform, TransformParameters
-from utils.misc import write_json, load_json, DynValue, ContextValue
+from mindful_core.data import ModalitySet, Modality, ModalityType, Sample
+from mindful_core.data.transforms.batch_transform import BatchTransform
+from mindful_core.data.transforms.serializable_transform import SerializableTransform, TransformParameters
+from mindful_core.utils.misc import write_json, load_json, DynValue, ContextValue
 
 """
 {
