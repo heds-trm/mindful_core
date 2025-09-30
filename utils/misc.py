@@ -196,41 +196,9 @@ def initialize_tensorboard(verbose: bool = False):
         if verbose:
             print("Tensorflow not found, using PyTorch's base Tensorboard.")
 
-# endregion
-
-# region Std Out
-@contextmanager
-def stdout_redirected(to=os.devnull):
-    """
-    import os
-
-    with stdout_redirected(to=filename):
-        print("from Python")
-        os.system("echo non-Python applications are also supported")
-    """
-
-    fd = sys.stdout.fileno()
-
-    # assert that Python and C stdio write using the same file descriptor
-    # assert libc.fileno(ctypes.c_void_p.in_dll(libc, "stdout")) == fd == 1
-
-    def _redirect_stdout(_to):
-        sys.stdout.close()  # + implicit flush()
-        os.dup2(_to.fileno(), fd)  # fd writes to 'to' file
-        sys.stdout = os.fdopen(fd, 'w')  # Python writes to fd
-
-    with os.fdopen(os.dup(fd), 'w') as old_stdout:
-        with open(to, 'w') as file:
-            _redirect_stdout(_to=file)
-        try:
-            yield  # allow code to be run with the redirected stdout
-        finally:
-            _redirect_stdout(_to=old_stdout)  # restore stdout.
-            # buffering and flags such as
-            # CLOEXEC may be different
-
 
 # endregion
+
 
 def is_defined(record_value: Any) -> bool:
     if isinstance(record_value, list):
