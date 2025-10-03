@@ -9,3 +9,6 @@
 
 # Poetry
 poetry.lock
+
+# Code sink
+_sink
