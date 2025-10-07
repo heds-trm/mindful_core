@@ -7,6 +7,7 @@ from tqdm import tqdm
 from typing import Sequence
 import warnings
 
+from mindful_core.utils.data_constants import SCAN_ID, SUBSET_ID, LABEL
 from mindful_core.analysis.statistics.roc_compare import delong_roc_variance
 
 
@@ -16,10 +17,10 @@ class BootstrappedMetric(object):
         self.mean = np.mean(values)
 
     def lower_bound(self, alpha: float) -> float:
-        return np.percentile(self.values, alpha * 100 * 0.5)
+        return float(np.percentile(self.values, alpha * 100 * 0.5))
 
     def upper_bound(self, alpha: float) -> float:
-        return np.percentile(self.values, 100 - alpha * 100 * 0.5)
+        return float(np.percentile(self.values, 100 - alpha * 100 * 0.5))
 
 
 def compute_eer(ground_truth: np.ndarray,
@@ -150,7 +151,8 @@ def compute_eer_threshold_from_available(fold_inferences: pd.DataFrame) -> float
     preferred_order = ["train", "validation", "test"]
     selected_inferences = None
     for subset_id in preferred_order:
-        in_subset = fold_inferences["SubsetID"] == subset_id
+        # noinspection PyTypeChecker
+        in_subset: pd.Series = fold_inferences[SUBSET_ID] == subset_id
         if len(in_subset[in_subset]) > 0:
             selected_inferences = fold_inferences[in_subset]
             break
@@ -160,7 +162,7 @@ def compute_eer_threshold_from_available(fold_inferences: pd.DataFrame) -> float
                            format(fold_inferences.columns))
 
     probabilities = np.asarray(selected_inferences["Probability"], dtype=float)
-    ground_truth = np.asarray(selected_inferences["Label"], dtype=int)
+    ground_truth = np.asarray(selected_inferences[LABEL], dtype=int)
     _, eer_threshold = compute_eer(ground_truth, probabilities, thresholds_count=1000)
     return eer_threshold
 
@@ -170,17 +172,17 @@ def compute_fold_metrics(path: Path,
                          metrics=("auroc", "eer", "sensitivity", "specificity", "accuracy"),
                          seed: int = None,
                          ) -> dict[str, BootstrappedMetric] | None:
-    fold_inferences = pd.read_csv(path, index_col="ScanID")
+    fold_inferences = pd.read_csv(path, index_col=SCAN_ID)
 
-    if "SubsetID" in fold_inferences.columns:
-        test_inferences = fold_inferences[fold_inferences["SubsetID"] == "test"]
+    if SUBSET_ID in fold_inferences.columns:
+        test_inferences = fold_inferences[fold_inferences[SUBSET_ID] == "test"]
     else:
         test_inferences = fold_inferences
 
-    ground_truth = np.asarray(test_inferences["Label"], dtype=int)
+    ground_truth = np.asarray(test_inferences[LABEL], dtype=int)
     probabilities = np.asarray(test_inferences["Probability"], dtype=float)
 
-    if "Prediction (EER)" not in test_inferences:
+    if "Prediction (EER)" not in test_inferences.columns:
         return None
         # eer_threshold = compute_eer_threshold_from_available(fold_inferences)
         # predictions = probabilities > eer_threshold
@@ -257,7 +259,8 @@ def main():
 
         experiment_results = {}
         for metric, metric_values in experiment_metrics.items():
-            mean = round(metric_values.mean * 100, 1)
+            # noinspection PyTypeChecker
+            mean = round(metric_values.mean * 100.0, 1)
             lower_bound = round(metric_values.lower_bound(alpha) * 100, 1)
             upper_bound = round(metric_values.upper_bound(alpha) * 100, 1)
             experiment_results[metric] = "{} [{} - {}]".format(mean, lower_bound, upper_bound)

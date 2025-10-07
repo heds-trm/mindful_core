@@ -7,6 +7,7 @@ import copy
 import json
 from typing import Any
 
+from mindful_core.utils.data_constants import SCAN_ID
 from mindful_core.utils.misc import load_json
 from mindful_core.experiments.experiment_config import ExperimentRoundConfig, GradientClipConfig
 from mindful_core.experiments.experiment_round import ExperimentRound
@@ -131,7 +132,7 @@ class Experiment(object):
 
                 fold_test_inferences_path = filepath / "test_inferences.csv"
                 if fold_test_inferences_path.exists():
-                    fold_test_inferences = pd.read_csv(fold_test_inferences_path, index_col="ScanID")
+                    fold_test_inferences = pd.read_csv(fold_test_inferences_path, index_col=SCAN_ID)
                     test_inferences.append(fold_test_inferences)
 
         if len(test_inferences) == 0:
@@ -139,7 +140,7 @@ class Experiment(object):
 
         test_inferences: pd.DataFrame = pd.concat(test_inferences)
         output_filepath = self.log_dir / "test_inferences.csv"
-        test_inferences.to_csv(output_filepath.as_posix(), index_label="ScanID")
+        test_inferences.to_csv(output_filepath.as_posix(), index_label=SCAN_ID)
 
     def print_current_step_and_fold(self, fold_index: int) -> None:
         if self.name is None:

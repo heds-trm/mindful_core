@@ -5,6 +5,8 @@ import re
 from abc import ABC, abstractmethod
 from typing import Any, Union, Container, Optional
 
+from mindful_core.utils.data_constants import LABEL
+
 _classification_metric_id_regex = re.compile(r"((?<=[a-z\d])[A-Z]|(?!^)[A-Z](?=[a-z]))")
 
 
@@ -955,7 +957,7 @@ class ClassificationSummary(object):
         if multi_class and (self.positive_class is None):
             probabilities, predicted_class = torch.max(probabilities, dim=-1)
             predicted_class = predicted_class.to(torch.int32)
-            inferences["Label"] = labels
+            inferences[LABEL] = labels
             inferences["Probability"] = probabilities.to(torch.float32)
 
             inferences["Predicted Class"] = predicted_class
@@ -968,7 +970,7 @@ class ClassificationSummary(object):
                     ref_label = self.positive_class
                 probabilities = probabilities[..., self.positive_class]
                 labels = (labels == ref_label).to(torch.int32)
-            inferences["Label"] = labels
+            inferences[LABEL] = labels
             inferences["Probability"] = probabilities.to(torch.float32)
 
             # region EER

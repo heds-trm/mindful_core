@@ -6,15 +6,17 @@ from pathlib import Path
 import argparse
 from tqdm import tqdm
 
-from mindful_core.data import Modality, ModalityType, Sample
-from mindful_core.data.transforms.pipeline import Pipeline
+from mindful_core.utils.data_constants import SCAN_ID
 from mindful_core.utils.misc import load_json
 from mindful_core.utils.imaging import write_slices
 from mindful_core.utils.tensor_utils import normalize
+from mindful_core.data import Modality, ModalityType, Sample
+from mindful_core.data.transforms.pipeline import Pipeline, PipelineConfig
 
 
 def get_pipeline(path: str) -> Pipeline:
-    config = load_json(path)
+    # noinspection PyTypeChecker
+    config: PipelineConfig = load_json(path)
     return Pipeline(config, multiview=False, preprocess_device="cuda")
 
 
@@ -41,15 +43,18 @@ def get_samples_paths(path: Path, sample_count: int) -> dict[str, Path]:
     if path.is_file():
         if path.suffix == ".csv":
             fold = pd.read_csv(path)
-            if "ScanID" in fold.columns:
-                fold = fold.set_index("ScanID")
+            if SCAN_ID in fold.columns:
+                fold = fold.set_index(SCAN_ID)
 
-            if "ScanFilepath" in fold:
+            if "ScanFilepath" in fold.columns:
                 samples = fold["ScanFilepath"].to_dict()
             else:
                 image_columns = [column for column in fold.columns if column.endswith(":image")]
                 if len(image_columns) != 1:
-                    raise RuntimeError("Could not identify the image column")
+                    extra = "" if (len(image_columns) == 0) else ": {}".format(image_columns)
+                    raise RuntimeError("Could not identify the image column. "
+                                       "Found `{}` columns ending with `:image`{}".
+                                       format(len(image_columns), extra))
                 else:
                     samples = fold[image_columns[0]].to_dict()
         else:

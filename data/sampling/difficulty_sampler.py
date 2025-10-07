@@ -5,6 +5,7 @@ from torch.utils.data.sampler import Sampler, SequentialSampler
 import pandas as pd
 from typing import Union
 
+from mindful_core.utils.data_constants import LABEL
 from mindful_core.data.subset import Subset
 from mindful_core.data.transforms.pipeline import Pipeline
 from mindful_core.models.model_output import ClassifierOutput
@@ -33,10 +34,10 @@ class DifficultySampler(Sampler):
         starting_history = torch.ones([len(dataset), self.class_count], dtype=torch.float32) * starting_history
         self.history: list[torch.Tensor] = [starting_history]
 
-        df = pd.DataFrame(data={"label": self.get_labels()}, index=self.indices)
+        df = pd.DataFrame(data={LABEL: self.get_labels()}, index=self.indices)
         df = df.sort_index()
-        label_to_count = df["label"].value_counts()
-        weights = 1.0 / label_to_count[df["label"]]
+        label_to_count = df[LABEL].value_counts()
+        weights = 1.0 / label_to_count[df[LABEL]]
         self.weights = torch.DoubleTensor(weights.to_list())
 
         update_sampler = SequentialSampler(dataset)

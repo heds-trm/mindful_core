@@ -2,6 +2,8 @@ import pandas as pd
 from pathlib import Path
 import argparse
 
+from mindful_core.utils.data_constants import SCAN_ID, SUBSET_ID
+
 
 def filepath_to_partition_id(filepath: Path) -> int:
     filename = filepath.stem
@@ -14,8 +16,8 @@ def folds_to_partitions(root: Path) -> pd.DataFrame:
     columns = None
 
     for filepath in root.glob(pattern="*fold*.csv"):
-        fold = pd.read_csv(filepath, index_col="ScanID")
-        subset_ids = fold.pop("SubsetID")
+        fold = pd.read_csv(filepath, index_col=SCAN_ID)
+        subset_ids = fold.pop(SUBSET_ID)
 
         if columns is None:
             columns = fold.columns
@@ -32,7 +34,7 @@ def folds_to_partitions(root: Path) -> pd.DataFrame:
                 partitions_data[column_name][scan_id] = fold[column_name][scan_id]
 
     partitions = pd.DataFrame(partitions_data)
-    partitions.index.name = "ScanID"
+    partitions.index.name = SCAN_ID
     return partitions
 
 

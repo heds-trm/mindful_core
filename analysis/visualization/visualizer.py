@@ -517,12 +517,12 @@ class Visualizer(ABC):
         folder = self.visualizer_folder / modality.id
         folder.mkdir(parents=True, exist_ok=True)
 
-        data_frame.index.name = "ScanID"
+        data_frame.index.name = SCAN_ID
         data_frame.to_csv(folder / "scalar_{}.csv".format(name))
 
         normed = data_frame.values / np.linalg.norm(data_frame, axis=1, keepdims=True)
         normed = pd.DataFrame(normed, index=data_frame.index, columns=columns)
-        normed.index.name = "ScanID"
+        normed.index.name = SCAN_ID
         normed.to_csv(folder / "normed_scalar_{}.csv".format(name))
 
         # try:

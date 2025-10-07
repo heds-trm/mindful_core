@@ -6,17 +6,19 @@ from sklearn.preprocessing import StandardScaler
 import argparse
 from pathlib import Path
 
+from mindful_core.utils.data_constants import SCAN_ID, SUBSET_ID
+
 
 def gather_representations(path: Path):
     log_path = path / "lightning_logs"
 
     representation_paths = [version_path / "representations.csv" for version_path in log_path.iterdir()
                             if (version_path / "representations.csv").exists()]
-    representations = [pd.read_csv(representation_path, index_col="ScanID")
+    representations = [pd.read_csv(representation_path, index_col=SCAN_ID)
                        for representation_path in representation_paths]
     
     for i, representation_set in enumerate(representations):
-        representation_set = representation_set.drop(columns="SubsetID")
+        representation_set = representation_set.drop(columns=SUBSET_ID)
         representation_set.to_csv(path / "representations_{:02d}.csv".format(i))
 
         scan_ids = representation_set.index

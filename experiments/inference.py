@@ -8,11 +8,13 @@ from pathlib import Path
 import warnings
 from typing import Any
 
+from mindful_core.utils.data_constants import LABEL
+from mindful_core.utils.misc import load_json
 from mindful_core.models.classification import AbstractClassifier
 from mindful_core.models.index import get_model, ModuleConfig
 from mindful_core.data.transforms.pipeline import Pipeline
 from mindful_core.data.modalities import ModalityType, Modality
-from mindful_core.utils.misc import load_json
+
 
 INPUT_SAMPLE_DATA = tuple[MetaTensor, ...] | MetaTensor
 INPUT_BATCH_DATA = list[INPUT_SAMPLE_DATA]
@@ -95,6 +97,7 @@ def prepare_sample(sample_data: dict,
     input_image_modality_id = input_image_modality.id if input_image_modality is not None else None
     for modality, value in zip(preparation_pipeline.output_modalities, prepared_data):
         modality: Modality
+        # noinspection PyTypeHints
         value: MetaTensor | np.ndarray
 
         meta_data[modality.id] = value.meta
@@ -137,10 +140,10 @@ def load_sample(inputs: str | Path | dict[str, Any],
     input_data = {modality_name: value for modality_name, value in input_data.items()
                   if modality_name in preproc_pipeline.input_modalities}
 
-    if "label" in preproc_pipeline.input_modalities:
-        input_data["label"] = -1
+    if LABEL in preproc_pipeline.input_modalities:
+        input_data[LABEL] = -1
 
-    with preproc_pipeline.disable_modalities(["label"]):
+    with preproc_pipeline.disable_modalities([LABEL]):
         sample_data = preproc_pipeline(input_data)
 
     if isinstance(sample_data, torch.Tensor):

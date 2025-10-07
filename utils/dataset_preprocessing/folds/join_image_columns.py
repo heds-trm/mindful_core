@@ -2,6 +2,8 @@ import pandas as pd
 from pathlib import Path
 import argparse
 
+from mindful_core.utils.data_constants import SCAN_ID, DEFAULT_IMAGE_COLUMN
+
 
 def main():
     arg_parser = argparse.ArgumentParser()
@@ -22,8 +24,8 @@ def main():
     for key, root in inputs.items():
         for fold_path in root.glob("*fold_*.csv"):
             fold_id = int(fold_path.stem.split("_")[-1])
-            fold = pd.read_csv(fold_path, index_col="ScanID")
-            image_column = "image:image"
+            fold = pd.read_csv(fold_path, index_col=SCAN_ID)
+            image_column = DEFAULT_IMAGE_COLUMN
             fold = fold.rename(columns={image_column: key})
 
             if fold_id not in additional_folds:

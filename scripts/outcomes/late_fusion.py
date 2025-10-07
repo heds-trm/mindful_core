@@ -3,6 +3,8 @@ import pandas as pd
 from pathlib import Path
 import argparse
 
+from mindful_core.utils.data_constants import SCAN_ID, SUBSET_ID, LABEL
+from mindful_core.utils.misc import save_csv
 from mindful_core.analysis.statistics.classification_summary import (
     ClassificationSummary,
 
@@ -20,7 +22,6 @@ from mindful_core.analysis.statistics.classification_summary import (
     SpecificityAtSensitivity,
 )
 from mindful_core.scripts.outcomes.gather_test_results import summarize_experiments
-from mindful_core.utils.misc import save_csv
 
 
 def make_classification_summary(sensitivity_thresholds: list[float]
@@ -55,9 +56,9 @@ def load_test_folds(folds_path: str | Path) -> dict[str, list]:
 
     test_folds = {}
     for fold_path in folds_path.glob(pattern="*fold_*.csv"):
-        fold = pd.read_csv(fold_path, index_col="ScanID")
-        if "SubsetID" in fold:
-            fold = fold[fold["SubsetID"] == "test"]
+        fold = pd.read_csv(fold_path, index_col=SCAN_ID)
+        if SUBSET_ID in fold.columns:
+            fold = fold[fold[SUBSET_ID] == "test"]
         fold_id = fold_path.stem[-2:]
         test_folds[fold_id] = fold.index.tolist()
     return test_folds
@@ -103,8 +104,8 @@ def get_folded_experiment_probabilities(experiment_path: Path) -> dict[str, pd.S
     probabilities = {}
 
     for fold_path in experiment_path.glob(pattern="*_fold_*.csv"):
-        fold = pd.read_csv(fold_path, index_col="ScanID")
-        test_inferences = fold[fold["SubsetID"] == "test"]
+        fold = pd.read_csv(fold_path, index_col=SCAN_ID)
+        test_inferences = fold[fold[SUBSET_ID] == "test"]
         fold_probabilities = test_inferences["Probability"]
 
         fold_id = fold_path.stem[-2:]
@@ -119,7 +120,7 @@ def get_folded_experiment_probabilities(experiment_path: Path) -> dict[str, pd.S
 def get_unfolded_experiment_probabilities(inference_path: Path,
                                           test_folds: dict[str, list]
                                           ) -> dict[str, pd.Series]:
-    inferences = pd.read_csv(inference_path, index_col="ScanID")
+    inferences = pd.read_csv(inference_path, index_col=SCAN_ID)
     probabilities = {fold_id: inferences.loc[fold_indices]["Probability"]
                      for fold_id, fold_indices in test_folds.items()}
 
@@ -152,10 +153,10 @@ def get_labels(inference_path: Path) -> dict[str, pd.Series]:
     inference_path = Path(inference_path)
     labels: dict[str, pd.Series] = {}
     for fold_path in inference_path.glob(pattern="*_fold_*.csv"):
-        fold = pd.read_csv(fold_path, index_col="ScanID")
+        fold = pd.read_csv(fold_path, index_col=SCAN_ID)
         fold_id = fold_path.stem[-2:]
-        test_fold = fold[fold["SubsetID"] == "test"]
-        labels[fold_id] = test_fold["Label"]
+        test_fold = fold[fold[SUBSET_ID] == "test"]
+        labels[fold_id] = test_fold[LABEL]
 
     return labels
 

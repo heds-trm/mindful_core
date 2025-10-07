@@ -2,6 +2,8 @@ import pandas as pd
 from pathlib import Path
 import argparse
 
+from mindful_core.utils.data_constants import SCAN_ID, LABEL
+
 
 def main():
     arg_parser = argparse.ArgumentParser()
@@ -18,7 +20,7 @@ def main():
     compilation = pd.DataFrame()
     error_count, entry_count = None, None
     for filepath in test_inferences_filepaths:
-        test_inference = pd.read_csv(filepath, index_col="ScanID")
+        test_inference = pd.read_csv(filepath, index_col=SCAN_ID)
         test_id = filepath.relative_to(root).parent
 
         correct_predictions = test_inference["Correct Prediction"]
@@ -27,7 +29,7 @@ def main():
         if error_count is None:
             error_count = errors
             entry_count = entries
-            compilation["Label"] = test_inference["Label"]
+            compilation[LABEL] = test_inference[LABEL]
         else:
             error_count += errors
             entry_count += entries

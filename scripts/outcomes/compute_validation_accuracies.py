@@ -4,13 +4,14 @@ from tqdm import tqdm
 import argparse
 
 from mindful_core.utils.misc import load_json, write_json
+from mindful_core.utils.data_constants import SCAN_ID, SUBSET_ID
 from mindful_core.models.classification.ensemble.ensemble_classifier import EnsembleClassifier
 
 
 def get_validation_accuracy(model_path: Path, threshold_name: str) -> float:
     inferences_path = model_path / "inferences.csv"
-    inferences = pd.read_csv(inferences_path, index_col="ScanID")
-    is_validation = inferences["SubsetID"] == "validation"
+    inferences = pd.read_csv(inferences_path, index_col=SCAN_ID)
+    is_validation = inferences[SUBSET_ID] == "validation"
     inferences = inferences[is_validation]
 
     correctness_column = "Correctness ({})".format(threshold_name)

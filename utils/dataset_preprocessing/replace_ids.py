@@ -3,6 +3,7 @@ from pathlib import Path
 from shutil import copy2
 import argparse
 
+from mindful_core.utils.data_constants import SCAN_ID, DEFAULT_IMAGE_COLUMN
 from mindful_core.utils.dataset_preprocessing.anonymize import randomize_ids
 
 
@@ -16,8 +17,8 @@ def list_ids_in_folder(source: Path,
 
 
 def list_ids_from_csv(source: Path) -> dict[str, Path]:
-    data_frame = pd.read_csv(source, index_col="ScanID")
-    original_ids = data_frame.to_dict()["image:image"]
+    data_frame = pd.read_csv(source, index_col=SCAN_ID)
+    original_ids = data_frame.to_dict()[DEFAULT_IMAGE_COLUMN]
     original_ids = {original_id: Path(original_path) for original_id, original_path in original_ids.items()}
     return original_ids
 

@@ -3,6 +3,7 @@ import json
 import pandas as pd
 from typing import Union
 
+from mindful_core.utils.data_constants import SCAN_ID, SUBSET_ID, LABEL, DEFAULT_IMAGE_COLUMN
 from mindful_core.data import SubsetID, Sample, Modality, ModalityType
 from mindful_core.data.data_folds.data_fold import DataFold
 
@@ -55,8 +56,8 @@ class PresetFold(DataFold):
 
         samples = {
             SubsetID.parse(subset_id): [
-                Sample(sample_id=sample["ScanID"],
-                       label=sample["Label"],
+                Sample(sample_id=sample[SCAN_ID],
+                       label=sample[LABEL],
                        image_path=sample["image_path"])
                 for sample in data[subset_id]
             ]
@@ -108,12 +109,12 @@ class PresetFold(DataFold):
             return path.as_posix()
 
         data_frame = pd.read_csv(fold_path)
-        if "ScanID" not in data_frame:
+        if SCAN_ID not in data_frame.columns:
             raise RuntimeError("Missing `ScanID` column from sheet at `{}`".format(fold_path))
 
         # Handle key for images from previous (and deprecated) versions
-        if "ScanFilepath" in data_frame:
-            data_frame = data_frame.rename(columns={"ScanFilepath": "image:image"})
+        if "ScanFilepath" in data_frame.columns:
+            data_frame = data_frame.rename(columns={"ScanFilepath": DEFAULT_IMAGE_COLUMN})
 
         image_columns = []
         for column in data_frame:
@@ -124,16 +125,16 @@ class PresetFold(DataFold):
                 data_frame[column] = data_frame[column].apply(process_filepath)
                 image_columns.append(column)
 
-        if "Label" in data_frame.columns:
-            data_frame["Label"] = data_frame["Label"].apply(self._parse_csv_label)
+        if LABEL in data_frame.columns:
+            data_frame[LABEL] = data_frame[LABEL].apply(self._parse_csv_label)
         record_array = data_frame.to_records(index=False)
 
         subset_id_map = {subset_id.as_prefix(): subset_id for subset_id in SubsetID}
         dataset = {}
         for record in record_array:
-            subset_id = subset_id_map[record["SubsetID"]] if "SubsetID" in data_frame else SubsetID.TRAIN
-            label = record["Label"] if "Label" in data_frame.columns else None
-            sample = Sample(sample_id=record["ScanID"],
+            subset_id = subset_id_map[record[SUBSET_ID]] if SUBSET_ID in data_frame else SubsetID.TRAIN
+            label = record[LABEL] if LABEL in data_frame.columns else None
+            sample = Sample(sample_id=record[SCAN_ID],
                             label=label,
                             image_path={Modality.parse(column): record[column] for column in image_columns}
                             )

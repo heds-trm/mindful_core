@@ -8,6 +8,7 @@ import argparse
 from enum import IntEnum
 from typing import Mapping, Hashable, Any
 
+from mindful_core.utils.data_constants import SCAN_ID, LABEL
 from mindful_core.data.data_folds.data_fold import load_scalar_features, load_categorical_features
 
 
@@ -50,10 +51,10 @@ def plot_trial(root: str | Path,
     test_inferences_path = root / "test_inferences.csv"
     correctness, labels = None, None
     if test_inferences_path.exists():
-        test_inferences = pd.read_csv(test_inferences_path, index_col="ScanID")
-        if correctness_column in test_inferences:
+        test_inferences = pd.read_csv(test_inferences_path, index_col=SCAN_ID)
+        if correctness_column in test_inferences.columns:
             correctness = test_inferences[correctness_column]
-        if labels_column in test_inferences:
+        if labels_column in test_inferences.columns:
             labels = test_inferences[labels_column]
 
     figures_folder = root / "fusion_attention"
@@ -95,7 +96,7 @@ def export_attention_map_weights_to_csv(module_name: str,
     columns = get_columns(attention_maps.shape[1], modalities)
 
     data_frame = pd.DataFrame(attention_maps, columns=columns, index=ids)
-    data_frame.index.name = "ScanID"
+    data_frame.index.name = SCAN_ID
 
     export_dir = Path(os.path.commonpath(attention_map_paths), "{}_fusion_weights.csv".format(module_name))
     data_frame.to_csv(export_dir)
@@ -122,6 +123,7 @@ def filter_and_plot_module_maps(module_name: str,
         for status, status_ids in ids_by_status.items():
             status: ModalityStatus
             figure_title = module_name + "_" + status.name
+            # noinspection PyTypeChecker
             figure_filters[figure_title] = status_ids
         all_data["ModalityStatus"] = modality_statuses
 
@@ -136,7 +138,7 @@ def filter_and_plot_module_maps(module_name: str,
         all_data["Correctness"] = correctness
 
     if labels is not None:
-        all_data["Label"] = labels
+        all_data[LABEL] = labels
 
     results = {}
     for figure_title, figure_ids in figure_filters.items():
@@ -298,12 +300,12 @@ def plot_by_label(title: str,
 
     data_frame = pd.DataFrame(data={"Weight": attention_weights,
                                     "Modality": modalities,
-                                    "Label": labels})
+                                    LABEL: labels})
 
     figure = plt.figure(figsize=(10, 7))
     plt.title("{} ({})".format(title, len(attention_maps)))
     sn.violinplot(data_frame,
-                  x="Modality", y="Weight", hue="Label",
+                  x="Modality", y="Weight", hue=LABEL,
                   palette=["#4f81bd", "#c0514d"],
                   split=True, native_scale=True, cut=0, density_norm="width")
     return figure
@@ -441,6 +443,7 @@ def get_modality_statuses(scalar_path: str | None,
         statuses = scalars_statuses
         for sample_id, status in categorical_statuses.items():
             if sample_id in statuses:
+                # noinspection PyTypeChecker
                 statuses[sample_id] = status.join(statuses[sample_id])
             else:
                 statuses[sample_id] = status.join(ModalityStatus.MISSING)
@@ -455,7 +458,7 @@ def main():
     arg_parser.add_argument("--scalar_features", default=None, nargs="+")
     arg_parser.add_argument("--categorical_features", default=None, nargs="+")
     arg_parser.add_argument("--correctness_column", default="Correctness (EER)")
-    arg_parser.add_argument("--labels_column", default="Label")
+    arg_parser.add_argument("--labels_column", default=LABEL)
     args = arg_parser.parse_args()
 
     trials = args.trials

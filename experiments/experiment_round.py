@@ -13,6 +13,10 @@ import copy
 import warnings
 from typing import Optional, Iterator
 
+from mindful_core.utils.data_constants import SCAN_ID, SUBSET_ID
+from mindful_core.data.transforms.pipeline import Pipeline
+from mindful_core.utils.callbacks import MilestoneCheckpoint
+from mindful_core.utils.parsing import get_monitor_mode
 from mindful_core.experiments import ExperimentRoundConfig
 from mindful_core.models import MindfulModule
 from mindful_core.models.index import get_model, is_representation_model, is_classification_model
@@ -23,9 +27,6 @@ from mindful_core.analysis.visualization import VisualizerGroup
 from mindful_core.analysis.statistics import ConfidenceSummary, logits_to_probabilities, ClassificationSummary
 from mindful_core.data import SubsetID, MindfulDataset, Sample, ModalityType
 from mindful_core.data.data_folds import DataFold, PresetFold
-from mindful_core.data.transforms.pipeline import Pipeline
-from mindful_core.utils.callbacks import MilestoneCheckpoint
-from mindful_core.utils.parsing import get_monitor_mode
 
 
 class ExperimentRound(object):
@@ -277,16 +278,16 @@ class ExperimentRound(object):
         # region Aggregate and Save inferences
         inferences = pd.concat(list(inferences_by_subset.values()))
         inferences_filepath = os.path.join(self.logger.log_dir, "inferences.csv")
-        inferences.to_csv(inferences_filepath, index_label="ScanID")
+        inferences.to_csv(inferences_filepath, index_label=SCAN_ID)
 
         test_inferences_filepath = os.path.join(self.logger.log_dir, "test_inferences.csv")
         test_inferences = inferences_by_subset[SubsetID.TEST]
-        test_inferences.to_csv(test_inferences_filepath, index_label="ScanID")
+        test_inferences.to_csv(test_inferences_filepath, index_label=SCAN_ID)
 
         if len(inferred_features) > 0:
             inferred_features_frame = pd.concat(inferred_features)
             inferred_features_filepath = os.path.join(self.logger.log_dir, "inferred_features.csv")
-            inferred_features_frame.to_csv(inferred_features_filepath, index_label="ScanID")
+            inferred_features_frame.to_csv(inferred_features_filepath, index_label=SCAN_ID)
         # endregion
 
     def test(self):
@@ -541,11 +542,11 @@ class ExperimentRound(object):
                 representations.append(batch_representations)
             representations = torch.concat(representations, axis=0).cpu().numpy()
             data_sub_frame = pd.DataFrame(data=representations, index=ids)
-            data_sub_frame["SubsetID"] = subset_id.as_prefix()
+            data_sub_frame[SUBSET_ID] = subset_id.as_prefix()
             data_sub_frames.append(data_sub_frame)
 
         data_frame = pd.concat(data_sub_frames, axis=0)
-        data_frame.index.name = "ScanID"
+        data_frame.index.name = SCAN_ID
         data_frame.to_csv(os.path.join(self.logger.log_dir, "representations.csv"))
 
     def save_job_metadata(self):

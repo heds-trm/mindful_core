@@ -327,7 +327,7 @@ class DataFold(object):
                 entry = [sample.id, subset_name, str(sample.label)] + list(sample.image_path.values())
                 values.append(entry)
 
-        columns = ["ScanID", "SubsetID", "Label"] + image_columns
+        columns = [SCAN_ID, SUBSET_ID, LABEL] + image_columns
         return pd.DataFrame(values, columns=columns)
 
     def save_scan_data(self, filepath: str | Path):
@@ -348,8 +348,8 @@ class DataFold(object):
         samples = {
             subset_id.as_prefix(): [
                 {
-                    "ScanID": sample.id,
-                    "Label": sample.label,
+                    SCAN_ID: sample.id,
+                    LABEL: sample.label,
                     "Images": sample.image_path,
                 }
                 for sample in self.samples[subset_id]

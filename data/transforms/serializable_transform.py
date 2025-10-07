@@ -24,8 +24,9 @@ import copy
 from abc import ABC, abstractmethod
 from typing import Any, Union, Optional
 
-from mindful_core.data import Sample
+from mindful_core.utils.data_constants import LABEL
 from mindful_core.utils.misc import find_all_subclasses
+from mindful_core.data import Sample
 
 TransformParameters = dict[str, Any]
 
@@ -209,7 +210,7 @@ class SerializableTransform(Transform, ABC):
         elif isinstance(transform, RandCropByPosNegLabel):
             config = {
                 "spatial_size": transform.spatial_size,
-                "label": None if transform.label is None else float(transform.label),
+                LABEL: None if transform.label is None else float(transform.label),
                 "pos": 1.0,
                 "neg": (1.0 / transform.pos_ratio) - 1.0,
                 "num_samples": transform.num_samples,

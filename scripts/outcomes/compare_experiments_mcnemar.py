@@ -6,6 +6,8 @@ import argparse
 import os
 from typing import Union
 
+from mindful_core.utils.data_constants import SCAN_ID, SUBSET_ID
+
 
 class McNemarTest(object):
     def __init__(self, statistic: float, pvalue: float, best: str):
@@ -27,7 +29,7 @@ class McNemarTest(object):
     def from_data_frames(experiment_a: pd.DataFrame,
                          experiment_b: pd.DataFrame,
                          criterion: str) -> Union["McNemarTest", None]:
-        if (criterion not in experiment_a) or (criterion not in experiment_b):
+        if (criterion not in experiment_a.columns) or (criterion not in experiment_b.columns):
             return None
 
         index = experiment_a.index
@@ -75,9 +77,9 @@ def load_experiments_inferences(experiments_paths: list[Path]) -> dict[str, list
 
         experiment_inferences = {}
         for fold_inferences_path in experiment_path.glob("*inferences_fold_*.csv"):
-            fold_inferences = pd.read_csv(fold_inferences_path, index_col="ScanID")
-            if "SubsetID" in fold_inferences:
-                fold_inferences = fold_inferences[fold_inferences["SubsetID"] == "test"]
+            fold_inferences = pd.read_csv(fold_inferences_path, index_col=SCAN_ID)
+            if SUBSET_ID in fold_inferences.columns:
+                fold_inferences = fold_inferences[fold_inferences[SUBSET_ID] == "test"]
             fold_id = int(fold_inferences_path.stem.split("inferences_fold_")[-1])
             experiment_inferences[fold_id] = fold_inferences
 

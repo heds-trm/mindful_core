@@ -7,6 +7,7 @@ import argparse
 import copy
 from typing import Optional
 
+from mindful_core.utils.data_constants import SCAN_ID, LABEL
 from mindful_core.utils.misc import load_json
 
 
@@ -119,8 +120,8 @@ def pick_samples(trial_path: Path, count: int) -> list[int]:
     if not inferences_path.exists():
         raise FileNotFoundError(inferences_path.as_posix())
 
-    inferences = pd.read_csv(inferences_path.as_posix(), index_col="ScanID")
-    error = (inferences["Label"] - inferences["Probability"]).abs()
+    inferences = pd.read_csv(inferences_path.as_posix(), index_col=SCAN_ID)
+    error = (inferences[LABEL] - inferences["Probability"]).abs()
     error = error.sort_values()
 
     failures_count = count // 2

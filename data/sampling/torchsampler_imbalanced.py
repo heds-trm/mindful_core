@@ -7,12 +7,12 @@ Summary: A (PyTorch) imbalanced dataset sampler for oversampling low classes and
 Had to copy to by-pass the __about__.py file that raised a KeyError because of the metadata file has a typo.
 """
 
-
-from typing import Callable
-
 import pandas as pd
 import torch
 import torch.utils.data
+from typing import Callable
+
+from mindful_core.utils.data_constants import LABEL
 
 
 class ImbalancedDatasetSampler(torch.utils.data.sampler.Sampler):
@@ -45,13 +45,13 @@ class ImbalancedDatasetSampler(torch.utils.data.sampler.Sampler):
 
         # distribution of classes in the dataset
         df = pd.DataFrame()
-        df["label"] = self._get_labels(dataset) if labels is None else labels
+        df[LABEL] = self._get_labels(dataset) if labels is None else labels
         df.index = self.indices
         df = df.sort_index()
 
-        label_to_count = df["label"].value_counts()
+        label_to_count = df[LABEL].value_counts()
 
-        weights = 1.0 / label_to_count[df["label"]]
+        weights = 1.0 / label_to_count[df[LABEL]]
 
         self.weights = torch.DoubleTensor(weights.to_list())
 

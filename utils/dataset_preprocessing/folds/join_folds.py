@@ -4,8 +4,10 @@ import os
 import itertools
 import argparse
 
+from mindful_core.utils.data_constants import SCAN_ID, DEFAULT_IMAGE_COLUMN
 
-def add_dataset_name_to_scan_id(data_frame: pd.DataFrame, dataset_name: str, column_id: str = "ScanID"):
+
+def add_dataset_name_to_scan_id(data_frame: pd.DataFrame, dataset_name: str, column_id: str = SCAN_ID):
     def _update_scan_id(_scan_id: str) -> str:
         return "{}_{}".format(dataset_name, _scan_id)
 
@@ -13,7 +15,7 @@ def add_dataset_name_to_scan_id(data_frame: pd.DataFrame, dataset_name: str, col
     return data_frame
 
 
-def add_dataset_rel_path(data_frame: pd.DataFrame, rel_path: str, column_id: str = "image:image"):
+def add_dataset_rel_path(data_frame: pd.DataFrame, rel_path: str, column_id: str = DEFAULT_IMAGE_COLUMN):
     def _update_filepath(_filepath: str) -> str:
         return os.path.join(rel_path, _filepath)
 
@@ -40,6 +42,7 @@ def load_fold(path: Path | str) -> pd.DataFrame:
     return pd.read_csv(path)
 
 
+# noinspection PyTypeHints
 def join_folds(fold_paths: list[Path],
                dataset_names: list[str],
                scalar_features_paths: list[Path] = None,
@@ -118,6 +121,7 @@ def match_fold_count(fold_paths: list[Path]) -> list[list[Path]]:
     return fold_paths
 
 
+# noinspection PyTypeHints
 def save_joint_folds(output_dir: Path,
                      folds: list[pd.DataFrame],
                      scalar_features: pd.DataFrame | None = None,

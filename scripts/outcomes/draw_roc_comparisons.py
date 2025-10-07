@@ -5,10 +5,11 @@ import matplotlib.pyplot as plt
 from pathlib import Path
 import argparse
 
+from mindful_core.utils.data_constants import SCAN_ID, SUBSET_ID, LABEL
+from mindful_core.utils.misc import load_json
 from mindful_core.analysis.statistics.roc_compare import compute_roc_curve, compute_kfolds_roc_distribution
 from mindful_core.analysis.statistics.classification_summary import compute_auroc
 from mindful_core.scripts.outcomes.compare_experiments_delong import load_test_inferences_from_config
-from mindful_core.utils.misc import load_json
 
 
 def get_test_partitions(folds_folder: str) -> list[pd.Index]:
@@ -17,8 +18,8 @@ def get_test_partitions(folds_folder: str) -> list[pd.Index]:
     for filepath in folds_folder.iterdir():
         if filepath.match("*_fold_*.csv"):
             index = int(filepath.stem.split("_")[-1])
-            fold = pd.read_csv(filepath, index_col="ScanID")
-            fold = fold[fold["SubsetID"] == "test"]
+            fold = pd.read_csv(filepath, index_col=SCAN_ID)
+            fold = fold[fold[SUBSET_ID] == "test"]
             test_partitions[index] = fold.index
 
     test_partitions = [test_partitions[i] for i in range(len(test_partitions))]
@@ -28,7 +29,7 @@ def get_test_partitions(folds_folder: str) -> list[pd.Index]:
 def get_experiment_test_inferences(experiment_path: str,
                                    test_partitions: list[pd.Index]
                                    ):
-    test_inferences = pd.read_csv(experiment_path, index_col="ScanID")
+    test_inferences = pd.read_csv(experiment_path, index_col=SCAN_ID)
     return [test_inferences.loc[test_partition] for test_partition in test_partitions]
 
 
@@ -48,7 +49,7 @@ def extract_ground_truth_and_probabilities(test_inferences: dict[str, pd.DataFra
 
 
 def get_ground_truth(experiment_inferences: pd.DataFrame) -> np.ndarray:
-    return np.asarray(experiment_inferences["Label"], dtype=np.int32)
+    return np.asarray(experiment_inferences[LABEL], dtype=np.int32)
 
 
 def get_probabilities(experiment_inferences: pd.DataFrame) -> np.ndarray:
