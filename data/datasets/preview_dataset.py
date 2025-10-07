@@ -49,11 +49,11 @@ def get_samples_paths(path: Path, sample_count: int) -> dict[str, Path]:
             if "ScanFilepath" in fold.columns:
                 samples = fold["ScanFilepath"].to_dict()
             else:
-                image_columns = [column for column in fold.columns if column.endswith(":image")]
+                image_columns = [column for column in fold.columns if column.startswith("image:")]
                 if len(image_columns) != 1:
                     extra = "" if (len(image_columns) == 0) else ": {}".format(image_columns)
                     raise RuntimeError("Could not identify the image column. "
-                                       "Found `{}` columns ending with `:image`{}".
+                                       "Found `{}` columns starting with `image:`{}".
                                        format(len(image_columns), extra))
                 else:
                     samples = fold[image_columns[0]].to_dict()
