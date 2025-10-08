@@ -1,37 +1,22 @@
 from pathlib import Path
 import argparse
 import copy
-import json
+import warnings
+
+from mindful_core.utils.misc import try_load_json, write_json
 
 
-def load_json(path: str | Path) -> dict:
-    if isinstance(path, Path):
-        path = path.as_posix()
-
-    with open(path, "r") as file:
-        return json.load(file)
-
-
-def write_json(path: str | Path, value: dict) -> None:
-    with open(path, 'w') as file:
-        json.dump(value, file, indent=4)
-
-
-def main():
-    arg_parser = argparse.ArgumentParser()
-    arg_parser.add_argument("--base_run_config", required=True, type=str)
-    arg_parser.add_argument("--mode", required=True, type=str)
-    arg_parser.add_argument("--dataset_filter", default=[], nargs="+")
-    arg_parser.add_argument("--mode_filter", default=[], nargs="+")
-    args = arg_parser.parse_args()
-
-    config_path = Path(args.base_run_config)
-    mode: str = args.mode
-    dataset_filter: list[str] = args.dataset_filter
-    mode_filter: list[str] = args.mode_filter
+def make_follow_up_experiment_series_config(config_path: Path,
+                                            mode: str, 
+                                            dataset_filter: list[str],
+                                            mode_filter: list[str]
+                                            ) -> Path:
+    warnings.warn(("`make_follow_up_experiment_series_config` is currently deprecated, "
+                   "as it relies on a deprecated schema."),
+                  category=DeprecationWarning)
 
     mode = mode.replace(" ", "-")
-    run_config = load_json(config_path)
+    run_config = try_load_json(config_path, "Experiment Series config")
 
     steps_config: dict[str, dict] = run_config["steps"]
     steps = list(steps_config.keys())
@@ -67,9 +52,27 @@ def main():
                 datasets.pop(dataset)
 
     output_path = config_path.parent / "{}_follow_up.json".format(config_path.stem)
-    print(output_path)
     write_json(output_path, run_config)
 
+    return output_path
+
+
+def main():
+    arg_parser = argparse.ArgumentParser()
+    arg_parser.add_argument("--base_run_config", required=True, type=str)
+    arg_parser.add_argument("--mode", required=True, type=str)
+    arg_parser.add_argument("--dataset_filter", default=[], nargs="+")
+    arg_parser.add_argument("--mode_filter", default=[], nargs="+")
+    args = arg_parser.parse_args()
+
+    config_path = Path(args.base_run_config)
+    mode: str = args.mode
+    dataset_filter: list[str] = args.dataset_filter
+    mode_filter: list[str] = args.mode_filter
+
+    output_path = make_follow_up_experiment_series_config(config_path, mode, dataset_filter, mode_filter)
+    print(output_path)
+    
 
 if __name__ == "__main__":
     main()

@@ -1,7 +1,7 @@
 from pathlib import Path
 from typing import Any, TypedDict, NotRequired, Type, TypeVar
 
-from mindful_core.utils.misc import load_json
+from mindful_core.utils.misc import try_load_json
 from mindful_core.utils.parsing import parse_checkpoint_path
 from mindful_core.models.module import MindfulModule
 from mindful_core.models.classification.abstract_classifier import AbstractClassifier
@@ -46,7 +46,7 @@ def get_model(module_config: ModuleConfig, checkpoint: str | Path | None = None)
 
     model_class = MindfulModule.get_module_class(model_class_name)
     if isinstance(hparams, (Path, str)):
-        hparams = load_json(hparams)
+        hparams = try_load_json(hparams, "Mindful Model hparams")
 
     if len(sub_modules) > 0:
         hparams.update(sub_modules)
@@ -144,7 +144,7 @@ def load_mindful_model(model_path: Path | str,
                        ) -> _MM | None:
     model_path = Path(model_path)
     model_config_path = find_mindful_model_config(model_path, model_class)
-    model_config: ModuleConfig = load_json(model_config_path)
+    model_config: ModuleConfig = try_load_json(model_config_path, "Mindful Model config")
     checkpoint_path = parse_checkpoint_path(model_path / "checkpoints", monitor)
 
     model = get_model(model_config, checkpoint=checkpoint_path)

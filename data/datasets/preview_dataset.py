@@ -7,7 +7,7 @@ import argparse
 from tqdm import tqdm
 
 from mindful_core.utils.data_constants import SCAN_ID
-from mindful_core.utils.misc import load_json
+from mindful_core.utils.misc import try_load_json
 from mindful_core.utils.imaging import write_slices
 from mindful_core.utils.tensor_utils import normalize
 from mindful_core.data import Modality, ModalityType, Sample
@@ -16,7 +16,7 @@ from mindful_core.data.transforms.pipeline import Pipeline, PipelineConfig
 
 def get_pipeline(path: str) -> Pipeline:
     # noinspection PyTypeChecker
-    config: PipelineConfig = load_json(path)
+    config: PipelineConfig = try_load_json(path, "Preview Pipeline config")
     return Pipeline(config, multiview=False, preprocess_device="cuda")
 
 

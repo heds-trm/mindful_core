@@ -8,7 +8,7 @@ import copy
 from typing import Optional
 
 from mindful_core.utils.data_constants import SCAN_ID, LABEL
-from mindful_core.utils.misc import load_json
+from mindful_core.utils.misc import try_load_json
 
 
 def gather_spatial_visualizations(trial_path: Path, sample_ids: list[str]) -> None:
@@ -139,7 +139,7 @@ def main():
     args = arg_parser.parse_args()
 
     config_path = args.config_path
-    config: dict[str, list[int]] = load_json(config_path)
+    config: dict[str, list[int]] = try_load_json(config_path, "Spatial Visualizations gathering config")
 
     for trial, sample_ids in config.items():
         trial = Path(trial)

@@ -9,7 +9,7 @@ import warnings
 from typing import Any
 
 from mindful_core.utils.data_constants import LABEL
-from mindful_core.utils.misc import load_json
+from mindful_core.utils.misc import try_load_json
 from mindful_core.models.classification import AbstractClassifier
 from mindful_core.models.index import get_model, ModuleConfig
 from mindful_core.data.transforms.pipeline import Pipeline
@@ -130,7 +130,10 @@ def load_sample(inputs: str | Path | dict[str, Any],
                 preparation_savers: dict[Modality, SaveImage] = None,
                 to_gpu: bool = True
                 ) -> INPUT_SAMPLE_DATA:
-    input_data = load_json(inputs) if isinstance(inputs, (Path, str)) else inputs
+    if isinstance(inputs, (Path, str)):
+        input_data = try_load_json(inputs, "Input Sample data")
+    else:
+        input_data = inputs
 
     if preparation_pipeline is not None:
         input_data, meta_data = prepare_sample(input_data, preparation_pipeline, preparation_savers)

@@ -6,7 +6,7 @@ from pathlib import Path
 import argparse
 
 from mindful_core.utils.data_constants import SCAN_ID, SUBSET_ID, LABEL
-from mindful_core.utils.misc import load_json
+from mindful_core.utils.misc import try_load_json
 from mindful_core.analysis.statistics.roc_compare import compute_roc_curve, compute_kfolds_roc_distribution
 from mindful_core.analysis.statistics.classification_summary import compute_auroc
 from mindful_core.scripts.outcomes.compare_experiments_delong import load_test_inferences_from_config
@@ -110,7 +110,7 @@ def main():
     # endregion
 
     # region Load
-    config = load_json(config_path)
+    config = try_load_json(config_path, "ROC Comparison config")
     folds_ids = get_test_partitions(config["folds"])
     test_inferences = load_test_inferences_from_config(config["experiments"])
     # endregion

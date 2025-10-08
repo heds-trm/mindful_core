@@ -3,7 +3,7 @@ from pathlib import Path
 from tqdm import tqdm
 import argparse
 
-from mindful_core.utils.misc import load_json, write_json
+from mindful_core.utils.misc import try_load_json, write_json
 from mindful_core.utils.data_constants import SCAN_ID, SUBSET_ID
 from mindful_core.models.classification.ensemble.ensemble_classifier import EnsembleClassifier
 
@@ -43,7 +43,7 @@ def main():
     print("Updating the following model hparam files: {}".format(ensemble_hparams_paths))
 
     for ensemble_hparams_path in tqdm(ensemble_hparams_paths):
-        ensemble_hparams = load_json(ensemble_hparams_path)
+        ensemble_hparams = try_load_json(ensemble_hparams_path, "Ensemble Model config")
         if "models_paths" not in ensemble_hparams:
             print("{} is not ensemble model hparam file".format(ensemble_hparams_path))
             continue

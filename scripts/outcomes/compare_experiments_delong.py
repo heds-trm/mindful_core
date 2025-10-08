@@ -4,7 +4,7 @@ import argparse
 from typing import Any
 
 from mindful_core.utils.data_constants import SCAN_ID
-from mindful_core.utils.misc import load_json
+from mindful_core.utils.misc import try_load_json
 from mindful_core.analysis.statistics.roc_compare import compute_kfolds_delong_roc_test
 from mindful_core.scripts.outcomes.draw_roc_comparisons import (get_test_partitions,
                                                                 extract_ground_truth_and_probabilities)
@@ -21,7 +21,8 @@ def load_test_inferences_from_file(path: str) -> pd.DataFrame:
 
 def load_test_inferences_from_config(config: str | Path | dict[str, Any]) -> dict[str, pd.DataFrame]:
     if not isinstance(config, dict):
-        config = load_json(config)
+        config = try_load_json(config, "Test Inferences config")
+
     return {exp_id: load_test_inferences_from_file(path)
             for exp_id, path in config.items()
             if not exp_id.startswith("-")}
@@ -33,7 +34,7 @@ def main():
     args = arg_parser.parse_args()
 
     config_path = Path(args.config_path)
-    config = load_json(config_path)
+    config = try_load_json(config_path, "DeLong Experiments Comparison config")
     folds_ids = get_test_partitions(config["folds"])
     test_inferences = load_test_inferences_from_config(config["experiments"])
 

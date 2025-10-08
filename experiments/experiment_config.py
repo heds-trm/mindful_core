@@ -3,7 +3,7 @@ from enum import Enum
 from typing import Any, TypedDict
 
 from mindful_core.utils.parsing import parse_list, parse_checkpoint_path, parse_batch_size
-from mindful_core.utils.misc import load_json, write_json
+from mindful_core.utils.misc import try_load_json, write_json
 from mindful_core.data.subset_id import SubsetID
 from mindful_core.data.data_folds import DataFold, PresetFold
 from mindful_core.models.index import ModuleConfig, MindfulModule
@@ -90,7 +90,7 @@ class ExperimentRoundConfig(object):
 
         self.preparation_pipeline_export = preparation_pipeline_export
         self.pipeline_config_path = pipeline_config
-        self.base_pipeline_config = load_json(pipeline_config)
+        self.base_pipeline_config = try_load_json(pipeline_config, "Base Pipeline config")
 
         # region Directories
         self.log_dir: str = log_dir

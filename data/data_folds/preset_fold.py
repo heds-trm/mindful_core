@@ -1,9 +1,8 @@
 from pathlib import Path
-import json
 import pandas as pd
-from typing import Union
 
 from mindful_core.utils.data_constants import SCAN_ID, SUBSET_ID, LABEL, DEFAULT_IMAGE_COLUMN
+from mindful_core.utils.misc import try_load_json
 from mindful_core.data import SubsetID, Sample, Modality, ModalityType
 from mindful_core.data.data_folds.data_fold import DataFold
 
@@ -51,8 +50,7 @@ class PresetFold(DataFold):
     # region Read the fold from a JSON
     @staticmethod
     def _read_json(fold_path: str):
-        with open(fold_path, "r") as file:
-            data: dict[str, list[dict[str, Union[str, bool]]]] = json.load(file)
+        data: dict[str, list[dict[str, str | bool]]] = try_load_json(fold_path, "Fold path")
 
         samples = {
             SubsetID.parse(subset_id): [
@@ -70,7 +68,7 @@ class PresetFold(DataFold):
 
     # region Read the fold from a CSV
     @staticmethod
-    def _parse_csv_label(label: Union[str, bool, int]) -> int:
+    def _parse_csv_label(label: str | bool | int) -> int:
         if isinstance(label, bool):
             return int(label)
 
