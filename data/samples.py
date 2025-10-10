@@ -25,7 +25,7 @@ class Sample(object):
         self.label_name: str | None = label_name
 
         self.label: int = label
-        self.image_path: dict[Modality, str] = image_path
+        self.image_path: dict[Modality, str | Path] = image_path
         self.scalar_features: list[float] | None = scalar_features
         self.categorical_features: dict[str, int] | None = categorical_features
 
