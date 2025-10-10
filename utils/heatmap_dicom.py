@@ -7,11 +7,10 @@ from pydicom_seg import writer_utils
 from pydicom_seg.template import from_dcmqi_metainfo
 from pydicom_seg.dicom_utils import CodeSequence, DimensionOrganizationSequence
 from datetime import datetime
-import json
 from pathlib import Path
 from typing import Iterable, Sequence
 
-from mindful_core.utils.misc import load_json
+from mindful_core.utils.misc import try_load_json
 
 
 class HeatmapDataset(pydicom.Dataset):
@@ -273,8 +272,7 @@ class HeatmapDataset(pydicom.Dataset):
                              format(segment_number, self.segment_numbers))
 
     def validate_dataset(self, template_path: str):
-        with open(template_path, "r") as file:
-            template: dict = json.load(file)
+        template: dict = try_load_json(template_path, "Heatmap DICOM template")
 
         expected_attributes = []
         for group_name, group_attributes in template.items():
@@ -304,7 +302,8 @@ class HeatmapDataset(pydicom.Dataset):
 class HeatmapWriter(object):
     def __init__(self, template: str | Path | dict | pydicom.Dataset):
         if isinstance(template, (str, Path)):
-            template = load_json(template)
+            template = try_load_json(template, "Heatmap DICOM template")
+
         if isinstance(template, dict):
             template = from_dcmqi_metainfo(template)
         self.template = template

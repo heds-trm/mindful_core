@@ -7,7 +7,7 @@ import argparse
 from tqdm import tqdm
 
 from mindful_core.utils.data_constants import SCAN_ID
-from mindful_core.utils.misc import load_json
+from mindful_core.utils.misc import try_load_json
 from mindful_core.utils.imaging import write_slices
 from mindful_core.utils.tensor_utils import normalize
 from mindful_core.data import Modality, ModalityType, Sample
@@ -16,7 +16,7 @@ from mindful_core.data.transforms.pipeline import Pipeline, PipelineConfig
 
 def get_pipeline(path: str) -> Pipeline:
     # noinspection PyTypeChecker
-    config: PipelineConfig = load_json(path)
+    config: PipelineConfig = try_load_json(path, "Preview Pipeline config")
     return Pipeline(config, multiview=False, preprocess_device="cuda")
 
 
@@ -49,11 +49,11 @@ def get_samples_paths(path: Path, sample_count: int) -> dict[str, Path]:
             if "ScanFilepath" in fold.columns:
                 samples = fold["ScanFilepath"].to_dict()
             else:
-                image_columns = [column for column in fold.columns if column.endswith(":image")]
+                image_columns = [column for column in fold.columns if column.startswith("image:")]
                 if len(image_columns) != 1:
                     extra = "" if (len(image_columns) == 0) else ": {}".format(image_columns)
                     raise RuntimeError("Could not identify the image column. "
-                                       "Found `{}` columns ending with `:image`{}".
+                                       "Found `{}` columns starting with `image:`{}".
                                        format(len(image_columns), extra))
                 else:
                     samples = fold[image_columns[0]].to_dict()

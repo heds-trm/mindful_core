@@ -15,7 +15,7 @@ from typing import Any, TypedDict, Optional
 from mindful_core.data import ModalitySet, Modality, ModalityType, Sample
 from mindful_core.data.transforms.batch_transform import BatchTransform
 from mindful_core.data.transforms.serializable_transform import SerializableTransform, TransformParameters
-from mindful_core.utils.misc import write_json, load_json, DynValue, ContextValue
+from mindful_core.utils.misc import write_json, try_load_json, DynValue, ContextValue
 
 """
 {
@@ -271,7 +271,7 @@ class Pipeline(Randomizable):
                  preprocess_device: str | None = None,
                  ):
         if isinstance(config, (str, Path)):
-            config: PipelineConfig = load_json(config)
+            config: PipelineConfig = try_load_json(config, "Pipeline config")
 
         # may need to differentiate inputs modalities from output modalities (for dynamic multimodal masking/weighting)
         input_modalities = Pipeline.get_config_modalities(config["inputs"])

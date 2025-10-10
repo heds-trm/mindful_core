@@ -4,11 +4,10 @@ import pandas as pd
 import shutil
 from pathlib import Path
 import copy
-import json
 from typing import Any
 
 from mindful_core.utils.data_constants import SCAN_ID
-from mindful_core.utils.misc import load_json
+from mindful_core.utils.misc import try_load_json
 from mindful_core.experiments.experiment_config import ExperimentRoundConfig, GradientClipConfig
 from mindful_core.experiments.experiment_round import ExperimentRound
 
@@ -156,10 +155,7 @@ class Experiment(object):
     def hparams(self) -> dict[str, Any]:
         hparams = self.base_config["model"]["hparams"]
         if isinstance(hparams, (str, Path)):
-            try:
-                hparams = load_json(hparams)
-            except json.decoder.JSONDecodeError:
-                raise RuntimeError("Found {} but could not load hparams from it (invalid file)".format(hparams))
+            hparams = try_load_json(hparams, "Hparams")
             self.hparams = hparams
 
         return hparams
@@ -179,7 +175,7 @@ class Experiment(object):
 
 def merge_hparams(hparams: dict[str, Any] | str | Path, additional_hparams: dict[str, Any]) -> dict[str, Any]:
     if isinstance(hparams, (str, Path)):
-        hparams = load_json(hparams)
+        hparams = try_load_json(hparams, "Base hparams")
 
     result = copy.deepcopy(hparams)
     for key in additional_hparams:

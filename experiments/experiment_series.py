@@ -3,7 +3,7 @@ import copy
 import warnings
 from typing import TypedDict, Literal, Any
 
-from mindful_core.utils.misc import load_json
+from mindful_core.utils.misc import try_load_json
 from mindful_core.models.index import ModuleConfig
 from mindful_core.data.datasets.protoset import ProtoSet, get_proto_datasets
 from mindful_core.experiments.experiment import Experiment
@@ -60,7 +60,7 @@ class ExperimentSeriesConfig(TypedDict, total=False):
 class ExperimentSeries(object):
     def __init__(self, config: str | Path | dict | ExperimentSeriesConfig) -> None:
         if isinstance(config, (str, Path)):
-            config = load_json(config)
+            config = try_load_json(config, "Experiment Series config")
 
         config = copy.deepcopy(config)
         self._check_config(config)

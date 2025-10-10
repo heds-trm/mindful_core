@@ -17,7 +17,7 @@ from mindful_core.analysis.visualization import (
     AttentionRecorder, 
     SegmentationMap,
     MatchSamples)
-from mindful_core.utils.misc import load_json
+from mindful_core.utils.misc import try_load_json
 
 DataLoaderOutput = tuple[list[Sample], ModelInput]
 
@@ -31,7 +31,7 @@ class VisualizerGroup(object):
                  features_names: dict[Modality, list[str]] = None,
                  ):
         if isinstance(visualizer_configs, (str, Path)):
-            visualizer_configs = load_json(visualizer_configs)
+            visualizer_configs = try_load_json(visualizer_configs, "Visualizers Group config")
 
         self.visualizer_configs = visualizer_configs
         self.model = model

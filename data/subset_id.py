@@ -19,7 +19,7 @@ class SubsetID(Enum):
             raise RuntimeError
 
     @staticmethod
-    def parse(expression: str) -> SUBSET_ID:
+    def parse(expression: str) -> "SubsetID":
         if not isinstance(expression, str):
             raise ValueError("Expression must be a string, got {}.".format(type(expression)))
 

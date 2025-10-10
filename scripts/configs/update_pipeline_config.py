@@ -2,7 +2,7 @@ import argparse
 from pathlib import Path
 from typing import Union, Optional, Any
 
-from mindful_core.utils.misc import load_json, write_json
+from mindful_core.utils.misc import try_load_json, write_json
 from mindful_core.data.transforms.pipeline import PipelineConfig as PipelineConfigV2, StageConfig, TransformConfig
 
 """ V1
@@ -112,7 +112,7 @@ def main():
 
     output_folder = None if args.output_folder is None else Path(args.output_folder)
     for json_path in paths:
-        original_config = load_json(json_path)
+        original_config = try_load_json(json_path, "Original Pipeline config")
         updated_config = update_pipeline_config(original_config)
 
         if updated_config is None:

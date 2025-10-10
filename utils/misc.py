@@ -3,8 +3,8 @@ import pandas as pd
 from pathlib import Path
 import importlib.util
 import json
+from json.decoder import JSONDecodeError
 import sys
-import os
 from contextlib import contextmanager
 import importlib.util
 from abc import ABCMeta
@@ -63,12 +63,42 @@ def get_filepath_suffix(filepath: str | Path):
 # endregion
 
 # region JSON
-def load_json(path: str | Path) -> dict:
-    with open(path, "r") as file:
-        return json.load(file)
+def load_json(path: str | Path) -> dict[Any, Any]:
+    try:
+        with open(path, "r") as file:
+            return json.load(file)
+        
+    except JSONDecodeError as exception:
+        raise JSONDecodeError("Could not decode the following JSON file: {}".format(path)) from exception
+    
+    except PermissionError as exception:
+        if Path(path).is_dir():
+            raise IsADirectoryError("`{}` is a directory, expected a file.".format(path))
+        else:
+            raise exception
+    
+
+def try_load_json(path: str | Path, file_description: str) -> dict[Any, Any]:
+    try:
+        with open(path, "r") as file:
+            return json.load(file)
+        
+    except JSONDecodeError as exception:
+        error_message = "Could not decode `{}` file at `{}`".format(file_description, path)
+        raise JSONDecodeError(error_message) from exception
+    
+    except FileNotFoundError as exception:
+        error_message = "No such `{}` file: `{}`".format(file_description, path)
+        raise FileNotFoundError(error_message) from exception
+
+    except PermissionError as exception:
+        if Path(path).is_dir():
+            raise IsADirectoryError("Path to `{}` ({}) is a directory, expected a file.".format(file_description, path))
+        else:
+            raise exception
 
 
-def write_json(path: str | Path, value: dict) -> None:
+def write_json(path: str | Path, value: dict[Any, Any]) -> None:
     with open(path, 'w') as file:
         json.dump(value, file, indent=4)
 
