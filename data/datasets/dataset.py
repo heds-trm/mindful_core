@@ -92,7 +92,7 @@ class MindfulDataset(object):
 
             if use_imbalanced_sampler:
                 if shuffle:
-                    if use_imbalanced_sampler == "v2":
+                    if use_imbalanced_sampler in ["v2", "difficulty"]:
                         from mindful_core.data.sampling.difficulty_sampler import DifficultySampler
                         sampler = DifficultySampler(subset, trainer, model, batch_size)
                     else:

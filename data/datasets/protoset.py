@@ -216,6 +216,7 @@ class ProtoSet(object):
             export_folder = Path(self.preparation_pipeline_export_path).parent
             export_folder.mkdir(parents=True, exist_ok=True)
             with open(self.preparation_pipeline_export_path, "wb") as file:
+                # noinspection PyTypeChecker
                 pickle.dump(pipeline, file)
 
         self._preparation_pipeline = pipeline
