@@ -4,6 +4,9 @@
 # VS folder
 .vscode
 
+# Virtual environment
+.venv
+
 # PyC
 *.pyc
 
