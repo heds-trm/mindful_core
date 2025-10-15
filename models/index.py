@@ -1,3 +1,4 @@
+import torch
 from pathlib import Path
 from typing import Any, TypedDict, NotRequired, Type, TypeVar
 
@@ -19,7 +20,10 @@ class ModuleConfig(TypedDict):
     train: NotRequired[str | None]
 
 
-def get_model(module_config: ModuleConfig, checkpoint: str | Path | None = None) -> MindfulModule:
+def get_model(module_config: ModuleConfig,
+              checkpoint: str | Path | None = None,
+              device: str | None = None
+              ) -> MindfulModule:
     # region Check configuration
     if not isinstance(module_config, dict):
         raise ValueError("Expected `module_config` to be a dictionary, got `{}`".format(type(module_config)))
@@ -53,11 +57,17 @@ def get_model(module_config: ModuleConfig, checkpoint: str | Path | None = None)
 
     if checkpoint is not None:
         print("Loading a {} from {}.".format(model_class.__name__, checkpoint))
+        if device is not None:
+            map_location = torch.device(device)
+        else:
+            map_location = None
         # noinspection PyTypeChecker
-        model = model_class.load_from_checkpoint(checkpoint, **hparams)
+        model = model_class.load_from_checkpoint(checkpoint, **hparams, map_location=map_location)
     else:
         print("Building new {}.".format(model_class.__name__))
         model = model_class(**hparams)
+        if device is not None:
+            model = model.to(device)
 
     if unfreeze:
         model.unfreeze()
@@ -140,28 +150,30 @@ def find_mindful_models(models_paths: list[Path | str],
 
 def load_mindful_model(model_path: Path | str,
                        model_class: Type[_MM],
-                       monitor: str
+                       monitor: str,
+                       device: str | None = None,
                        ) -> _MM | None:
     model_path = Path(model_path)
     model_config_path = find_mindful_model_config(model_path, model_class)
     model_config: ModuleConfig = try_load_json(model_config_path, "Mindful Model config")
     checkpoint_path = parse_checkpoint_path(model_path / "checkpoints", monitor)
 
-    model = get_model(model_config, checkpoint=checkpoint_path)
+    model = get_model(model_config, checkpoint=checkpoint_path, device=device)
 
-    if isinstance(model, model_class):
-        return model
-    else:
+    if not isinstance(model, model_class):
         return None
+
+    return model
 
 
 def load_mindful_models(models_paths: list[Path | str],
                         model_class: Type[_MM],
-                        monitor: str
+                        monitor: str,
+                        device: str | None = None,
                         ) -> list[_MM]:
     models: list[AbstractClassifier] = []
     for model_path in models_paths:
-        model = load_mindful_model(model_path, model_class, monitor)
+        model = load_mindful_model(model_path, model_class, monitor, device)
         if model is not None:
             models.append(model)
     return models

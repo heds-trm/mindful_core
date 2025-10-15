@@ -37,9 +37,10 @@ class EnsembleClassifier(AbstractClassifier):
                  confidence_budget: float | None = None,
                  positive_class: int | None = None,
                  use_focal_loss: bool | None = None,
+                 device: str | None = None,
                  ):
         models_paths = find_mindful_models(models_paths, AbstractClassifier)
-        models = load_mindful_models(models_paths, AbstractClassifier, monitor)
+        models = load_mindful_models(models_paths, AbstractClassifier, monitor, device)
         if len(models) < self.minimum_model_count:
             raise ValueError("Not enough model found for an ensemble model, "
                              "found {} but need at least {}.".format(len(models), self.minimum_model_count))

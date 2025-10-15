@@ -170,8 +170,12 @@ class ExperimentSeries(object):
             # region Pop `dataset`, `seeds` and `folds` from config
             # noinspection PyTypeChecker
             dataset_name: str = experiment_config.pop("dataset")
-            # noinspection PyTypeChecker
-            seeds: list[int] = experiment_config.pop("seeds")
+            seeds: list[int] | None
+            if "seeds" in experiment_config:
+                # noinspection PyTypeChecker
+                seeds = experiment_config.pop("seeds")
+            else:
+                seeds = None
             # noinspection PyTypeChecker
             folds_config: str | int | list[int] = experiment_config.pop("folds")
             # endregion

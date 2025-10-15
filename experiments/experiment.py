@@ -16,7 +16,7 @@ class Experiment(object):
     def __init__(self,
                  base_config: dict,
                  folds: dict[int, str],
-                 seeds: list[int],
+                 seeds: list[int] | None,
                  checkpoint: str | Path | None = None,
                  name: str | None = None,
                  ) -> None:
@@ -26,8 +26,8 @@ class Experiment(object):
         self.checkpoint = Path(checkpoint) if checkpoint is not None else None
         self.name = name
 
-        if len(self.seeds) < len(self.folds):
-            raise ValueError("You have more folds than seeds ({} > {})".format(len(self.folds), len(self.seeds)))
+        if (seeds is not None) and (len(seeds) < len(folds)):
+            raise ValueError("You have more folds than seeds ({} > {})".format(len(folds), len(seeds)))
 
         self.gradient_clip_config: GradientClipConfig | None = None
 
@@ -41,9 +41,10 @@ class Experiment(object):
             round_config = copy.deepcopy(self.base_config)
 
             seed = self.get_seed_for_round(fold_index)
-            set_determinism(seed)
-            seed_everything(seed)
-            round_config["seed"] = seed
+            if seed is not None:
+                set_determinism(seed)
+                seed_everything(seed)
+                round_config["seed"] = seed
 
             # TODO : Allow for a dictionary of checkpoints to allow for importing models from other experiments
             #   as sub-modules (eg. import an encoder trained with SSL in an encoder+mlp setup)
@@ -89,7 +90,10 @@ class Experiment(object):
             "algorithm": gradient_clip_algorithm
         }
 
-    def get_seed_for_round(self, fold_index: int) -> int:
+    def get_seed_for_round(self, fold_index: int) -> int | None:
+        if self.seeds is None:
+            return None
+        
         if len(self.seeds) < len(self.folds):
             raise RuntimeError("You have more folds than seeds ({} > {}). "
                                "This should have been verified during initialisation, did you change seeds or folds ?".
