@@ -66,14 +66,44 @@ class McNemarNaiveCrossValidationTest(object):
             best = "mixed"
 
         return McNemarTest(statistic, pvalue, best)
+    
+
+def experiments_paths_to_ids(experiments_paths: list[Path]) -> dict[Path, str]:
+    experiments_paths = set([path.absolute() for path in experiments_paths])
+
+    level = 1
+    max_level_reached = previous_max_level_reached = 0
+    unique_ids = False
+    while not unique_ids:
+        existing_ids = []
+        unique_ids = True
+        paths_to_ids = {}
+        for experiment_path in experiments_paths:
+            exp_level = min(level, len(experiment_path.parts))
+            previous_max_level_reached = max(exp_level, previous_max_level_reached)
+            exp_id = Path(*experiment_path.parts[-exp_level:]).as_posix()
+            
+            if exp_id in existing_ids:
+                unique_ids = False
+                break
+            
+            existing_ids.append(exp_id)
+            paths_to_ids[experiment_path] = exp_id
+
+        level += 1
+        if previous_max_level_reached == max_level_reached:
+            raise RuntimeError("Could not build experiment ids for {}".format(experiments_paths))
+        
+    print(paths_to_ids)
+    return paths_to_ids
 
 
 def load_experiments_inferences(experiments_paths: list[Path]) -> dict[str, list[pd.DataFrame]]:
     # common_path = os.path.commonpath(experiments_paths)
+    experiments_paths_ids = experiments_paths_to_ids(experiments_paths)
     experiments_inferences: dict[str, list[pd.DataFrame]] = {}
-    for experiment_path in experiments_paths:
+    for experiment_path, experiment_id in experiments_paths_ids.items():
         # experiment_id = os.path.relpath(experiment_path, common_path)
-        experiment_id = experiment_path.name
 
         experiment_inferences = {}
         for fold_inferences_path in experiment_path.glob("*inferences_fold_*.csv"):
