@@ -33,6 +33,7 @@ from monai.utils.enums import TransformBackends
 from monai.utils.type_conversion import convert_to_tensor
 from monai.transforms.utils import map_spatial_axes, create_grid
 from pytorch_lightning.utilities.types import STEP_OUTPUT
+import matplotlib.cm
 from pathlib import Path
 import copy
 from typing import Sequence, Any, Callable, Literal
@@ -422,6 +423,97 @@ class StandardizeIntensityD(SerializableTransform):
         }
 
 
+
+class NormalizeIntensity(SerializableTransform):
+    backend = [TransformBackends.TORCH]
+
+    def __init__(self,
+                 channel_wise: bool = False,
+                 spatial_dims: int = 3,
+                 print_stats: bool = False,
+                 population_min: torch.Tensor | list[float] | None = None,
+                 population_max: torch.Tensor | list[float] | None = None,
+                 ):
+        super().__init__()
+        self.channel_wise = channel_wise
+        self.spatial_dims = spatial_dims
+
+        if population_min is not None:
+            population_min = torch.as_tensor(population_min, dtype=torch.float32)
+
+        if population_max is not None:
+            population_max = torch.as_tensor(population_max, dtype=torch.float32)
+
+        self._min: torch.Tensor | None = population_min
+        self._max: torch.Tensor | None = population_max
+
+        self.print_stats = print_stats
+        self._requires_fitting_preprocessed = (population_min is None) or (population_max is None)
+
+    def reset_preprocessed(self) -> None:
+        self._min = None
+        self._max = None
+
+    def fit_preprocessed(self, sample: torch.Tensor) -> None:
+        if self._min is None:
+            self.reset_preprocessed()
+
+        if self.channel_wise:
+            axis = tuple([-i for i in range(1, 1 + self.spatial_dims)])
+
+            sample_min = sample.min(axis, keepdim=True)
+            sample_max = sample.max(axis, keepdim=True)
+        else:
+            sample_min = sample.min()
+            sample_max = sample.max()
+
+        if self._min is None:
+            self._min = sample_min
+            self._max = sample_max
+        else:
+            self._min = torch.minimum(self._min, sample_min)
+            self._max = torch.minimum(self._max, sample_max)
+
+    def aggregate_preprocessed(self) -> None:
+        if self.print_stats:
+            print("Computed mean/std: {} ({})".format(self._min.squeeze(), self._max.squeeze()))
+
+    def __call__(self, data: torch.Tensor | MetaTensor) -> torch.Tensor | MetaTensor:
+        if (self._min is None) or (self._max is None):
+            _min, _max = data.min(), data.max()
+
+        else:
+            _min, _max = self._min, self._max
+
+        return (data - _min) / (_max - _min)
+
+    @property
+    def requires_fitting_preprocessed(self) -> bool:
+        return self._requires_fitting_preprocessed
+
+    @classmethod
+    def json_identifier(cls) -> str:
+        return "normalize_intensity"
+
+    def serialize_stats(self) -> dict[str, float | list[float]]:
+        stats = {}
+        if self._min is not None:
+            stats["population_min"] = self._min.tolist()
+
+        if self._max is not None:
+            stats["population_max"] = self._max.tolist()
+
+        return stats
+
+    def to_json(self) -> dict[str, Any]:
+        return {
+            "channel_wise": self.channel_wise,
+            "spatial_dims": self.spatial_dims,
+            "print_stats": self.print_stats,
+            **self.serialize_stats()
+        }
+
+
 class ClipIntensity(SerializableTransform):
     backend = [TransformBackends.NUMPY, TransformBackends.TORCH]
 
@@ -469,23 +561,7 @@ class ClipIntensity(SerializableTransform):
             "channel_wise": self.channel_wise,
             "spatial_dims": self.spatial_dims,
         }
-
-
-# class ScaleIntensityReference(SerializableTransform):
-#     backend = [TransformBackends.NUMPY]
-#
-#     def __init__(self, mask_path: str | Path):
-#         super().__init__()
-#
-#     @classmethod
-#     def json_identifier(cls) -> str:
-#         return "scale_intensity_reference"
-#
-#     def to_json(self) -> TransformParameters:
-#         pass
-#
-#     def __call__(self, data: Any):
-#         pass
+    
 
 
 class CenterIntensityBoost(SerializableTransform):
@@ -553,6 +629,72 @@ class CenterIntensityBoost(SerializableTransform):
             "spatial_dims": self.spatial_dims,
         }
 
+
+class PseudoColor(SerializableTransform):
+    backend = [TransformBackends.TORCH]
+
+    def __init__(self, color_map: str, **kwargs):
+        super().__init__(**kwargs)
+
+        self.color_map = color_map
+
+        color_map_fn = matplotlib.cm.get_cmap(name=color_map, lut=256)
+        color_map_array = color_map_fn(range(256))
+        color_map_array = color_map_array[:, :3]
+        color_map_array = torch.as_tensor(color_map_array)
+        self.color_map_array = color_map_array
+        self.color_map_by_device = {}
+
+    def __call__(self, image: torch.Tensor | MetaTensor) -> torch.Tensor | MetaTensor:
+        if not isinstance(image, torch.Tensor):
+            raise TypeError("Expected a Tensor, got {}".format(type(image)))
+
+        if torch.is_floating_point(image):
+            image = self.convert_image_to_integer(image)
+
+        elif image.dtype not in (torch.int8, torch.int16, torch.int32, torch.int64):
+            raise ValueError("Received an image with incorrect data type: {}".format(image.dtype))
+
+        elif image.max() > 255:
+            raise ValueError("Unsupported image range: max={}".format(image.max()))
+        
+        if image.device not in self.color_map_by_device:
+            self.color_map_by_device[image.device] = self.color_map_array.to(image.device)
+        color_map_array = self.color_map_by_device[image.device]
+
+        image = image.squeeze()
+        dims = len(image.shape)
+        image = color_map_array[image]
+
+        permutation = [dims] + list(range(dims))
+        image = torch.permute(image, permutation)
+
+        return image
+
+    @staticmethod
+    def convert_image_to_integer(image: torch.Tensor | MetaTensor) -> torch.Tensor | MetaTensor:
+        image_min = float(image.min())
+        image_max = float(image.max())
+        if (image_min < 0.0) or (image_max > 255.0):
+            raise ValueError("Unsupported image range: min={} and max={}".format(image_min, image_max))
+        
+        if image_max > 1.0:
+            if image_min == image_max:
+                raise ValueError("Only one intensity found in image, could not normalize image for colormapping.")
+            image = (image - image_min) / (image_max - image_min)
+
+        image = (image * 255).to(torch.int32)
+
+        return image
+
+    @classmethod
+    def json_identifier(cls) -> str:
+        return "pseudo_color"
+
+    def to_json(self) -> dict[str, Any]:
+        return {
+            "color_map": self.color_map
+        }
 
 # endregion
 

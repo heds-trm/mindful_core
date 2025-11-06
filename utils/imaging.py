@@ -186,6 +186,9 @@ def get_3d_image_slices(image: np.ndarray | torch.Tensor,
     image: np.ndarray = image.cpu().numpy() if isinstance(image, torch.Tensor) else image
     image = remove_image_extra_channel(image)
 
+    if (len(image.shape) == 4) and (image.shape[0] <= 3):
+        image = np.transpose(image, [1, 2, 3, 0])
+
     slices_indices = get_3d_image_slices_indices(image, method)
     # noinspection PyTypeChecker
 
@@ -246,9 +249,8 @@ def get_formatted_3d_image_slice(image: np.ndarray | torch.Tensor,
 def get_3d_image_slices_indices(image: np.ndarray,
                                 method: Literal["center", "max_intensity"],
                                 ) -> tuple[int, int, int]:
-    if image.shape[0] <= 3:
-        raise NotImplementedError("Image shape {} started with channels, "
-                                  "which is not supported yet".format(image.shape))
+    if (len(image.shape)) == 4 and (image.shape[0] <= 3):
+        image = torch.permute(image, [1, 2, 3, 0])
 
     if method == "center":
         # noinspection PyTypeChecker
