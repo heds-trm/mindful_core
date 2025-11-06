@@ -69,7 +69,8 @@ def load_json(path: str | Path) -> dict[Any, Any]:
             return json.load(file)
         
     except JSONDecodeError as exception:
-        raise JSONDecodeError("Could not decode the following JSON file: {}".format(path)) from exception
+        error_message = "Could not decode the following JSON file: {}".format(path)
+        raise JSONDecodeError(error_message, doc=exception.doc, pos=exception.pos) from exception
     
     except PermissionError as exception:
         if Path(path).is_dir():
@@ -85,7 +86,7 @@ def try_load_json(path: str | Path, file_description: str) -> dict[Any, Any]:
         
     except JSONDecodeError as exception:
         error_message = "Could not decode `{}` file at `{}`".format(file_description, path)
-        raise JSONDecodeError(error_message) from exception
+        raise JSONDecodeError(error_message, doc=exception.doc, pos=exception.pos) from exception
     
     except FileNotFoundError as exception:
         error_message = "No such `{}` file: `{}`".format(file_description, path)
