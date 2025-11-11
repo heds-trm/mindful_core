@@ -5,7 +5,7 @@ from monai.networks.nets import ViT
 from monai.networks.nets.swin_unetr import BasicLayer as BasicSwinLayer
 # noinspection PyProtectedMember
 from monai.networks.nets.swin_unetr import MERGING_MODE, UnetrBasicBlock
-from monai.networks.blocks import PatchEmbed
+from monai.networks.blocks import PatchEmbed, TransformerBlock
 from monai.utils import ensure_tuple_rep, look_up_option
 import numpy as np
 from typing import Sequence, Literal
@@ -68,6 +68,8 @@ class ViTEncoder(ViT):
                                   in zip(self.img_size, self.patch_size)])
         self.total_patch_count = np.prod(self.patch_count)
 
+        self.compat_remove_cross_attn_modules()
+
     def forward(self, inputs, *args, **kwargs):
         outputs = self.patch_embedding(inputs)
         outputs = self.cls_token(outputs)
@@ -84,6 +86,19 @@ class ViTEncoder(ViT):
             outputs = self.classification_head(outputs)
 
         return outputs
+    
+    def compat_remove_cross_attn_modules(self):
+        """
+            MONAI added two sub-modules to their TransformerBlock (`cross_attn` and `norm_cross_attn`) that are always 
+                built, even when they will not be used. By default, their ViT does not use them (and therefore we don't).
+            However, to allow loading weights from a prior version where these un-used weights did not exist, we have
+                to remove them (otherwise, torch fails loading because of the missing weights.)
+            This method removes these two sub-modules from all TransformerBlock instances.
+        """
+        for block in self.blocks:
+            block: TransformerBlock
+            del block.cross_attn
+            del block.norm_cross_attn
 
 
 class SwinEncoder(nn.Module):
