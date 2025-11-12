@@ -821,6 +821,7 @@ class ClassificationSummary(object):
                  eer_threshold: Union[torch.Tensor, float] = None,
                  sensitivity_threshold: Union[torch.Tensor, float] = None,
                  positive_class=-1,
+                 sum_multiclass_logits: bool = False,
                  ) -> None:
         self.metrics = metrics
         self.num_thresholds = num_thresholds
@@ -828,6 +829,7 @@ class ClassificationSummary(object):
         self.eer_threshold = eer_threshold
         self.sensitivity_threshold = sensitivity_threshold
         self.positive_class = positive_class
+        self.sum_multiclass_logits = sum_multiclass_logits
 
     def __call__(self,
                  logits: torch.Tensor,
@@ -862,11 +864,19 @@ class ClassificationSummary(object):
                      confidence: torch.Tensor = None,
                      probabilities: torch.Tensor = None,
                      ) -> dict[str, Union[torch.Tensor, int]]:
+        class_count = get_class_count(logits)
+        positive_multiclass = (class_count > 1) and (self.positive_class is not None)
+        if self.sum_multiclass_logits and positive_multiclass:
+            weights = torch.ones([class_count, class_count], dtype=logits.dtype, device=logits.device) * -1.0
+            # weights[:, self.positive_class] = - 1.0 / (class_count - 1)
+            # weights[self.positive_class, self.positive_class] = 1.0
+            weights += torch.eye(class_count, dtype=logits.dtype, device=logits.device) * 2.0
+            logits = logits @ weights
+            
         if probabilities is None:
             probabilities = logits_to_probabilities(logits)
-        class_count = get_class_count(logits)
 
-        if (class_count > 1) and (self.positive_class is not None):
+        if positive_multiclass:
             positive_class = self.positive_class if (self.positive_class >= 0) else (class_count + self.positive_class)
             probabilities = probabilities[..., positive_class]
 
