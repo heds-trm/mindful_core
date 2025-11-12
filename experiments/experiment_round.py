@@ -165,6 +165,9 @@ class ExperimentRound(object):
         if self.includes_segmentation:
             self.segment()
 
+        if self.includes_model_save:
+            self.save_model_checkpoint()
+
         self.wrap_up()
 
     # region Train
@@ -208,7 +211,7 @@ class ExperimentRound(object):
 
     # endregion
 
-    def load_best_checkpoint(self):
+    def load_best_checkpoint(self) -> None:
         best_model_path = self._model_checkpoint_callbacks[0].best_model_path
 
         if not best_model_path:
@@ -219,6 +222,11 @@ class ExperimentRound(object):
             print("Loading checkpoint from best_model_path `{}`.".format(best_model_path))
 
         self.get_model(best_model_path, load_now=True)
+
+    def save_model_checkpoint(self) -> None:
+        save_path = Path(self.logger.log_dir, "checkpoints", "saved_model.ckpt")
+        print("Saving model checkpoint to {}".format(save_path))
+        self.trainer.save_checkpoint(save_path, weights_only=True)
 
     def compute_inferences(self, data_loaders: dict[SubsetID, DataLoader] | None = None):
         data_loaders = self.get_data_loaders(training=False) if data_loaders is None else data_loaders
@@ -606,7 +614,7 @@ class ExperimentRound(object):
         inference_components = {
             "preparation_pipeline": preparation_pipeline,
             "preproc_pipeline": preproc_pipeline,
-            "model": self.config.model,
+            "model_config": self.config.model,
         }
 
         if isinstance(self.model, AbstractClassifier):
@@ -737,6 +745,10 @@ class ExperimentRound(object):
     @property
     def includes_segmentation(self) -> bool:
         return self.config.stages.includes_segmentation
+    
+    @property
+    def includes_model_save(self) -> bool:
+        return self.config.stages.includes_model_save
 
     @property
     def includes_post_training_tasks(self) -> bool:

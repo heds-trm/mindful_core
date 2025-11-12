@@ -98,6 +98,16 @@ class SegmentationStage(ExperimentStage):
         return "segmentation"
 
 
+class ModelSaveStage(ExperimentStage):
+    @classmethod
+    def stage_identifier(cls) -> str:
+        return "model_save"
+    
+    @classmethod
+    def stage_aliases(cls) -> list[str]:
+        return ["save"]
+
+
 class ExperimentStages(object):
     def __init__(self, stages_configs: str | list[str] | dict[str, Any]) -> None:
         if isinstance(stages_configs, str):
@@ -156,6 +166,10 @@ class ExperimentStages(object):
     @property
     def includes_segmentation(self) -> bool:
         return self._include_stage(SegmentationStage)
+    
+    @property
+    def includes_model_save(self) -> bool:
+        return self._include_stage(ModelSaveStage)
 
     def serialize(self) -> dict:
         return {stage.stage_identifier(): stage.serialize() for stage in self.stages}
