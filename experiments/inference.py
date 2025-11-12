@@ -51,7 +51,7 @@ def find_json_samples(input_paths: list[Path]) -> list[Path]:
     sample_paths = []
     for path in input_paths:
         if not path.exists():
-            raise RuntimeError(path)
+            raise FileNotFoundError(path)
 
         if path.is_dir():
             for sub_path in path.iterdir():
@@ -64,6 +64,7 @@ def find_json_samples(input_paths: list[Path]) -> list[Path]:
 
 
 def get_image_savers(pipeline: Pipeline, output_dir: str, output_ext: str = ".mha") -> dict[Modality, SaveImage]:
+    Path(output_dir).mkdir(exist_ok=True, parents=True)
     image_modalities = [modality for modality in pipeline.output_modalities
                         if modality.type == ModalityType.IMAGE]
     image_savers = {
@@ -143,10 +144,10 @@ def load_sample(inputs: str | Path | dict[str, Any],
     input_data = {modality_name: value for modality_name, value in input_data.items()
                   if modality_name in preproc_pipeline.input_modalities}
 
-    if LABEL in preproc_pipeline.input_modalities:
-        input_data[LABEL] = -1
+    if "label" in preproc_pipeline.input_modalities:
+        input_data["label"] = -1
 
-    with preproc_pipeline.disable_modalities([LABEL]):
+    with preproc_pipeline.disable_modalities(["label", "mask"]):
         sample_data = preproc_pipeline(input_data)
 
     if isinstance(sample_data, torch.Tensor):
