@@ -340,13 +340,16 @@ class ProtoMetaSet(ProtoSet):
                  prepared_folds_folder: str | Path = None,
                  scalar_features_path: str = None,
                  categorical_features_path: str = None,
+                 preparation_pipeline_export_path: str = None,
                  ):
         self.proto_sets = proto_sets
         super(ProtoMetaSet, self).__init__(name="+".join([proto_set.name for proto_set in self.proto_sets]),
                                            original_folds_folder=original_folds_folder,
                                            prepared_folds_folder=prepared_folds_folder,
                                            scalar_features_path=scalar_features_path,
-                                           categorical_features_path=categorical_features_path)
+                                           categorical_features_path=categorical_features_path,
+                                           preparation_pipeline_export_path=preparation_pipeline_export_path,
+                                           )
 
     def prepare_samples(self, folds: list[PresetFold], verbose=True) -> dict[str, dict[Modality, str]]:
         individual_folds = {proto_set.name: self.load_folds(proto_set.prepare(verbose))
@@ -378,7 +381,8 @@ class ProtoMetaSet(ProtoSet):
                             original_folds_folder=config["folds"],
                             prepared_folds_folder=config.get("prepared_folds"),
                             scalar_features_path=config.get("scalar_features"),
-                            categorical_features_path=config.get("categorical_features"))
+                            categorical_features_path=config.get("categorical_features"),
+                            preparation_pipeline_export_path=config.get("preparation_pipeline_export"))
 
     def prepare_destination_folders(self) -> None:
         if self.prepared_folds_folder.exists():
