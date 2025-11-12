@@ -152,11 +152,16 @@ def load_mindful_model(model_path: Path | str,
                        model_class: Type[_MM],
                        monitor: str,
                        device: str | None = None,
+                       load_weights: bool = True,
                        ) -> _MM | None:
     model_path = Path(model_path)
     model_config_path = find_mindful_model_config(model_path, model_class)
     model_config: ModuleConfig = try_load_json(model_config_path, "Mindful Model config")
-    checkpoint_path = parse_checkpoint_path(model_path / "checkpoints", monitor)
+
+    if load_weights:
+        checkpoint_path = parse_checkpoint_path(model_path / "checkpoints", monitor)
+    else:
+        checkpoint_path = None
 
     model = get_model(model_config, checkpoint=checkpoint_path, device=device)
 
@@ -170,10 +175,11 @@ def load_mindful_models(models_paths: list[Path | str],
                         model_class: Type[_MM],
                         monitor: str,
                         device: str | None = None,
+                        load_weights: bool = True,
                         ) -> list[_MM]:
     models: list[AbstractClassifier] = []
     for model_path in models_paths:
-        model = load_mindful_model(model_path, model_class, monitor, device)
+        model = load_mindful_model(model_path, model_class, monitor, device, load_weights)
         if model is not None:
             models.append(model)
     return models
