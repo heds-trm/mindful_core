@@ -123,7 +123,7 @@ class FusionTransformer(FusionModule, AttentionInterface):
 
     # region AttentionInterface
     def get_attention_layers(self) -> list[nn.Module]:
-        attention_layers = [module for module in self.transformer.layers.modules()
+        attention_layers = [module.self_attn for module in self.transformer.layers.modules()
                             if isinstance(module, FusionTransformerEncoderLayer)]
         return attention_layers
 
@@ -133,6 +133,22 @@ class FusionTransformer(FusionModule, AttentionInterface):
                                  ) -> torch.Tensor | list[torch.Tensor]:
         inputs, _, _ = inputs
         _, attention_weights = outputs
+
+        # if isinstance(inputs, tuple):
+        #     if len(inputs) not in (1, 3):
+        #         raise ValueError(len(inputs))
+        #     inputs = inputs[0]
+        # else:
+        #     raise TypeError(type(inputs))
+
+        # if isinstance(outputs, tuple):
+        #     if len(outputs) != 2:
+        #         raise ValueError(len(outputs))
+        #     attention_weights = outputs[-1]
+        # else:
+        #     attention_weights = outputs
+            
+
         return [attention_weights, inputs]
 
     @property
