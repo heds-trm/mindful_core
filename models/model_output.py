@@ -126,7 +126,8 @@ class ClassifierOutput(ModelOutput):
                  batched: bool = True) -> None:
         super().__init__(batched)
         self.single_class = single_class
-        self.logits = torch.squeeze(logits, dim=-1) if single_class else logits
+        squeeze_logits = single_class and (len(logits.shape) > 1)
+        self.logits = torch.squeeze(logits, dim=-1) if squeeze_logits else logits
         self.confidence = confidence
         self.intermediate_outputs = intermediate_outputs
         self.prototype_outputs = prototype_outputs
