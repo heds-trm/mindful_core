@@ -145,6 +145,8 @@ class ExperimentRound(object):
         if self.includes_post_training_tasks:
             self.load_best_checkpoint()
 
+        self.model.eval()
+
         if self.includes_testing:
             self.test()
         elif isinstance(self.model, AbstractClassifier):
@@ -303,7 +305,6 @@ class ExperimentRound(object):
 
         if (SubsetID.TEST not in data_loaders) or (len(data_loaders[SubsetID.TEST]) == 0):
             raise RuntimeError("No samples provided belonged in the Test subset.")
-
         if isinstance(self.model, AbstractClassifier):
             self.test_classifier(data_loaders)
         elif isinstance(self.model, SegmentationUNet):
