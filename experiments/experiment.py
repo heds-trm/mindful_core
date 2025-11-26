@@ -8,7 +8,7 @@ from typing import Any
 
 from mindful_core.utils.data_constants import SCAN_ID
 from mindful_core.utils.misc import try_load_json
-from mindful_core.experiments.experiment_config import ExperimentRoundConfig, GradientClipConfig
+from mindful_core.experiments.experiment_round_config import ExperimentRoundConfig, GradientClipConfig
 from mindful_core.experiments.experiment_round import ExperimentRound
 
 
