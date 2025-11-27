@@ -17,6 +17,7 @@ from mindful_core.utils.data_constants import SCAN_ID, SUBSET_ID
 from mindful_core.data.transforms.pipeline import Pipeline
 from mindful_core.utils.callbacks import MilestoneCheckpoint
 from mindful_core.utils.parsing import get_monitor_mode
+from mindful_core.utils.reproducibility import archive_modules
 from mindful_core.experiments import ExperimentRoundConfig
 from mindful_core.models import MindfulModule
 from mindful_core.models.index import get_model, is_representation_model, is_classification_model
@@ -27,9 +28,12 @@ from mindful_core.analysis.visualization import VisualizerGroup
 from mindful_core.analysis.statistics import ConfidenceSummary, logits_to_probabilities, ClassificationSummary
 from mindful_core.data import SubsetID, MindfulDataset, Sample, ModalityType
 from mindful_core.data.data_folds import DataFold, PresetFold
+import mindful_core
 
 
 class ExperimentRound(object):
+    archived_modules = [mindful_core]
+
     def __init__(self, config: ExperimentRoundConfig):
         self.config = config
         self._model: MindfulModule | None = None
@@ -630,6 +634,9 @@ class ExperimentRound(object):
         filepath = Path(self.logger.log_dir, "inference_components.pkl")
         with open(filepath, "wb") as file:
             pickle.dump(inference_components, file)
+
+    def archive_code(self):
+        archive_modules(ExperimentRound.archived_modules, self.logger.log_dir)
 
     @property
     def logger(self) -> TensorBoardLogger:
