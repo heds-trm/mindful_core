@@ -74,7 +74,7 @@ class AbstractClassifier(MindfulModule):
                  positive_class=-1,
                  use_focal_loss=False,
                  **kwargs):
-        super(AbstractClassifier, self).__init__(optimizer_config=optimizer_config)
+        super().__init__(optimizer_config=optimizer_config)
 
         if class_count <= 0:
             raise ValueError("`class_count` must be strictly positive (got {})".format(class_count))

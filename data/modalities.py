@@ -1,5 +1,5 @@
 from enum import IntEnum
-from typing import Sequence, Iterator, Union, Optional
+from typing import Sequence, Iterator, Union, Optional, Self
 
 
 class ModalityType(IntEnum):
@@ -176,6 +176,22 @@ class ModalitySet(object):
                 return modality
 
         raise KeyError(key)
+
+    def __len__(self):
+        return len(self.modalities)
+
+    def __eq__(self, other: Self) -> bool:
+        if self is other:
+            return True
+
+        if len(other.modalities) != len(self.modalities):
+            return False
+
+        for modality in self:
+            if modality not in other:
+                return False
+
+        return True
 
     def __sub__(self, value: Modality | ModalityType | str) -> "ModalitySet":
         if value not in self:
