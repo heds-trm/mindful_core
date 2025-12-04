@@ -1,4 +1,4 @@
-from mindful_core.experiments.experiment_config import ExperimentRoundConfig
+from mindful_core.experiments.experiment_round_config import ExperimentRoundConfig
 from mindful_core.experiments.experiment_round import ExperimentRound
 from mindful_core.experiments.experiment import Experiment
 from mindful_core.experiments.experiment_series import ExperimentSeries

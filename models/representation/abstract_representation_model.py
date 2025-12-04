@@ -140,10 +140,12 @@ class AbstractRepresentationModel(MindfulModule):
         representations = representations - representations_mean
 
         covariance = (representations.T @ representations) / (batch_size - 1)  # [latent_size, latent_size]
+        # region Remove diagonal
         covariance = covariance.flatten()  # [latent_size * latent_size]
         covariance = covariance[:-1]  # [latent_size * latent_size - 1]
         covariance = covariance.view(latent_size - 1, latent_size + 1)  # [latent_size - 1, latent_size + 1]
         covariance = covariance[:, 1:]  # [latent_size - 1, latent_size]
+        # endregion
 
         covariance_regularization = covariance.pow(2.0).sum() / latent_size
         return covariance_regularization

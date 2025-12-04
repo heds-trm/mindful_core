@@ -131,8 +131,10 @@ class MindfulModule(pl.LightningModule, metaclass=ABCMeta):
 
     def __init__(self,
                  optimizer_config: dict[str, dict[str, Any]] | None = None,
-                 *args, **kwargs):
-        super(MindfulModule, self).__init__(*args, **kwargs)
+                 *args,
+                 **kwargs
+                 ):
+        super().__init__(*args, **kwargs)
         self.optimizer_config = optimizer_config
         self.loss_aggregator = LossAggregator()
         self._loss_aggregator_setup = False

@@ -7,10 +7,31 @@ from typing import Any, Iterator
 
 from mindful_core.models.model_output import ClassifierOutput
 from mindful_core.models.classification import AbstractClassifier
-from mindful_core.models.index import find_mindful_models, load_mindful_models
+from mindful_core.models.index import find_mindful_models, load_mindful_models, get_model, ModuleConfig
 
 
 class EnsembleClassifier(AbstractClassifier):
+    """
+        Class for building an ensemble of classifier.
+
+        :param models_paths: Either a path to a folder or a list of paths to folders.
+            Will recursively search in the given folders for checkpoints of registered models
+            based on AbstractClassifier.
+        :param monitor:
+        :param weights:
+        :param accuracies:
+        :param class_count:
+        :param optimizer_config:
+        :param label_smoothing:
+        :param confidence_lambda:
+        :param confidence_corr_lambda:
+        :param confidence_budget:
+        :param positive_class:
+        :param use_focal_loss:
+        :param device:
+        :param models_configs:
+    """
+
     # region Class/Subclass methods
     @classmethod
     def module_identifier(cls) -> str:
@@ -38,10 +59,16 @@ class EnsembleClassifier(AbstractClassifier):
                  positive_class: int | None = None,
                  use_focal_loss: bool | None = None,
                  device: str | None = None,
-                 load_checkpoints_now: bool = True,
+                 models_configs: list[ModuleConfig] | None = None
                  ):
-        models_paths = find_mindful_models(models_paths, AbstractClassifier)
-        models = load_mindful_models(models_paths, AbstractClassifier, monitor, device, load_checkpoints_now)
+        if models_configs is None:
+            print("Loading ensemble from individual models")
+            models_paths = find_mindful_models(models_paths, AbstractClassifier)
+            models, models_configs = load_mindful_models(models_paths, AbstractClassifier, monitor, device)
+        else:
+            print("Loading ensemble from save")
+            models = [get_model(model_config, device=device) for model_config in models_configs]
+
         if len(models) < self.minimum_model_count:
             raise ValueError("Not enough model found for an ensemble model, "
                              "found {} but need at least {}.".format(len(models), self.minimum_model_count))
@@ -84,7 +111,7 @@ class EnsembleClassifier(AbstractClassifier):
             initial_weights = torch.ones(size=[self.ensemble_weights_size]) / self.ensemble_weights_size
         else:
             initial_weights = weights / weights.sum()
-            print("Provided weights: {} (normalized to {})".format(weights.tolist(), initial_weights.tolist()))
+            # print("Provided weights: {} (normalized to {})".format(weights.tolist(), initial_weights.tolist()))
         self.ensemble_weights = nn.Parameter(initial_weights)
         # endregion
 
@@ -92,6 +119,15 @@ class EnsembleClassifier(AbstractClassifier):
             self.ensemble_confidence_weights = nn.Parameter(initial_weights.copy_())
         else:
             self.ensemble_confidence_weights = None
+
+        self.hparams["models_configs"] = models_configs
+
+        self.hparams["models_paths"] = models_paths
+        self.hparams["monitor"] = monitor
+        self.hparams["weights"] = self.ensemble_weights.cpu().tolist()
+        if accuracies is not None:
+            self.hparams["accuracies"] = accuracies.cpu().tolist()
+        self.hparams["device"] = device
 
     def forward(self, inputs, *args, **kwargs) -> ClassifierOutput:
         with torch.no_grad():
@@ -134,4 +170,5 @@ class EnsembleClassifier(AbstractClassifier):
     @property
     def ensemble_weights_size(self) -> int:
         return len(self.models)
+
     # endregion

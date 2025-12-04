@@ -74,7 +74,7 @@ class AbstractClassifier(MindfulModule):
                  positive_class=-1,
                  use_focal_loss=False,
                  **kwargs):
-        super(AbstractClassifier, self).__init__(optimizer_config=optimizer_config)
+        super().__init__(optimizer_config=optimizer_config)
 
         if class_count <= 0:
             raise ValueError("`class_count` must be strictly positive (got {})".format(class_count))
@@ -136,6 +136,18 @@ class AbstractClassifier(MindfulModule):
                                                             confidence_threshold=None,
                                                             positive_class=positive_class)
         # endregion
+
+        self.hparams["class_count"] = class_count
+        self.hparams["optimizer_config"] = optimizer_config
+        self.hparams["label_smoothing"] = label_smoothing
+        self.hparams["confidence_lambda"] = confidence_lambda
+        self.hparams["confidence_corr_lambda"] = confidence_corr_lambda
+        self.hparams["confidence_budget"] = confidence_budget
+        self.hparams["hidden_size"] = hidden_size
+        self.hparams["prototype_model_config"] = prototype_model_config
+        self.hparams["prototype_lambda"] = prototype_lambda
+        self.hparams["positive_class"] = positive_class
+        self.hparams["use_focal_loss"] = use_focal_loss
 
     # region Forward
     def forward(self, inputs, *args, **kwargs) -> ClassifierOutput:

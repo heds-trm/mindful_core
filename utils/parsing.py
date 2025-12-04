@@ -42,10 +42,28 @@ def parse_last_number(text: str) -> int | None:
 # region Checkpoint path parsing
 
 def parse_checkpoint_path(checkpoint: str | Path | None,
-                          monitor: str | None = None,
+                          monitor: str | list[str] | None = None,
                           use_last: bool = False,
                           verbose: bool = False
                           ) -> str | None:
+    """
+    If `checkpoint` is a file, returns `checkpoint`. Otherwise, search if the given folder for a checkpoint.
+    If `use_last` is True, will return the `last.ckpt` checkpoint. If `use_last` is False, will search for a checkpoint
+    corresponding to the given monitor(s). If `monitor` is None, defaults to searching for 1) validation_loss,
+    2) validation_auroc and 3) any .ckpt file.
+
+    The search is adapted for PyTorch Lightning folder architecture
+    (experiment_folder/lightning_logs/version/checkpoints).
+    If multiple versions are available, will default to the last version.
+
+    Returns None if not valid checkpoint can be found.
+
+    :param checkpoint: The path to search the checkpoint in. Should preferably be a version or a checkpoint folder
+        directly to avoid picking the wrong version.
+    :param monitor: A monitor (or a list of candidates) to select the checkpoint
+    :param use_last: If True, returns the checkpoint saved as "last.ckpt"
+    :param verbose: If True, will print what checkpoint was found and its associated monitor value if available.
+    """
     if checkpoint is None:
         return None
 
@@ -62,11 +80,16 @@ def parse_checkpoint_path(checkpoint: str | Path | None,
             selected_filename = "last.ckpt"
         else:
             if monitor is None:
-                monitors = ["validation_loss", "validation_auroc"]
+                monitors = ["validation_loss", "validation_auroc", None]
             else:
-                if "validation" not in monitor:
-                    monitor = "validation_{}".format(monitor)
-                monitors = [monitor]
+                if isinstance(monitor, str):
+                    monitors = [monitor]
+                else:
+                    monitors = list(monitor)
+
+                monitors = ["validation_{}".format(_monitor) if "validation" not in _monitor else _monitor
+                            for _monitor in monitors]
+
             selected_filename, selected_value = get_best_checkpoint(checkpoint, monitors)
 
         if selected_filename is None:
@@ -79,6 +102,8 @@ def parse_checkpoint_path(checkpoint: str | Path | None,
         elif verbose:
             if use_last:
                 print("Using `{}` as it is the last checkpoint in {}.".format(selected_filename, checkpoint))
+            elif selected_value is None:
+                print("Using `{}` as the fallback checkpoint in {}.".format(selected_filename, checkpoint))
             else:
                 print("Found best checkpoint {} with monitor value of {} in {}."
                       .format(selected_filename, selected_value, checkpoint))
@@ -140,9 +165,36 @@ def monitor_compare(monitor_name: str, previous: float | None, current: float) -
         raise NotImplementedError(monitor_name)
 
 
-def get_best_checkpoint(folder: str | Path, monitors: list[str]) -> tuple[str | None, float | None]:
+def get_best_checkpoint(folder: str | Path,
+                        monitors: list[str | None]
+                        ) -> tuple[str | None, float | None]:
+    """
+    Searches in the given folder for a checkpoint for the given monitors.
+
+    If multiple monitors are provided, picks the first monitor found in the folder.
+
+    If multiple checkpoints are found for the given monitor, picks the checkpoint with the "best" monitor value.
+    Check `KNOWN_MONITORS` for how the "best" value is defined for each monitor.
+
+    If None is in the list of monitors, it will pick the first file found ending with .ckpt
+    (unless one of the previous monitors in the list is found before).
+
+    Returns the best checkpoint path and its associated monitor value, when applicable.
+
+        :param folder: The folder containing the checkpoint(s).
+        :param monitors: A list of candidate monitors.
+        :returns: A tuple containing the path to the best checkpoint found (or None if none was found)
+        and the associated monitor value if applicable.
+    """
     filenames = os.listdir(folder)
     filenames = [filename for filename in filenames if filename.endswith(".ckpt")]
+
+    if len(filenames) == 0:
+        return None, None
+
+    allow_any = None in monitors
+    while None in monitors:
+        monitors.remove(None)
 
     selected_monitor: str | None = None
     for monitor in monitors:
@@ -150,11 +202,15 @@ def get_best_checkpoint(folder: str | Path, monitors: list[str]) -> tuple[str | 
             if monitor in filename:
                 selected_monitor = monitor
                 break
+
         if selected_monitor is not None:
             break
 
     if selected_monitor is None:
-        return None, None
+        if allow_any:
+            return filenames[0], None
+        else:
+            return None, None
 
     filename_pattern = re.compile(r"""(?P<key>\w+)\s*=+\s*'?(?P<value>\d+\.\d+)'?""")
     selected_filename: str | None = None
