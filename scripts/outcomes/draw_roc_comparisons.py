@@ -2,14 +2,86 @@ import torch
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
+import cv2
 from pathlib import Path
+import os
 import argparse
+from typing import Any
 
 from mindful_core.utils.data_constants import SCAN_ID, SUBSET_ID, LABEL
 from mindful_core.utils.misc import try_load_json
 from mindful_core.analysis.statistics.roc_compare import compute_roc_curve, compute_kfolds_roc_distribution
 from mindful_core.analysis.statistics.classification_summary import compute_auroc
-from mindful_core.scripts.outcomes.compare_experiments_delong import load_test_inferences_from_config
+
+
+def load_folded_test_inferences(path: str | Path) -> pd.DataFrame | None:
+    path = Path(path)
+
+    if path.is_file():
+        path = path.parent
+
+    inferences_paths = list(path.rglob("inferences_fold_*.csv"))
+    if len(inferences_paths) == 0:
+        return None
+    
+    test_inferences_disjoint = []
+    existing_ids = []
+    for inferences_path in inferences_paths:
+        inferences = pd.read_csv(inferences_path, index_col=SCAN_ID)
+
+        # region Only keep test samples
+        if SUBSET_ID in inferences.columns:
+            is_test = inferences[SUBSET_ID] == "test"
+            inferences = inferences[is_test]
+        # endregion
+
+        # region Check for IDs that may already be accounted for
+        new_ids = inferences.index.to_list()
+        ids_present_twice = [new_id for new_id in new_ids if new_id in existing_ids]
+        if len(ids_present_twice) > 0:
+            raise KeyError("IDs `{}` are present at least twice in separate test folds in {}".
+                           format(ids_present_twice, inferences_path))
+        existing_ids += new_ids
+        # endregion
+
+        test_inferences_disjoint.append(inferences)
+
+    test_inferences = pd.concat(test_inferences_disjoint)
+    return test_inferences
+
+
+def load_test_inferences_from_path(path: str | Path) -> pd.DataFrame:
+    path = Path(path)
+
+    if not path.exists():
+        raise FileNotFoundError(path)
+
+    if path.is_dir():
+        path = path / "test_inferences.csv"
+
+    if not path.exists():
+        folded_test_inferences = load_folded_test_inferences(path.parent)
+        if folded_test_inferences is None:
+            raise FileNotFoundError(path)
+        else:
+            folded_test_inferences.to_csv(path)
+
+    if path.suffix == ".xlsx":
+        # noinspection PyTypeChecker
+        data_frame = pd.read_excel(path, index_col=SCAN_ID)
+    else:
+        data_frame = pd.read_csv(path, index_col=SCAN_ID)
+
+    return data_frame
+
+
+def load_test_inferences_from_config(config: str | Path | dict[str, Any]) -> dict[str, pd.DataFrame]:
+    if not isinstance(config, dict):
+        config = try_load_json(config, "Test Inferences config")
+
+    return {exp_id: load_test_inferences_from_path(path)
+            for exp_id, path in config.items()
+            if not exp_id.startswith("-")}
 
 
 def get_test_partitions(folds_folder: str) -> list[pd.Index]:
@@ -63,12 +135,14 @@ class KFoldROCSummary(object):
                  name: str,
                  n_thresholds: int = 1000,
                  color: str = None,
+                 bootstrapped_auroc: str = None,
                  ):
         self.ground_truth = ground_truth
         self.probabilities = probabilities
         self.name = name
         self.n_thresholds = n_thresholds
         self.color = color
+        self.bootstrapped_auroc = bootstrapped_auroc
 
         self.roc_curves = compute_roc_curve(ground_truth, probabilities, n_thresholds=n_thresholds)
         (fpr_mean, tpr_mean), (_, tpr_std) = compute_kfolds_roc_distribution(self.roc_curves)
@@ -92,27 +166,29 @@ class KFoldROCSummary(object):
         axis.plot(self.fpr_mean, self.tpr_upper, alpha=alpha, color=self.color)
 
     def plot_mean(self, axis: plt.Axes, alpha=1.0) -> None:
-        label = "{} - AUROC: {} (+/- {})".format(self.name, self.auroc_mean, self.auroc_std)
-        axis.plot(self.fpr_mean, self.tpr_mean, label=label, color=self.color, alpha=alpha)
+        axis.plot(self.fpr_mean, self.tpr_mean, label=self.label, color=self.color, alpha=alpha)
+
+    @property
+    def label(self) -> str:
+        if self.bootstrapped_auroc is None:
+            auroc_label = "{} (+/- {})".format(self.auroc_mean, self.auroc_std)
+        else:
+            auroc_label = self.bootstrapped_auroc
+        label = "{} - AUROC: {}".format(self.name, auroc_label)
+        return label
 
 
-def main():
-    # region Arg parsing
-    arg_parser = argparse.ArgumentParser()
-    arg_parser.add_argument("config_path", type=str)
-    arg_parser.add_argument("--n_thresholds", type=int, default=1000)
-    arg_parser.add_argument("--sensitivity_thresholds", nargs="+")
-    args = arg_parser.parse_args()
-
-    n_thresholds = int(args.n_thresholds)
-    config_path = Path(args.config_path)
-    sensitivity_thresholds = [float(sensitivity_threshold) for sensitivity_threshold in args.sensitivity_thresholds]
-    # endregion
+def draw_roc_comparisons(config_path: Path, 
+                         n_thresholds: int = 1000, 
+                         sensitivity_thresholds: list[float] = None
+                         ) -> Path:
+    sensitivity_thresholds = sensitivity_thresholds or []
 
     # region Load
     config = try_load_json(config_path, "ROC Comparison config")
     folds_ids = get_test_partitions(config["folds"])
     test_inferences = load_test_inferences_from_config(config["experiments"])
+    bootstrapped_aurocs = config.get("bootstrapped_aurocs", {})
     # endregion
 
     figure, axis = plt.subplots()
@@ -121,7 +197,8 @@ def main():
 
     ground_truth, test_probabilities = extract_ground_truth_and_probabilities(test_inferences, folds_ids)
     summaries = [KFoldROCSummary(ground_truth, exp_probabilities, exp_id, n_thresholds,
-                                 color=color_cycle[i % len(color_cycle)])
+                                 color=color_cycle[i % len(color_cycle)],
+                                 bootstrapped_auroc=bootstrapped_aurocs.get(exp_id))
                  for i, (exp_id, exp_probabilities) in enumerate(test_probabilities.items())]
 
     for summary in summaries:
@@ -141,9 +218,34 @@ def main():
 
     axis.legend()
 
-    save_filepath = config_path.parent / "roc_comparisons.png"
+    save_filepath = config_path.parent / "{}.png".format(config_path.stem)
     figure.savefig(save_filepath)
 
+    return save_filepath
+
+
+def main():
+    arg_parser = argparse.ArgumentParser()
+    arg_parser.add_argument("config_paths", type=str, nargs="+")
+    arg_parser.add_argument("--n_thresholds", type=int, default=1000)
+    arg_parser.add_argument("--sensitivity_thresholds", nargs="+")
+    args = arg_parser.parse_args()
+
+    config_paths = [Path(path) for path in args.config_paths]
+    n_thresholds = int(args.n_thresholds)
+    sensitivity_thresholds = [float(sensitivity_threshold) for sensitivity_threshold in args.sensitivity_thresholds]
+
+    output_paths: list[Path] = []
+    for config_path in config_paths:
+        output_path = draw_roc_comparisons(config_path, n_thresholds, sensitivity_thresholds)
+        output_paths.append(output_path)
+
+    if len(output_paths) > 1:
+        images = [cv2.imread(path.as_posix()) for path in output_paths]
+        joint_image = cv2.hconcat(images)
+        root = os.path.commonpath(output_paths)
+        joint_image_path = Path(root, "joint_roc_comparison.png")
+        cv2.imwrite(joint_image_path.as_posix(), joint_image)
 
 if __name__ == "__main__":
     main()

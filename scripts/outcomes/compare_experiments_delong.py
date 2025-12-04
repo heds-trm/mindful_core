@@ -1,31 +1,12 @@
 import pandas as pd
 from pathlib import Path
 import argparse
-from typing import Any
 
-from mindful_core.utils.data_constants import SCAN_ID
 from mindful_core.utils.misc import try_load_json
 from mindful_core.analysis.statistics.roc_compare import compute_kfolds_delong_roc_test
 from mindful_core.scripts.outcomes.draw_roc_comparisons import (get_test_partitions,
-                                                                extract_ground_truth_and_probabilities)
-
-
-def load_test_inferences_from_file(path: str) -> pd.DataFrame:
-    if path.endswith(".xlsx"):
-        # noinspection PyTypeChecker
-        data_frame = pd.read_excel(path, index_col=SCAN_ID)
-    else:
-        data_frame = pd.read_csv(path, index_col=SCAN_ID)
-    return data_frame
-
-
-def load_test_inferences_from_config(config: str | Path | dict[str, Any]) -> dict[str, pd.DataFrame]:
-    if not isinstance(config, dict):
-        config = try_load_json(config, "Test Inferences config")
-
-    return {exp_id: load_test_inferences_from_file(path)
-            for exp_id, path in config.items()
-            if not exp_id.startswith("-")}
+                                                                extract_ground_truth_and_probabilities,
+                                                                load_test_inferences_from_config)
 
 
 def main():
