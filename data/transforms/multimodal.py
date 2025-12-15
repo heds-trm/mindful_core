@@ -53,6 +53,9 @@ class InferModalityMask(SerializableTransform):
         return mask
 
     def get_feature_wise_masks(self, *data: Any) -> list[np.ndarray]:
+        if self.templates is None:
+            raise RuntimeError("Make sure you fit the transform/pipeline before you use it.")
+
         masks = []
         for modality_type, template, value in zip(self.modalities, self.templates, data):
             if value is None:
