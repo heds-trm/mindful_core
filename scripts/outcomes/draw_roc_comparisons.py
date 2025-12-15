@@ -88,7 +88,7 @@ def get_test_partitions(folds_folder: str) -> list[pd.Index]:
     folds_folder: Path = Path(folds_folder)
     test_partitions = {}
     for filepath in folds_folder.iterdir():
-        if filepath.match("*_fold_*.csv"):
+        if filepath.match("*fold_*.csv"):
             index = int(filepath.stem.split("_")[-1])
             fold = pd.read_csv(filepath, index_col=SCAN_ID)
             fold = fold[fold[SUBSET_ID] == "test"]
@@ -145,12 +145,20 @@ class KFoldROCSummary(object):
         self.bootstrapped_auroc = bootstrapped_auroc
 
         self.roc_curves = compute_roc_curve(ground_truth, probabilities, n_thresholds=n_thresholds)
-        (fpr_mean, tpr_mean), (_, tpr_std) = compute_kfolds_roc_distribution(self.roc_curves)
+        if len(self.roc_curves) > 1:
+            (fpr_mean, tpr_mean), (_, tpr_std) = compute_kfolds_roc_distribution(self.roc_curves)
+        else:
+            fpr_mean, tpr_mean = self.roc_curves[0][0].mean(), self.roc_curves[0][1].mean()
+            tpr_std = None
 
         self.fpr_mean = fpr_mean
         self.tpr_mean = tpr_mean
-        self.tpr_upper = np.minimum(tpr_mean + tpr_std, 1.0)
-        self.tpr_lower = np.maximum(tpr_mean - tpr_std, 0.0)
+
+        if tpr_std is not None:
+            self.tpr_upper = np.minimum(tpr_mean + tpr_std, 1.0)
+            self.tpr_lower = np.maximum(tpr_mean - tpr_std, 0.0)
+        else:
+            self.tpr_upper = self.tpr_lower = None
 
         # using same method as with ClassificationSummary
         aurocs = [compute_auroc(torch.as_tensor(_probabilities), torch.as_tensor(_labels)).numpy() * 100.0
@@ -159,9 +167,15 @@ class KFoldROCSummary(object):
         self.auroc_mean, self.auroc_std = round(np.mean(aurocs), 1), round(np.std(aurocs), 1)
 
     def plot_std_area(self, axis: plt.Axes, alpha=0.2) -> None:
+        if (self.tpr_lower is None) or (self.tpr_upper is None):
+            return
+        
         axis.fill_between(self.fpr_mean, self.tpr_lower, self.tpr_upper, alpha=alpha, color=self.color)
 
     def plot_std_bounds(self, axis: plt.Axes, alpha=0.2) -> None:
+        if (self.tpr_lower is None) or (self.tpr_upper is None):
+            return
+
         axis.plot(self.fpr_mean, self.tpr_lower, alpha=alpha, color=self.color)
         axis.plot(self.fpr_mean, self.tpr_upper, alpha=alpha, color=self.color)
 
