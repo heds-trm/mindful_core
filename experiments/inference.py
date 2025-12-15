@@ -63,19 +63,30 @@ def find_json_samples(input_paths: list[Path]) -> list[Path]:
     return sample_paths
 
 
-def get_image_savers(pipeline: Pipeline, output_dir: str, output_ext: str = ".mha") -> dict[Modality, SaveImage]:
+def get_image_savers(pipeline: Pipeline, 
+                     output_dir: str, 
+                     output_ext: str = ".mha",
+                     separate_modality_dirs: bool = False
+                     ) -> dict[Modality, SaveImage]:
     Path(output_dir).mkdir(exist_ok=True, parents=True)
     image_modalities = [modality for modality in pipeline.output_modalities
                         if modality.type == ModalityType.IMAGE]
+    if separate_modality_dirs:
+        modality_dirs: list[Path] = [output_dir / modality.id for modality in image_modalities]
+        for modality_dir in modality_dirs:
+            modality_dir.mkdir(exist_ok=True)
+    else:
+        modality_dirs = [output_dir] * len(image_modalities)
+
     image_savers = {
         modality:
-            SaveImage(output_dir=output_dir,
+            SaveImage(output_dir=modality_dir,
                       output_ext=output_ext,
                       output_postfix="",
                       resample=False,
                       separate_folder=False,
                       print_log=False)
-        for modality in image_modalities
+        for modality, modality_dir in zip(image_modalities, modality_dirs)
     }
 
     return image_savers
