@@ -84,3 +84,36 @@ def make_conv_decoder(in_channels: int,
                        spatial_dims=spatial_dims,
                        use_batch_norm=use_batch_norm
                        )
+
+def make_decoders(decoders_config: dict[str, dict[str, Any] | str]) -> dict[str, nn.Module]:
+    """
+    Builds decoders for each (`modality`, `encoder_config`) pair in encoders_config.
+
+    `decoder_config` can be a string referencing another modality. If so, it will reference the same decoder,
+    thus sharing weights.
+    """
+    original_order = list(decoders_config.keys())
+
+    decoders = {
+        modality: make_decoder(decoder_config)
+        for modality, decoder_config in decoders_config.items()
+        if isinstance(decoder_config, dict)
+    }
+    
+    reorder = False
+    for modality, decoder_config in decoders_config.items():
+        if isinstance(decoder_config, str):
+            if decoder_config not in decoders_config:
+                raise RuntimeError("Misconfiguration error: could not find decoder for modality `{}` in ({}).".
+                                   format(decoder_config, list(decoders_config.keys())))
+            decoders[modality] = decoders[decoder_config]
+            reorder = True
+        elif not isinstance(decoder_config, dict):
+            raise RuntimeError("Misconfiguration error: Unknown identifier type `{}` for modality `{}`.".
+                               format(type(decoder_config), modality))
+        
+    if reorder:
+        decoders = {modality: decoders[modality] for modality in original_order}
+        
+    return decoders
+

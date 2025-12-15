@@ -1,10 +1,9 @@
-import os.path
-
 import torch
 import torch.nn as nn
 from monai.networks.nets import resnet, ResNet
 from monai.networks.nets.densenet import DenseNet121
 import copy
+import os.path
 from typing import Any, Callable, Sequence, Literal
 
 from mindful_core.models.representation.encoders.vit_encoder import ViTEncoder, SwinEncoder
@@ -95,12 +94,12 @@ def make_encoder(encoder_config: dict[str, Any]) -> nn.Module:
 
 
 # region Multimodal encoder
-def make_encoders(encoders_config: dict[str, dict[str, Any] | str]):
+def make_encoders(encoders_config: dict[str, dict[str, Any] | str]) -> dict[str, nn.Module]:
     """
     Builds encoders for each (`modality`, `encoder_config`) pair in encoders_config.
 
     `encoder_config` can be a string referencing another modality. If so, it will reference the same encoder,
-    sharing weights.
+    thus sharing weights.
     """
     original_order = list(encoders_config.keys())
 
