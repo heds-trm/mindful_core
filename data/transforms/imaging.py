@@ -2203,8 +2203,13 @@ class RandSyncedNDAugment(RandomizableTransform, SerializableTransform):
                       for image, modality_spatial_dims
                       in zip(images, self.modalities_spatial_dims)]
 
-        if self.do_affine:
-            images = [self.affine_image(image, modality_spatial_dims)
+        if self.do_rotate:
+            images = [self.rotate_image(image, modality_spatial_dims)
+                      for image, modality_spatial_dims
+                      in zip(images, self.modalities_spatial_dims)]
+
+        if self.do_translate:
+            images = [self.translate_image(image, modality_spatial_dims)
                       for image, modality_spatial_dims
                       in zip(images, self.modalities_spatial_dims)]
 
@@ -2215,10 +2220,10 @@ class RandSyncedNDAugment(RandomizableTransform, SerializableTransform):
         flip_dims = [dim for dim in self.flip_dims if dim in modality_spatial_dims]
         return flip(image, flip_dims, lazy=False, transform_info={})
 
-    def affine_image(self, image: torch.Tensor | MetaTensor,
+    def rotate_image(self, image: torch.Tensor | MetaTensor,
                      modality_spatial_dims: list[int]) -> torch.Tensor | MetaTensor:
         rotate_params = [self.rotate_angles[i] for i in modality_spatial_dims]
-        translate_params = [self.translate_offset[i] for i in modality_spatial_dims]
+        translate_params = [0.0 for _ in modality_spatial_dims]
         spatial_size = image.shape[1:]
 
         # noinspection PyTypeChecker
@@ -2243,10 +2248,29 @@ class RandSyncedNDAugment(RandomizableTransform, SerializableTransform):
                             lazy=False,
                             transform_info={})
         return image
+    
+    def translate_image(self,
+                        image: torch.Tensor | MetaTensor,
+                        modality_spatial_dims: list[int]) -> torch.Tensor | MetaTensor:
+        translate_offsets = [int(self.translate_offset[i]) for i in modality_spatial_dims]
 
-    @property
-    def do_affine(self) -> bool:
-        return self.do_rotate or self.do_translate
+        slices = [slice(None)]
+        paddings = []
+        for i, offset in enumerate(translate_offsets):
+            slice_start = -offset if (offset < 0) else None
+            slice_stop = image.shape[i + 1] - offset if (offset > 0) else None
+            slices.append(slice(slice_start, slice_stop))
+
+            pad_start = 0 if (offset < 0) else offset
+            pad_end = 0 if (offset > 0) else -offset
+            paddings.insert(0, pad_start)
+            paddings.insert(0, pad_end)
+
+        ori_shape = image.shape
+        image = image[slices]
+        inter_shape = image.shape
+        image = nn.functional.pad(image, tuple(paddings))
+        return image
 
     # region Serialization
     @classmethod
