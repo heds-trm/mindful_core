@@ -96,7 +96,20 @@ class SegmentationStage(ExperimentStage):
     @classmethod
     def stage_identifier(cls) -> str:
         return "segmentation"
+    
+    @classmethod
+    def stage_aliases(cls) -> list[str]:
+        return ["segment"]
+    
 
+class AutoencodingStage(ExperimentStage):
+    @classmethod
+    def stage_identifier(cls):
+        return "autoencode"
+    
+    @classmethod
+    def stage_aliases(cls) -> list[str]:
+        return ["autoencoder", "reconstruct"]
 
 class ModelSaveStage(ExperimentStage):
     @classmethod
@@ -166,6 +179,10 @@ class ExperimentStages(object):
     @property
     def includes_segmentation(self) -> bool:
         return self._include_stage(SegmentationStage)
+    
+    @property
+    def includes_autoencoding(self) -> bool:
+        return self._include_stage(AutoencodingStage)
     
     @property
     def includes_model_save(self) -> bool:

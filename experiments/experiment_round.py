@@ -171,6 +171,9 @@ class ExperimentRound(object):
         if self.includes_segmentation:
             self.segment()
 
+        if self.includes_autoencoding:
+            self.run_autoencoder()
+
         if self.includes_model_save:
             self.save_model_checkpoint()
 
@@ -304,6 +307,7 @@ class ExperimentRound(object):
             inferred_features_frame.to_csv(inferred_features_filepath, index_label=SCAN_ID)
         # endregion
 
+    # region Classification test (sample-wise or pixel-wise for segmentation models)
     def test(self):
         data_loaders = self.get_data_loaders(training=False)
 
@@ -348,6 +352,9 @@ class ExperimentRound(object):
         # noinspection PyTypeChecker
         self.save_test_results(test_results)
 
+    # endregion
+
+    # region Segmentation
     def segment_roi(self,
                     data_loader: DataLoader,
                     model: SegmentationUNet = None
@@ -406,6 +413,9 @@ class ExperimentRound(object):
                     i += 1
         self.model.train()
 
+    # endregion
+
+    # region Pseudo-labeling
     def pseudo_label_data(self) -> None:
         data_loaders = self.get_data_loaders(training=False)
         train_data_loader = [data_loaders[SubsetID.TRAIN]]
@@ -471,11 +481,16 @@ class ExperimentRound(object):
 
             pseudo_fold = DataFold(samples=pseudo_samples)
             pseudo_fold.save_scan_data(os.path.join(self.logger.log_dir, "pseudo_fold.csv"))
+            
+    # endregion
 
+    # region Confidence analysis
     def confidence_analysis(self) -> None:
         data_loaders = self.get_data_loaders(training=False)
         confidence_summary = ConfidenceSummary(self.model, self.logger.log_dir)
         confidence_summary(data_loaders, self.config.fold)
+
+    # endregion
 
     def visualize(self) -> None:
         visualizers_config = (self.config.visualizers_config or
@@ -529,6 +544,10 @@ class ExperimentRound(object):
 
         if was_training:
             self.model.train()
+
+    def run_autoencoder(self) -> None:
+        # TODO: go through data loaders as usual and call the autoencoder interface
+        raise NotImplementedError("Autoencoding is not implemented yet.")
 
     # region Saving
     def save_representations(self):
@@ -753,6 +772,10 @@ class ExperimentRound(object):
     @property
     def includes_segmentation(self) -> bool:
         return self.config.stages.includes_segmentation
+    
+    @property
+    def includes_autoencoding(self) -> bool:
+        return self.config.stages.includes_autoencoding
     
     @property
     def includes_model_save(self) -> bool:
