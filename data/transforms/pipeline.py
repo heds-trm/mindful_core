@@ -397,6 +397,7 @@ class Pipeline(Randomizable):
     # endregion
 
     # region Fit/Run
+    # region Fit
     def is_fit(self, samples: list[Sample] = None) -> bool:
         if len(self._fit_samples_ids) == 0:
             return False
@@ -472,6 +473,7 @@ class Pipeline(Randomizable):
                 for sample in samples:
                     update = transform_to_fit(sample)
                     sample.update(update)
+    # endregion
 
     def __call__(self, sample: Sample | TransformInput) -> PipelineOutput:
         if isinstance(sample, Sample):
@@ -519,7 +521,7 @@ class Pipeline(Randomizable):
 
     # region Finalize
     def finalize(self, sample: dict[str, NdarrayOrTensor]) -> ViewOutput:
-        sample = self.run_stages(sample, StageID.VALIDATION_ONLY, StageID.TEST_ONLY)
+        sample = self.run_stages(sample, StageID.TRAIN_ONLY, StageID.VALIDATION_ONLY, StageID.TEST_ONLY)
         sample = [self.finalize_modality(sample[modality.id])
                   for modality in self.output_modalities
                   if self.modality_allowed(modality)]
