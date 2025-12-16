@@ -255,3 +255,6 @@ def safe_float(value: str | None, default=None) -> float | None:
 
 def safe_bool(value: str | None, default: bool) -> bool:
     return value.lower() not in ["false", "0", "no", "disable"] if value else default
+
+def safe_path(value: str | Path | None, default=None) -> Path | None:
+    return Path(value) if value is not None else default

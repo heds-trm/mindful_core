@@ -5,7 +5,7 @@ from typing import TypedDict, Literal, Any
 
 from mindful_core.utils.misc import try_load_json
 from mindful_core.models.index import ModuleConfig
-from mindful_core.data.datasets.protoset import ProtoSet, get_proto_datasets
+from mindful_core.data.datasets.protoset import AbstractProtoSet, ProtoSet, get_proto_datasets
 from mindful_core.experiments.experiment import Experiment
 from mindful_core.scripts.outcomes.gather_test_results import gather_test_results
 
@@ -136,7 +136,7 @@ class ExperimentSeries(object):
         return shared
 
     def run(self) -> None:
-        datasets: dict[str, ProtoSet] = get_proto_datasets(self.config["datasets"])
+        datasets: dict[str, AbstractProtoSet] = get_proto_datasets(self.config["datasets"])
 
         print("Starting a series of experiments (logs: {})".format(self.log_dir))
         for experiment_name, experiment_config in self.experiment_configs.items():
@@ -190,9 +190,11 @@ class ExperimentSeries(object):
             additional_config = {
                 "scalar_features_path": dataset.scalar_features_path,
                 "categorical_features_path": dataset.categorical_features_path,
-                "preparation_pipeline_export": dataset.preparation_pipeline_export_path,
                 "log_dir": experiment_log_dir,
             }
+            if isinstance(dataset, ProtoSet):
+                additional_config["preparation_pipeline_export"] = dataset.preparation_pipeline_export_path
+
             experiment_config.update(additional_config)
             # endregion
 

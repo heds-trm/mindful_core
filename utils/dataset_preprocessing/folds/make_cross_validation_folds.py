@@ -62,11 +62,11 @@ def save_folds(folds: list[DataFold], folder: str | Path, dataset_name: str, out
         fold_id = "{}_fold_{:02d}".format(dataset_name, i)
         if output_type in ["both", "csv"]:
             output_path = folder / (fold_id + ".csv")
-            fold.save_scan_data(output_path)
+            fold.save(output_path)
 
         if output_type in ["both", "json"]:
             output_path = folder / (fold_id + ".json")
-            fold.save_scan_data(output_path)
+            fold.save(output_path)
 
 
 def main():

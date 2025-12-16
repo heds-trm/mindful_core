@@ -202,7 +202,7 @@ class ExperimentRound(object):
 
         if self.dataset.should_reduce_training_data:
             reduced_fold = DataFold(seed=self.config.seed, samples=self.dataset.samples)
-            reduced_fold.save_scan_data(os.path.join(self.logger.log_dir, "reduced_fold.csv"))
+            reduced_fold.save(os.path.join(self.logger.log_dir, "reduced_fold.csv"))
 
         # self.add_model_metadata_for_logger(data_loaders)
         train_dataloader = data_loaders.get(SubsetID.TRAIN)
@@ -480,7 +480,7 @@ class ExperimentRound(object):
             pseudo_samples[SubsetID.TRAIN] = pseudo_train_samples
 
             pseudo_fold = DataFold(samples=pseudo_samples)
-            pseudo_fold.save_scan_data(os.path.join(self.logger.log_dir, "pseudo_fold.csv"))
+            pseudo_fold.save(os.path.join(self.logger.log_dir, "pseudo_fold.csv"))
             
     # endregion
 

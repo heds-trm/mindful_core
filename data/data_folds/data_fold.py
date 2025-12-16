@@ -2,7 +2,7 @@ import numpy as np
 import pandas as pd
 from sklearn.utils.class_weight import compute_class_weight
 from pathlib import Path
-from typing import Sequence
+from typing import Sequence, Callable
 
 from mindful_core.data import Sample, SubsetID
 from mindful_core.utils.misc import is_defined, write_json
@@ -233,11 +233,32 @@ class DataFold(object):
 
     # endregion
 
+    def map_and_update_sample_ids(self, map_function: Callable[[str], str]) -> None:
+        for subset_samples in self.samples.values():
+            for sample in subset_samples:
+                sample.id = map_function(sample.id)
+
+    def remap_samples_subsets(self, subsets_map: str | SubsetID | dict[str | SubsetID, str | SubsetID]) -> None:
+        if isinstance(subsets_map, dict):
+            subsets_map = {SubsetID.parse(_from) if isinstance(_from, str) else _from: 
+                        SubsetID.parse(_to) if isinstance(_to, str) else _to 
+                        for _from, _to in subsets_map.items()}
+        else:
+            _to = SubsetID.parse(subsets_map) if isinstance(subsets_map, str) else subsets_map
+            subsets_map = {_from: _to for _from in SubsetID}
+
+        new_samples = {subset_id: [] for subset_id in SubsetID}
+        for subset_id, subset_samples in self.samples.items():
+            subset_id = subsets_map.get(subset_id, subset_id)
+            new_samples[subset_id] += subset_samples
+
+        self.samples = new_samples
+
     @staticmethod
     def join_folds(folds: list["DataFold"],
                    validation_ratio: float = 0.2,
                    test_ratio: float = 0.1,
-                   seed: int | None = None):
+                   seed: int | None = None) -> "DataFold":
         samples = {}
         for fold in folds:
             for subset_id, subset_samples in fold.samples.items():
@@ -330,7 +351,7 @@ class DataFold(object):
         columns = [SCAN_ID, SUBSET_ID, LABEL] + image_columns
         return pd.DataFrame(values, columns=columns)
 
-    def save_scan_data(self, filepath: str | Path):
+    def save(self, filepath: str | Path):
         if isinstance(filepath, Path):
             filepath = filepath.as_posix()
 

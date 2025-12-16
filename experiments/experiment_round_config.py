@@ -243,7 +243,7 @@ class ExperimentRoundConfig(object):
 
         # region Fold
         fold_path = Path(directory, "fold.csv")
-        self.fold.save_scan_data(fold_path)
+        self.fold.save(fold_path)
         # endregion
 
         # region Environment packages

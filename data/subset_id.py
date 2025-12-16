@@ -1,4 +1,5 @@
 from enum import Enum
+from typing import Self
 
 from mindful_core.utils.data_constants import SUBSET_ID
 
@@ -19,7 +20,7 @@ class SubsetID(Enum):
             raise RuntimeError
 
     @staticmethod
-    def parse(expression: str) -> "SubsetID":
+    def parse(expression: str) -> Self:
         if not isinstance(expression, str):
             raise ValueError("Expression must be a string, got {}.".format(type(expression)))
 
