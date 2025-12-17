@@ -23,7 +23,8 @@ class AbstractProtoSet(ABC):
                  name: str,
                  prepared_folds_folder: str | Path = None,
                  scalar_features_path: str = None,
-                 categorical_features_path: str = None
+                 categorical_features_path: str = None,
+                 preparation_pipeline_export_path: str | Path = None,
                  ):
         self.name = name
         self.prepared_folds_folder = safe_path(prepared_folds_folder)
@@ -31,6 +32,8 @@ class AbstractProtoSet(ABC):
 
         self.scalar_features_path = scalar_features_path
         self.categorical_features_path = categorical_features_path
+
+        self.preparation_pipeline_export_path = safe_path(preparation_pipeline_export_path)
 
     # region Abstract methods
     @abstractmethod
@@ -156,11 +159,12 @@ class ProtoSet(AbstractProtoSet):
         super().__init__(name=name,
                          prepared_folds_folder=prepared_folds_folder,
                          scalar_features_path=scalar_features_path,
-                         categorical_features_path=categorical_features_path)
+                         categorical_features_path=categorical_features_path,
+                         preparation_pipeline_export_path=preparation_pipeline_export_path
+                         )
         self.original_folds_folder = safe_path(original_folds_folder)
 
         self.preparation_pipeline_config_path = safe_path(preparation_pipeline_config_path)
-        self.preparation_pipeline_export_path = preparation_pipeline_export_path
 
         self._preparation_pipeline: Pipeline | None = None
         self.output_extension = output_extension
@@ -384,7 +388,8 @@ class ProtoMetaSet(AbstractProtoSet):
                  merge_config: list[str] | dict[str, str | dict[str, str]],
                  prepared_folds_folder: str | Path,
                  scalar_features_path: str = None,
-                 categorical_features_path: str = None
+                 categorical_features_path: str = None,
+                 preparation_pipeline_export_path: str | Path = None,
                  ):
         self.proto_sets = {proto_set.name: proto_set for proto_set in proto_sets}
         self.merge_config = merge_config
@@ -392,7 +397,8 @@ class ProtoMetaSet(AbstractProtoSet):
         super(ProtoMetaSet, self).__init__(name=name, 
                                            prepared_folds_folder=prepared_folds_folder,
                                            scalar_features_path=scalar_features_path,
-                                           categorical_features_path=categorical_features_path
+                                           categorical_features_path=categorical_features_path,
+                                           preparation_pipeline_export_path=preparation_pipeline_export_path
                                            )
         
         if self.scalar_features_path is None:
@@ -567,7 +573,9 @@ class ProtoMetaSet(AbstractProtoSet):
                             merge_config=config["subsets"],
                             prepared_folds_folder=config["prepared_folds"],
                             scalar_features_path=config.get("scalar_features"),
-                            categorical_features_path=config.get("categorical_features"))
+                            categorical_features_path=config.get("categorical_features"),
+                            preparation_pipeline_export_path=config.get("preparation_pipeline_export"),
+                            )
 
 # region Convert configs to proto datasets
 def get_proto_datasets(datasets_config: dict[str, dict[str, str]]) -> dict[str, AbstractProtoSet]:
