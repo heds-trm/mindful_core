@@ -7,10 +7,11 @@ from typing import Any, Iterator
 
 from mindful_core.models.model_output import ClassifierOutput
 from mindful_core.models.classification import AbstractClassifier
+from mindful_core.models.autoencoder_interface import AutoencoderInterface
 from mindful_core.models.index import find_mindful_models, load_mindful_models, get_model, ModuleConfig
 
 
-class EnsembleClassifier(AbstractClassifier):
+class EnsembleClassifier(AbstractClassifier, AutoencoderInterface):
     """
         Class for building an ensemble of classifier.
 
@@ -170,5 +171,49 @@ class EnsembleClassifier(AbstractClassifier):
     @property
     def ensemble_weights_size(self) -> int:
         return len(self.models)
+
+    # endregion
+
+    # region Autoencoder interface (when sub-models are autoencoders)
+    def autoencode(self, inputs: torch.Tensor | tuple[torch.Tensor]) -> torch.Tensor | tuple[torch.Tensor]:
+        if not self.can_autoencode:
+            raise RuntimeError("EnsembleClassifier require all sub-models to be autoencoders to autoencode.")
+        
+        modality_count, unimodal = None, True
+        # reconstructions shape: [modality_count, model_count]
+        models_reconstructions: list[list[torch.Tensor]] = None
+        for model in self.models:
+            model: AutoencoderInterface
+            model_reconstructions = model.autoencode(inputs)
+
+            if isinstance(model_reconstructions, torch.Tensor):
+                model_modality_count = 1
+                model_reconstructions = [model_reconstructions]
+            else:
+                unimodal = False
+                model_modality_count = len(model_reconstructions)
+                
+            if modality_count is None:
+                modality_count = model_modality_count
+                models_reconstructions = [[] for _ in range(model_modality_count)]
+            elif modality_count != model_modality_count:
+                raise RuntimeError("Misconfiguration error: Models must product the same amount of reconstructions.")
+            
+            for i, modality_reconstruction in enumerate(model_reconstructions):
+                models_reconstructions[i].append(modality_reconstruction)
+
+        reconstructions = [torch.stack(modality_reconstructions, dim=0).mean(dim=0) 
+                           for modality_reconstructions in models_reconstructions]
+        
+        if unimodal:
+            reconstructions = reconstructions[0]
+        else:
+            reconstructions = tuple(reconstructions)
+        return reconstructions
+            
+
+    @property
+    def can_autoencode(self) -> bool:
+        return all([isinstance(model, AutoencoderInterface) for model in self.models])
 
     # endregion

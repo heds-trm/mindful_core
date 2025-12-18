@@ -145,6 +145,15 @@ class MindfulDataset(object):
                 for sample in subset:
                     metadata_file.write(sample.to_tsv_line())
 
+    def get_sample_count(self, *subset_ids: SubsetID):
+        if len(subset_ids) == 0:
+            subset_ids = self.samples.keys()
+        else:
+            subset_ids = [key for key in self.samples if key in subset_ids]
+        
+        counts = [len(self.samples[subset_id]) for subset_id in subset_ids]
+        return sum(counts)
+
     @property
     def should_reduce_training_data(self) -> bool:
         return self.training_data_reduction is not None
