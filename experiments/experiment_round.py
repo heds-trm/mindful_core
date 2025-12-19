@@ -18,12 +18,14 @@ from mindful_core.data.transforms.pipeline import Pipeline
 from mindful_core.utils.callbacks import MilestoneCheckpoint
 from mindful_core.utils.parsing import get_monitor_mode
 from mindful_core.utils.reproducibility import archive_modules
+from mindful_core.utils.tensor_utils import to_device
 from mindful_core.experiments import ExperimentRoundConfig
 from mindful_core.models import MindfulModule
 from mindful_core.models.index import get_model, is_representation_model, is_classification_model
 from mindful_core.models.model_output import ClassifierOutput
 from mindful_core.models.classification import AbstractClassifier
 from mindful_core.models.segmentation.segmentation_unet import SegmentationUNet, SegmentationOutput
+from mindful_core.models.autoencoder_interface import AutoencoderInterface
 from mindful_core.analysis.visualization import VisualizerGroup
 from mindful_core.analysis.statistics import ConfidenceSummary, logits_to_probabilities, ClassificationSummary
 from mindful_core.data import SubsetID, MindfulDataset, Sample, ModalityType
@@ -546,9 +548,62 @@ class ExperimentRound(object):
             self.model.train()
 
     def run_autoencoder(self) -> None:
-        # TODO: go through data loaders as usual and call the autoencoder interface
-        raise NotImplementedError("Autoencoding is not implemented yet.")
+        from mindful_core.experiments.inference import get_image_savers
 
+        sample_count = self.dataset.get_sample_count(SubsetID.TEST)
+        if sample_count == 0:
+            raise RuntimeError("No test samples to autoencode were found in the dataset.")
+        
+        data_loaders = self.get_data_loaders_with_batched_samples()
+        test_data_loader = data_loaders[SubsetID.TEST]
+        self.model.eval()
+
+        if isinstance(self.model, AutoencoderInterface):
+            # noinspection PyTypeChecker
+            model: AutoencoderInterface = self.model
+        else:
+            raise RuntimeError("Expected model to inherit from AutoencoderInterface, got {}".format(type(self.model)))
+        
+        test_pipeline = self.pipelines[SubsetID.TEST]
+        modalities = test_pipeline.output_modalities - ModalityType.LABEL
+
+        reconstruction_folder = Path(self.logger.log_dir) / "reconstructions"
+        reconstruction_folder.mkdir(exist_ok=True)
+        delta_folder = Path(self.logger.log_dir) / "delta"
+        delta_folder.mkdir(exist_ok=True)
+        recon_savers = get_image_savers(modalities, output_dir=reconstruction_folder, separate_modality_dirs=True)
+
+        image_modalities_count = 0
+        for modality in modalities:
+            if modality.type == ModalityType.IMAGE:
+                image_modalities_count += 1
+                Path(reconstruction_folder, modality.id).mkdir(exist_ok=True)
+                Path(delta_folder, modality.id).mkdir(exist_ok=True)
+
+        with tqdm(total=sample_count, desc="Autoencoding test samples") as progress_bar:
+            with Pipeline.no_labels():
+                for samples, batch in test_data_loader:
+                    samples: list[Sample]
+
+                    batch = to_device(batch, model.device)
+                    batch_reconstructions = model.autoencode(batch)
+                    if len(modalities) == 1:
+                        batch_reconstructions = [batch_reconstructions]
+
+                    for modality, modality_inputs, modality_reconstructions in zip(modalities, batch, batch_reconstructions):
+                        if modality.type != ModalityType.IMAGE:
+                                continue
+                        
+                        saver = recon_savers[modality]
+                        for sample, modality_input, reconstruction in zip(samples, modality_inputs, modality_reconstructions):
+                            recon_save_path = Path(reconstruction_folder, modality.id, sample.id)
+                            saver(reconstruction, filename=recon_save_path)
+
+                            delta = reconstruction - modality_input
+                            delta_save_path = Path(delta_folder, modality.id, sample.id)
+                            saver(delta, filename=delta_save_path)
+
+                            progress_bar.update(1 / image_modalities_count)
     # region Saving
     def save_representations(self):
         representation_model = self.model

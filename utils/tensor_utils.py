@@ -114,6 +114,20 @@ def get_gradients(inputs: torch.Tensor | list[torch.Tensor] | tuple[torch.Tensor
 # endregion
 
 
+def to_device(tensor: torch.Tensor | tuple[torch.Tensor] | list[torch.Tensor], device):
+    if isinstance(tensor, torch.Tensor):
+        return tensor.to(device)
+    
+    elif isinstance(tensor, tuple):
+        return tuple([to_device(_tensor, device) for _tensor in tensor])
+    
+    elif isinstance(tensor, list):
+        return [to_device(_tensor, device) for _tensor in tensor]
+    
+    else:
+        raise TypeError("Incorrect type for `tensor`, expected a torch.Tensor, " \
+                        "tuple or list, got {}.".format(type(tensor)))
+
 class Range(object):
     def __init__(self, minimum: float, maximum: float):
         self.minimum = minimum

@@ -13,7 +13,7 @@ from mindful_core.utils.misc import try_load_json
 from mindful_core.models.classification import AbstractClassifier
 from mindful_core.models.index import get_model, ModuleConfig
 from mindful_core.data.transforms.pipeline import Pipeline
-from mindful_core.data.modalities import ModalityType, Modality
+from mindful_core.data.modalities import ModalityType, Modality, ModalitySet
 
 
 INPUT_SAMPLE_DATA = tuple[MetaTensor, ...] | MetaTensor
@@ -63,14 +63,16 @@ def find_json_samples(input_paths: list[Path]) -> list[Path]:
     return sample_paths
 
 
-def get_image_savers(pipeline: Pipeline, 
+def get_image_savers(modalities: Pipeline | ModalitySet, 
                      output_dir: str, 
                      output_ext: str = ".mha",
                      separate_modality_dirs: bool = False
                      ) -> dict[Modality, SaveImage]:
+    if isinstance(modalities, Pipeline):
+        modalities = modalities.output_modalities
+
     Path(output_dir).mkdir(exist_ok=True, parents=True)
-    image_modalities = [modality for modality in pipeline.output_modalities
-                        if modality.type == ModalityType.IMAGE]
+    image_modalities = [modality for modality in modalities if modality.type == ModalityType.IMAGE]
     if separate_modality_dirs:
         modality_dirs: list[Path] = [output_dir / modality.id for modality in image_modalities]
         for modality_dir in modality_dirs:
