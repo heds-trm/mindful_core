@@ -29,7 +29,7 @@ from mindful_core.models.representation.encoders.multimodal import (
 
     HiNetFusion,
 )
-from mindful_core.models.classification.monai_classifier import MonaiClassifier
+from mindful_core.models.classification.monai_classifier import MonaiClassifier, SUPPORTED_BACKBONES
 
 
 # noinspection PyTypeChecker
@@ -59,7 +59,7 @@ def make_encoder(encoder_config: dict[str, Any]) -> nn.Module:
         encoder_maker = make_resnet_encoder
     elif "densenet" in architecture:
         encoder_maker = make_densenet_encoder
-    elif architecture in MonaiClassifier.supported_backbones():
+    elif architecture in SUPPORTED_BACKBONES:
         encoder_maker = MonaiClassifier
         encoder_config["model_name"] = architecture
     else:
