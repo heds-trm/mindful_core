@@ -46,7 +46,10 @@ def make_encoder(encoder_config: dict[str, Any]) -> nn.Module:
 
     # region Architecture selection
     encoder_maker: Callable[[Any], nn.Module]
-    if "resnet" in architecture:
+    if architecture in ENCODERS_REGISTER:
+        encoder_maker = ENCODERS_REGISTER[architecture]
+    
+    elif "resnet" in architecture:
         if "resnet50" in architecture:
             encoder_config["layers"] = [3, 4, 6, 3]
             encoder_config["block"] = "ResNetBottleneck"
@@ -54,22 +57,8 @@ def make_encoder(encoder_config: dict[str, Any]) -> nn.Module:
             encoder_config["layers"] = [3, 4, 6, 3]
             encoder_config["block"] = "ResNetBlock"
         encoder_maker = make_resnet_encoder
-    elif architecture == "st_vit":
-        encoder_maker = make_st_vit_encoder
-    elif architecture == "vit":
-        encoder_maker = make_vit_encoder
-    elif architecture == "swin":
-        encoder_maker = make_swin_encoder
     elif "densenet" in architecture:
         encoder_maker = make_densenet_encoder
-    elif architecture == "multimodal":
-        encoder_maker = make_multimodal_encoder
-    elif architecture == "scalar":
-        encoder_maker = make_scalar_encoder
-    elif architecture == "categorical":
-        encoder_maker = make_categorical_encoder
-    elif architecture == "vgg":
-        encoder_maker = make_vgg_encoder
     elif architecture in MonaiClassifier.supported_backbones():
         encoder_maker = MonaiClassifier
         encoder_config["model_name"] = architecture
@@ -376,3 +365,13 @@ def make_categorical_encoder(categories_sizes: list[int],
                               linear_hidden_sizes=linear_hidden_sizes,
                               output_dimension=output_dimension,
                               add_missing_token=add_missing_token)
+
+ENCODERS_REGISTER = {
+    "st_vit": make_st_vit_encoder,
+    "vit": make_vit_encoder,
+    "swin": make_swin_encoder,
+    "multimodal": make_multimodal_encoder,
+    "scalar": make_scalar_encoder,
+    "categorical": make_categorical_encoder,
+    "vgg": make_vgg_encoder
+}
