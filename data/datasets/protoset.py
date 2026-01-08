@@ -207,6 +207,9 @@ class ProtoSet(AbstractProtoSet):
         if self.no_preparation_needed:
             return original_folds_paths
         
+        if not self.prepared_folds_folder.exists():
+            return None
+        
         existing_folds_paths, existing_folds = self.get_prepared_folds()
         if self.already_prepared:
             return existing_folds_paths
