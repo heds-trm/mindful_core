@@ -81,20 +81,23 @@ class SaliencyMap(Visualizer):
 
             saved_maps = modality_maps
 
-            # Image (3D expected)
+            # Image
             if modality.type == ModalityType.IMAGE:
+                # Move channel dim from 2nd to last (for inter-operability)
                 modality_value = torch.movedim(modality_value, 1, -1).cpu().numpy()
-                if self.use_smooth_maps:
-                    smooth_modality_maps = blur_4d(modality_maps, kernel)
-                    saved_maps = smooth_modality_maps
+                is_3d = len(modality_value.shape) == 5
+                if is_3d:
+                    if self.use_smooth_maps:
+                        smooth_modality_maps = blur_4d(modality_maps, kernel)
+                        saved_maps = smooth_modality_maps
 
-                    smooth_modality_maps = torch.movedim(smooth_modality_maps, 1, -1).cpu().numpy()
-                    self.save_batch_output_slices(modality_value, smooth_modality_maps, ids,
-                                                  correct_predictions, name="SmoothSaliency", modality=modality)
+                        smooth_modality_maps = torch.movedim(smooth_modality_maps, 1, -1).cpu().numpy()
+                        self.save_batch_output_slices(modality_value, smooth_modality_maps, ids,
+                                                    correct_predictions, name="SmoothSaliency", modality=modality)
 
-                modality_maps = torch.movedim(modality_maps, 1, -1).cpu().numpy()
-                self.save_batch_output_slices(modality_value, modality_maps, ids,
-                                              correct_predictions, name="Saliency", modality=modality)
+                    modality_maps = torch.movedim(modality_maps, 1, -1).cpu().numpy()
+                    self.save_batch_output_slices(modality_value, modality_maps, ids,
+                                                correct_predictions, name="Saliency", modality=modality)
 
             # Non-image
             elif modality.type in [ModalityType.SCALAR, ModalityType.CATEGORICAL]:

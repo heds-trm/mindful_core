@@ -8,9 +8,10 @@ from monai.networks.nets.swin_unetr import MERGING_MODE, UnetrBasicBlock
 from monai.networks.blocks import PatchEmbed, TransformerBlock
 from monai.utils import ensure_tuple_rep, look_up_option
 import numpy as np
-from typing import Sequence, Literal
+from typing import Sequence, Literal, Any
 
 from mindful_core.utils.transformers import TransformerPooling, AddClsToken
+# from mindful_core.models.attention_interface import AttentionInterface
 
 
 class ViTEncoder(ViT):
@@ -101,6 +102,7 @@ class ViTEncoder(ViT):
             del block.norm_cross_attn
 
 
+# class SwinEncoder(nn.Module, AttentionInterface):
 class SwinEncoder(nn.Module):
     """
     Hybrid version of the Swin Transformer (between the original and MONAI's)
@@ -241,3 +243,16 @@ class SwinEncoder(nn.Module):
             x = self.linear(x)
 
         return x
+
+    # region Attention interface (N.Y.I.)
+    # def get_attention_layers(self) -> list[nn.Module]:
+    #     pass
+
+    # def get_attention_recordings(self, inputs: Any, outputs: Any) -> torch.Tensor | list[torch.Tensor]:
+    #     pass
+
+    # @property
+    # def pooling_method(self) -> int | str:
+    #     pass
+
+    # endregion

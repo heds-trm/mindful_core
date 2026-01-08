@@ -1,11 +1,11 @@
 import torch
 import torch.nn as nn
 from abc import abstractmethod
-from typing import Any, Union
+from typing import Any, Self
 
 
 class AttentionInterface(object):
-    def get_attention_modules(self) -> Union["AttentionInterface", list["AttentionInterface"]]:
+    def get_attention_modules(self) -> Self | list[Self]:
         return self
 
     @abstractmethod

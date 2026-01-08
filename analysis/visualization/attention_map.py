@@ -102,15 +102,21 @@ class AttentionMap(Visualizer):
 
             # Non-image
             elif self.is_1d_attention_module(attention_module):
+                # module_maps shape: [batch_size, n_layers, n_heads, seq_length (+1), seq_length (+1)]
                 formatted_maps = attention_module.format_1d_attention(module_maps)
+                # formatted_maps shape: [batch_size, seq_length] or [batch_size, seq_length, seq_length]
                 self.save_1d_attention(attention_module, formatted_maps, ids, method="Rollout")
 
                 module_inputs = modules_inputs[attention_module]
                 if module_inputs is not None:
+                    # module_inputs shape: [batch_size, n_layers, seq_length (+1), dim]
                     inputs_norm = torch.norm(module_inputs, dim=-1)
+                    # inputs_norm shape: [batch_size, n_layers, seq_length (+1)]
                     self.save_1d_attention(attention_module, inputs_norm[:, 0], ids, method="InputsNorm")
 
-                    weighted_attention = inputs_norm.unsqueeze(-1).unsqueeze(-1) * module_maps
+                    _, n_layers, total_seq_length = inputs_norm.shape
+                    weighted_attention_shape = [batch_size, n_layers, 1, total_seq_length, 1]
+                    weighted_attention = torch.reshape(inputs_norm, weighted_attention_shape) * module_maps
                     weighted_attention = attention_module.format_1d_attention(weighted_attention)
                     self.save_1d_attention(attention_module, weighted_attention, ids, method="WeightedAttention")
 

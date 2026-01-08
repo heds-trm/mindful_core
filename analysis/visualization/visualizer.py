@@ -214,34 +214,44 @@ class Visualizer(ABC):
                             correct_prediction: bool | None,
                             base_image: np.ndarray,
                             ):
-        if "max_intensity" in self.saved_slices:
-            max_intensity_slice_index = get_3d_image_max_intensity_slice_index(output, dim=-2)
-            output_slice = output[..., max_intensity_slice_index, :]
-            base_slice = base_image[..., max_intensity_slice_index, :]
-            self._save_output_image(output_slice,
-                                    output_name="{}_MaxIntensitySlice".format(output_name),
-                                    sample_id=sample_id,
-                                    modality=modality,
-                                    correct_prediction=correct_prediction,
-                                    base_image=base_slice)
+        output_slices, output_names, base_slices = [], [], []
 
-        if "depth_wise_max" in self.saved_slices:
-            center_index = (output.shape[-2] - 1) // 2
-            output_slice = np.nanmax(output, axis=-2)
-            base_slice = base_image[..., center_index, :]
-            self._save_output_image(output_slice,
-                                    output_name="{}_DepthWiseMax".format(output_name),
-                                    sample_id=sample_id,
-                                    modality=modality,
-                                    correct_prediction=correct_prediction,
-                                    base_image=base_slice)
+        is_3d = len(output.shape) == 4
+        if is_3d:
+            if "max_intensity" in self.saved_slices:
+                max_intensity_slice_index = get_3d_image_max_intensity_slice_index(output, dim=-2)
+                output_slice = output[..., max_intensity_slice_index, :]
+                base_slice = base_image[..., max_intensity_slice_index, :]
 
-        if "center" in self.saved_slices:
-            center_index = (output.shape[-2] - 1) // 2
-            output_slice = output[..., center_index, :]
-            base_slice = base_image[..., center_index, :]
+                output_slices.append(output_slice)
+                output_names.append("{}_MaxIntensitySlice".format(output_name))
+                base_slices.append(base_slice)
+
+            if "depth_wise_max" in self.saved_slices:
+                center_index = (output.shape[-2] - 1) // 2
+                output_slice = np.nanmax(output, axis=-2)
+                base_slice = base_image[..., center_index, :]
+
+                output_slices.append(output_slice)
+                output_names.append("{}_DepthWiseMax".format(output_name))
+                base_slices.append(base_slice)
+
+            if "center" in self.saved_slices:
+                center_index = (output.shape[-2] - 1) // 2
+                output_slice = output[..., center_index, :]
+                base_slice = base_image[..., center_index, :]
+
+                output_slices.append(output_slice)
+                output_names.append("{}_Center".format(output_name))
+                base_slices.append(base_slice)
+        else:
+            output_slices.append(output)
+            output_names.append(output_name)
+            base_slices.append(base_image)
+            
+        for output_slice, output_name, base_slice in zip (output_slices, output_names, base_slices):
             self._save_output_image(output_slice,
-                                    output_name="{}_Center".format(output_name),
+                                    output_name=output_name,
                                     sample_id=sample_id,
                                     modality=modality,
                                     correct_prediction=correct_prediction,
@@ -391,12 +401,13 @@ class Visualizer(ABC):
                    image: np.ndarray,
                    mask: np.ndarray,
                    fusion_methods: list[Literal["add", "hue", "mul"]] | Literal["add", "hue", "mul"],
-                   isoline_thresholds: list[float] = None
+                   isoline_thresholds: list[float] = None,
+                   rotate_mask = True,
                    ) -> np.ndarray | list[np.ndarray]:
         _fusions = [fusion_methods] if isinstance(fusion_methods, str) else fusion_methods
         image = np.float32(image) / 255.0
         image = ensure_channel_last(image)
-        mask = self._format_image(mask, normalize_image=True, rotate=False)
+        mask = self._format_image(mask, normalize_image=True, rotate=rotate_mask)
         color_mask = cv2.applyColorMap(mask, self.color_map)
         color_mask = np.float32(color_mask) / 255.0
         mask = np.float32(mask) / mask.max()
