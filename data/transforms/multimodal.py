@@ -1,7 +1,7 @@
 import torch
 from monai.config.type_definitions import NdarrayOrTensor
 from monai.config import DtypeLike
-from monai.transforms import RandFlip
+from monai.transforms import RandFlip, RandomizableTransform
 from monai.transforms.utils import map_spatial_axes
 import numpy as np
 from typing import Any, Sequence
@@ -256,3 +256,30 @@ class RandMultimodalFlip(RandFlip, SerializableTransform):
 
         pattern_order = [index_map[symbol].pop(-1) for symbol in axis_pattern]
         return pattern_order
+
+
+class RandPickModality(RandomizableTransform, SerializableTransform):
+    def __init__(self):
+        super().__init__(prob=1, do_transform=True)
+        self.modality_index = None
+
+    def randomize(self, data):
+        super().randomize(data)
+        if self._do_transform:
+            self.modality_index = torch.randint(0, len(data), size=())
+
+    def __call__(self, *data, randomize: bool = True):
+        if randomize:
+            self.randomize(data)
+        elif self.modality_index is None:
+            raise RuntimeError("You must first randomize the transform to be able to use it.")
+        
+        return data[self.modality_index]
+    
+    @classmethod
+    def json_identifier(cls) -> str:
+        return "rand_pick_modality"
+
+    def to_json(self) -> dict[str, Any]:
+        return {}
+    
