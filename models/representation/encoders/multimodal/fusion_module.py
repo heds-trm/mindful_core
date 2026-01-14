@@ -5,7 +5,7 @@ from abc import abstractmethod
 from typing import Literal
 
 from mindful_core.models.representation.encoders.misc.modalities_attention_add import ModalitiesAttentionAdd
-from mindful_core.utils.transformers import TransformerPooling
+from mindful_core.utils.transformers import TransformerPooling, AddClsToken
 
 
 class FusionModule(nn.Module):
@@ -161,6 +161,7 @@ class LSTMFusion(FusionModule):
                  hidden_size: int, 
                  learn_initial_state: bool,
                  pooling: int | Literal["cls", "first", "last", "mean", "max", "mul", "prod", "none"] | None = "last",
+                 use_cls_token: bool = False,
                  num_layers: int = 1, 
                  bias=True,
                  dropout=0.0,
@@ -169,6 +170,8 @@ class LSTMFusion(FusionModule):
                  ):
         super().__init__(default_mask_replacement=0.0)
         self.learn_initial_state = learn_initial_state
+        self.use_cls_token = use_cls_token
+        
         self.lstm = nn.LSTM(input_size=input_size,
                             hidden_size=hidden_size,
                             num_layers=num_layers, 
@@ -178,18 +181,23 @@ class LSTMFusion(FusionModule):
                             bidirectional=bidirectional,
                             proj_size=proj_size)
         
+        self.cls_token = AddClsToken(input_size) if self.use_cls_token else None
+        
         if learn_initial_state:
-            initial_h0 = torch.randn(size=self.initial_state_shape)
-            initial_c0 = torch.randn(size=self.initial_state_shape)
+            initial_h0 = torch.randn(size=self.initial_hidden_state_shape)
+            initial_c0 = torch.randn(size=self.initial_cell_state_shape)
             self.initial_hidden_state = nn.Parameter(initial_h0)
             self.initial_cell_state = nn.Parameter(initial_c0)
         else:
-            self.initial_hidden_state = torch.zeros(self.initial_state_shape, dtype=torch.float32)
-            self.initial_cell_state = torch.zeros(self.initial_state_shape, dtype=torch.float32)
+            self.initial_hidden_state = torch.zeros(self.initial_hidden_state_shape, dtype=torch.float32)
+            self.initial_cell_state = torch.zeros(self.initial_cell_state_shape, dtype=torch.float32)
 
         self.pooling = TransformerPooling(pooling)
         
     def fuse(self, inputs: list[torch.Tensor] | torch.Tensor, mask=None, weights=None, *args, **kwargs) -> torch.Tensor:
+        if self.use_cls_token:
+            inputs = self.cls_token(inputs)
+            
         if not isinstance(inputs, torch.Tensor):
             inputs: torch.Tensor = torch.stack(inputs, dim=1)
         batch_size = inputs.shape[0]
@@ -219,8 +227,12 @@ class LSTMFusion(FusionModule):
         return self.lstm.proj_size if self.lstm.proj_size > 0 else self.lstm.hidden_size
     
     @property
-    def initial_state_shape(self) -> torch.Size:
+    def initial_hidden_state_shape(self) -> torch.Size:
         return torch.Size([self.bidirectional_size_factor * self.num_layers, 1, self.output_size])
+    
+    @property
+    def initial_cell_state_shape(self) -> torch.Size:
+        return torch.Size([self.bidirectional_size_factor * self.num_layers, 1, self.lstm.hidden_size])
         
 
 class StackFusion(FusionModule):
