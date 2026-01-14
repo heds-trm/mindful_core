@@ -66,6 +66,7 @@ class ExperimentRoundConfig(object):
         self.stages = ExperimentStages(stages)
 
         # region Models / Checkpoints
+        self.parse_sub_modules_checkpoints(model, verbose=True)
         self.model = model
         self.load_monitor = load_monitor
         self.checkpoint = parse_checkpoint_path(checkpoint, monitor=load_monitor, use_last=use_last, verbose=True)
@@ -204,8 +205,6 @@ class ExperimentRoundConfig(object):
 
         return self.gradient_clip_config.get("algorithm")
 
-    # endregion
-
     # region Folds
     @property
     def fold(self) -> PresetFold:
@@ -218,6 +217,18 @@ class ExperimentRoundConfig(object):
         return self._fold
 
     # endregion
+    # endregion
+
+    @staticmethod
+    def parse_sub_modules_checkpoints(model: ModuleConfig, verbose: bool = False) -> ModuleConfig:
+        if ("sub_modules" not in model) or (model["sub_modules"] is None):
+            return model
+        
+        sub_modules = model["sub_modules"]
+        for sub_module_id in sub_modules:
+            sub_module = sub_modules[sub_module_id]
+            if "checkpoint" in sub_module:
+                sub_module["checkpoint"] = parse_checkpoint_path(sub_module["checkpoint"], verbose=verbose)
 
     # region Save / Load (hparams, properties, ...)
 

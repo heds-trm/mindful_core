@@ -46,10 +46,9 @@ class Experiment(object):
                 seed_everything(seed)
                 round_config["seed"] = seed
 
-            # TODO : Allow for a dictionary of checkpoints to allow for importing models from other experiments
-            #   as sub-modules (eg. import an encoder trained with SSL in an encoder+mlp setup)
             round_config["fold_path"] = fold_path
-            round_config["checkpoint"] = self.get_checkpoint_for_round(fold_index)
+            round_config["checkpoint"] = self.checkpoint
+            round_config = self.resolve_checkpoints_for_round(round_config, fold_index)
             round_config["gradient_clip_config"] = self.gradient_clip_config
 
             experiment_round_config = ExperimentRoundConfig(**round_config)
@@ -105,21 +104,32 @@ class Experiment(object):
 
         return self.seeds[fold_index]
 
-    def get_checkpoint_for_round(self, fold_index: int) -> Path | None:
-        if self.checkpoint is None:
+    @staticmethod
+    def resolve_checkpoints_for_round(config: dict[str, Any], fold_index: int) -> dict[str, Any]:
+        for key in config:
+            if key == "checkpoint":
+                config[key] = Experiment.resolve_checkpoint_for_round(config[key], fold_index)
+            elif isinstance(config[key], dict):
+                config[key] = Experiment.resolve_checkpoints_for_round(config[key], fold_index)
+        return config
+    
+    @staticmethod
+    def resolve_checkpoint_for_round(checkpoint: str | Path | None, fold_index: int) -> str | None:
+        if checkpoint is None:
             return None
+        checkpoint = Path(checkpoint)
 
-        if self.checkpoint.exists() and self.checkpoint.is_file():
-            return self.checkpoint
+        if checkpoint.exists() and checkpoint.is_file():
+            return checkpoint
 
-        checkpoint = self.checkpoint / "version_{}".format(fold_index)
+        checkpoint = checkpoint / "version_{}".format(fold_index)
         if not checkpoint.exists():
-            checkpoint = self.checkpoint / "version_0"
+            checkpoint = checkpoint / "version_0"
 
             if not checkpoint.exists():
-                raise FileNotFoundError("Could not find any valid checkpoint version in `{}`.".format(self.checkpoint))
+                raise FileNotFoundError("Could not find any valid checkpoint version in `{}`.".format(checkpoint))
 
-        return checkpoint
+        return checkpoint.as_posix()
 
     def gather_inferences(self) -> None:
         lightning_logs_dir = self.log_dir / "lightning_logs"

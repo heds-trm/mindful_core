@@ -198,10 +198,30 @@ class ExperimentSeries(object):
             # endregion
 
             # region Resolve checkpoint(s) if present
+            experiment_config = self.resolve_checkpoints(experiment_config)
             if "checkpoint" in experiment_config:
-                # TODO : Allow for a dictionary of checkpoints to allow for importing models from other experiments
-                #   as sub-modules (eg. import an encoder trained with SSL in an encoder+mlp setup)
                 checkpoint = experiment_config.pop("checkpoint")
+            else:
+                checkpoint = None
+            # endregion
+
+            experiment = Experiment(experiment_config, folds, seeds, checkpoint=checkpoint, name=experiment_name)
+            experiment.run()
+
+            if experiment.has_test_stage:
+                gather_test_results(root=self.log_dir, summarize_folds=True, save_absolute_path=False)
+                print("Gathered test results in `{}`...".format(self.log_dir))
+
+            print("Completed experiment `{}`.".format(experiment_name))
+        print("Successfully completed this series of experiments! (logs: {})".format(self.log_dir))
+
+    def resolve_checkpoints(self, config: dict[str, Any]) -> dict[str, Any]:
+        """
+            Updates the checkpoints in the config and sub-config recursively.
+        """
+        for key in config:
+            if key == "checkpoint":
+                checkpoint: str | Path = config[key]
 
                 if checkpoint.startswith("$"):
                     checkpoint = checkpoint[1:]
@@ -216,19 +236,13 @@ class ExperimentSeries(object):
                     if lightning_dir.exists():
                         checkpoint = lightning_dir
 
-            else:
-                checkpoint = None
-            # endregion
+                config[key] = checkpoint
+            
+            elif isinstance(config[key], dict):
+                config[key] = self.resolve_checkpoints(config[key])
 
-            experiment = Experiment(experiment_config, folds, seeds, checkpoint=checkpoint, name=experiment_name)
-            experiment.run()
+        return config
 
-            if experiment.has_test_stage:
-                gather_test_results(root=self.log_dir, summarize_folds=True, save_absolute_path=False)
-                print("Gathered test results in `{}`...".format(self.log_dir))
-
-            print("Completed experiment `{}`.".format(experiment_name))
-        print("Successfully completed this series of experiments! (logs: {})".format(self.log_dir))
 
     @property
     def experiment_configs(self) -> dict[str, ExperimentConfig]:
