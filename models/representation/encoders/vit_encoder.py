@@ -225,7 +225,7 @@ class SwinEncoder(nn.Module):
         else:
             self.linear = None
 
-    def forward(self, x: torch.Tensor) -> torch.Tensor:
+    def forward(self, x: torch.Tensor, output_intermediates = False) -> torch.Tensor:
         x = self.patch_embed(x)
         x = self.pos_drop(x)
 
