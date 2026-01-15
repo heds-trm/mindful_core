@@ -160,7 +160,7 @@ class ExperimentSeries(object):
                 base_config_id = None
 
             if base_config_id is not None:
-                base_config = self.shared_configs[base_config_id]
+                base_config = copy.deepcopy(self.shared_configs[base_config_id])
                 experiment_config = {
                     **base_config,
                     **experiment_config
