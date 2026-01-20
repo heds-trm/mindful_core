@@ -78,6 +78,40 @@ def get_model(module_config: ModuleConfig,
     return model
 
 
+def get_models(modules_configs: dict[str, ModuleConfig | str],
+               device: str | None = None) -> dict[str, MindfulModule]:
+    """
+    Builds models for each (`module_id`, `module_config`) pair in modules_configs.
+
+    `module_config` can be a string referencing another module_id. If so, it will reference the same module,
+    thus sharing weights.
+    """
+    original_order = list(modules_configs.keys())
+
+    modules = {
+        module_id: get_model(module_config, device=device)
+        for module_id, module_config in modules_configs.items()
+        if isinstance(module_config, dict)
+    }
+    
+    reorder = False
+    for module_id, module_config in modules_configs.items():
+        if isinstance(module_config, str):
+            if module_config not in modules_configs:
+                raise RuntimeError("Misconfiguration error: could not find module for id `{}` in ({}).".
+                                   format(module_config, list(modules_configs.keys())))
+            modules[module_id] = modules[module_config]
+            reorder = True
+        elif not isinstance(module_config, dict):
+            raise RuntimeError("Misconfiguration error: Unknown identifier type `{}` for id `{}`.".
+                               format(type(module_config), module_id))
+        
+    if reorder:
+        modules = {module_id: modules[module_id] for module_id in original_order}
+        
+    return modules
+
+
 def is_model_of_type(module: str | Type[MindfulModule] | MindfulModule,
                      module_type: Type[MindfulModule] | tuple[Type[MindfulModule], ...]
                      ) -> bool:
