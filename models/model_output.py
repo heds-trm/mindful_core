@@ -424,17 +424,23 @@ class ClassifierOutput(ModelOutput):
                                 prototype_outputs=prototype_outputs)
 
     @staticmethod
-    def concat_confidence_values(outputs: list[Self]
+    def concat_confidence_values(outputs: list[Self],
+                                 stack_dim = None,
                                  ) -> tuple[torch.Tensor | None, torch.Tensor | float | None]:
         if not all([output.has_confidence for output in outputs]):
             return None, None
 
-        confidence = torch.concat([batch_outputs.confidence for batch_outputs in outputs], dim=0)
-        confidence_threshold = ClassifierOutput.concat_confidence_thresholds(outputs)
+        confidences = [batch_outputs.confidence for batch_outputs in outputs]
+        if stack_dim is not None:
+            confidence = torch.stack(confidences, dim=stack_dim)
+        else:
+            confidence = torch.concat(confidences, dim=0)
+        confidence_threshold = ClassifierOutput.concat_confidence_thresholds(outputs, stack_dim)
         return confidence, confidence_threshold
 
     @staticmethod
-    def concat_confidence_thresholds(outputs: list[Self]) -> torch.Tensor | float | None:
+    def concat_confidence_thresholds(outputs: list[Self],
+                                     stack_dim = None) -> torch.Tensor | float | None:
         if not all([output.has_confidence_threshold for output in outputs]):
             return None
 
@@ -448,7 +454,10 @@ class ClassifierOutput(ModelOutput):
 
         if concat_confidence_threshold:
             thresholds = [torch.as_tensor(output.confidence_threshold).view(-1) for output in outputs]
-            confidence_threshold = torch.concat(thresholds)
+            if stack_dim is not None:
+                confidence_threshold = torch.stack(thresholds, dim=stack_dim)
+            else:
+                confidence_threshold = torch.concat(thresholds)
 
         return confidence_threshold
 

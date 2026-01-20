@@ -117,7 +117,7 @@ class EnsembleClassifier(AbstractClassifier, AutoencoderInterface):
         # endregion
 
         if self.yield_confidence:
-            self.ensemble_confidence_weights = nn.Parameter(initial_weights.copy_())
+            self.ensemble_confidence_weights = nn.Parameter(initial_weights)
         else:
             self.ensemble_confidence_weights = None
 
@@ -135,18 +135,27 @@ class EnsembleClassifier(AbstractClassifier, AutoencoderInterface):
             models_outputs: list[ClassifierOutput] = [model(inputs) for model in self.models]
             models_logits: torch.Tensor = torch.stack([outputs.logits for outputs in models_outputs], dim=0)
 
+        confidence, confidence_threshold = ClassifierOutput.concat_confidence_values(models_outputs, stack_dim=0)
+
         ensemble_weights_shape = [len(self.models)] + [1] * (len(models_logits.shape) - 1)
         ensemble_weights = self.ensemble_weights.view(ensemble_weights_shape)
+        if confidence is not None:
+            if confidence_threshold is None:
+                confidence_scale = torch.sigmoid(confidence)
+            else:
+                confidence_scale = torch.sigmoid(confidence - confidence_threshold)
+            confidence_scale = confidence_scale / confidence_scale.sum(dim=0)
+            ensemble_weights = ensemble_weights * confidence_scale
+            confidence = confidence.mean(dim=0)
 
         logits = (models_logits.detach() * ensemble_weights).sum(dim=0)
-        confidence, confidence_threshold = ClassifierOutput.concat_confidence_values(models_outputs)
-
+        
         intermediate_outputs = models_logits.transpose(0, 1)
         return ClassifierOutput(single_class=self.single_class,
                                 logits=logits,
                                 intermediate_outputs=intermediate_outputs,
                                 confidence=confidence,
-                                confidence_threshold=confidence_threshold)
+                                confidence_threshold=None)
 
     # region Properties
     @property
