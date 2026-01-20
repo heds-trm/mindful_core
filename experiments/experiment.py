@@ -124,7 +124,7 @@ class Experiment(object):
 
         checkpoint = checkpoint / "version_{}".format(fold_index)
         if not checkpoint.exists():
-            checkpoint = checkpoint / "version_0"
+            checkpoint = checkpoint.parent / "version_0"
 
             if not checkpoint.exists():
                 raise FileNotFoundError("Could not find any valid checkpoint version in `{}`.".format(checkpoint))
