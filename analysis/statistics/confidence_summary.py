@@ -10,8 +10,9 @@ from mindful_core.data.subset_id import SubsetID
 from mindful_core.data.data_folds import DataFold
 from mindful_core.analysis.statistics.classification_summary import ConfidenceThreshold, EERThreshold, logits_to_probabilities
 from mindful_core.utils.tensor_utils import linear_sample, get_kde, to_numpy
+from mindful_core.models.model_output import ClassifierOutput
 
-Classifier = Callable[[list[torch.Tensor] | torch.Tensor], tuple[torch.Tensor, torch.Tensor]]
+Classifier = Callable[[list[torch.Tensor] | torch.Tensor], ClassifierOutput]
 
 
 class ConfidenceSummary(object):
@@ -36,7 +37,9 @@ class ConfidenceSummary(object):
                 for *inputs, batch_labels in data_loader:
                     if len(inputs) == 1:
                         inputs = inputs[0]
-                    batch_logits, batch_confidence = self.model(inputs)
+                    batch_outputs: ClassifierOutput = self.model(inputs)
+                    batch_logits = batch_outputs.logits
+                    batch_confidence = batch_outputs.confidence
                     subset_logits.append(batch_logits)
                     subset_confidence.append(batch_confidence)
                     subset_labels.append(batch_labels)
@@ -107,6 +110,9 @@ class ConfidenceSummary(object):
             axis = figure.axes[0]
 
         confidence_scores = to_numpy(confidence_scores)
+        correct_predictions = to_numpy(correct_predictions)
+        confidence_threshold = to_numpy(confidence_threshold)
+        
         confidence_correct: np.ndarray = confidence_scores[correct_predictions]
         confidence_incorrect: np.ndarray = confidence_scores[~correct_predictions]
 

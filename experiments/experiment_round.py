@@ -489,6 +489,11 @@ class ExperimentRound(object):
     # region Confidence analysis
     def confidence_analysis(self) -> None:
         data_loaders = self.get_data_loaders(training=False)
+        self.model.eval()
+
+        if self.config.accelerator in ["cuda", "gpu"]:
+            self.model.cuda()
+
         confidence_summary = ConfidenceSummary(self.model, self.logger.log_dir)
         confidence_summary(data_loaders, self.config.fold)
 
