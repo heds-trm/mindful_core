@@ -7,7 +7,7 @@ from tqdm import tqdm
 from typing import Sequence
 import warnings
 
-from mindful_core.utils.data_constants import SCAN_ID, SUBSET_ID, LABEL
+from mindful_core.utils.data_constants import SCAN_ID, SUBSET_ID, LABEL, IN_DISTRIBUTION
 from mindful_core.analysis.statistics.roc_compare import delong_roc_variance
 
 
@@ -167,12 +167,36 @@ def compute_eer_threshold_from_available(fold_inferences: pd.DataFrame) -> float
     return eer_threshold
 
 
+def get_confidence_filter(inferences_path: Path) -> pd.Series | None:
+    lightning_folder = inferences_path.parent / "lightning_logs" 
+    if not lightning_folder.exists():
+        return None
+    
+    index = int(inferences_path.stem.split("_")[-1])
+    version_folder = lightning_folder / "version_{}".format(index)
+    confidence_analysis_path = version_folder / "test_positive_threshold_confidence_analysis.csv"
+
+    if not confidence_analysis_path.exists():
+        return None
+    
+    confidence_analysis = pd.read_csv(confidence_analysis_path, index_col=SCAN_ID)
+    if IN_DISTRIBUTION not in confidence_analysis.columns:
+        warnings.warn("Found a confidence analysis file but could not find the {} column".format(IN_DISTRIBUTION))
+        return None
+    
+    return confidence_analysis[IN_DISTRIBUTION]
+
+
 def compute_fold_metrics(path: Path,
                          n_iterations: int = 1000,
                          metrics=("auroc", "eer", "sensitivity", "specificity", "accuracy"),
                          seed: int = None,
                          ) -> dict[str, BootstrappedMetric] | None:
     fold_inferences = pd.read_csv(path, index_col=SCAN_ID)
+
+    confidence_filter = get_confidence_filter(path)
+    if confidence_filter is not None:
+        fold_inferences = fold_inferences[confidence_filter]
 
     if SUBSET_ID in fold_inferences.columns:
         test_inferences = fold_inferences[fold_inferences[SUBSET_ID] == "test"]

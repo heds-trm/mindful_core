@@ -6,6 +6,7 @@ import matplotlib.pyplot as plt
 from pathlib import Path
 from typing import Callable
 
+from mindful_core.utils.data_constants import IN_DISTRIBUTION
 from mindful_core.data.subset_id import SubsetID
 from mindful_core.data.data_folds import DataFold
 from mindful_core.analysis.statistics.classification_summary import ConfidenceThreshold, EERThreshold, logits_to_probabilities
@@ -152,7 +153,7 @@ class ConfidenceSummary(object):
         summary_data = sum([self.summarize_subset(probabilities[subset_id], probability_threshold,
                                                   confidence_scores[subset_id], confidence_threshold)
                             for subset_id in fold.samples], [])
-        header = ["Probability", "Positive", "Confidence", "InDistribution"]
+        header = ["Probability", "Positive", "Confidence", IN_DISTRIBUTION]
         summary = pd.DataFrame(summary_data, columns=header)
 
         fold_data_frame = fold.to_data_frame()
