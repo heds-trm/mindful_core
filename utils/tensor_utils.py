@@ -51,6 +51,8 @@ def linear_sample(x: np.ndarray, num=1000) -> np.ndarray:
 
 
 def get_kde(x: np.ndarray, num=1000) -> np.ndarray:
+    if len(x) < 2:
+        return np.zeros(shape=(num))
     return gaussian_kde(x).evaluate(points=linear_sample(x, num=num))
 
 
