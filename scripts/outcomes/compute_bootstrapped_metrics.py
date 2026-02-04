@@ -174,7 +174,7 @@ def get_confidence_filter(inferences_path: Path) -> pd.Series | None:
     
     index = int(inferences_path.stem.split("_")[-1])
     version_folder = lightning_folder / "version_{}".format(index)
-    confidence_analysis_path = version_folder / "test_positive_threshold_confidence_analysis.csv"
+    confidence_analysis_path = version_folder / "confidence_analysis.csv"
 
     if not confidence_analysis_path.exists():
         return None

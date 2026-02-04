@@ -126,8 +126,49 @@ class ConfidenceThreshold(ClassificationMetric):
         return best_threshold
 
     @staticmethod
+    def compute_partial_aurocs(probabilities: torch.Tensor, labels: torch.Tensor, confidence: torch.Tensor,
+                               max_threshold_count: int | None = None) -> tuple[torch.Tensor, torch.Tensor]:
+        """ Computes AUROC values for each confidence thresholds and for the given probabilities and labels
+        ### Parameters
+        1. probabilities
+            - A 1D tensor. Shape [sample_count]. Contains probabilities comprised between 0 and 1.
+        2. labels
+            - A 1D tensor. Shape [sample_count]. Contains labels for given probabilities.
+        3. confidence
+            - A 1D tensor. Shape [sample_count]. Contains confidence scores for given probabilities.
+
+        ### Returns
+        - sorted_confidence: A 1D tensor. The sorted confidence values. May contain less values than confidence.
+        - aurocs: A 1D tensor. The AUROC values for each confidence values (sorted in the same order as sorted_confidence).
+        """
+        confidence, confidence_indices = torch.sort(confidence)
+        probabilities = probabilities[confidence_indices]
+        labels = labels[confidence_indices]
+
+        sample_count = confidence.size(0)
+        aurocs = torch.zeros(size=(sample_count,))
+        if max_threshold_count is None:
+            max_threshold_count = int(sample_count * 0.9)
+
+        for i in range(max_threshold_count):
+            partial_labels = labels[i:]
+
+            if torch.all(partial_labels) or not torch.any(partial_labels):
+                break
+
+            partial_auc = compute_auroc(probabilities[i:], partial_labels)
+            aurocs[i] = partial_auc
+
+        confidence = confidence[:i+1]
+        aurocs = aurocs[:i+1]
+
+        return confidence, aurocs
+
+
+    @staticmethod
     def compute_best_confidence(probabilities: torch.Tensor, labels: torch.Tensor, confidence: torch.Tensor,
-                                reference: torch.Tensor = None) -> tuple[torch.Tensor, torch.Tensor]:
+                                reference: torch.Tensor = None, max_threshold_count: int | None = None
+                                ) -> tuple[torch.Tensor, torch.Tensor]:
         """ Computes the confidence threshold that maximizes the AUROC for the given probabilities and labels
         ### Parameters
         1. probabilities
@@ -144,26 +185,33 @@ class ConfidenceThreshold(ClassificationMetric):
         - best_auroc: A scalar. The AUROC at the returned confidence threshold.
         """
         sample_count = confidence.size(0)
-        max_threshold_count = sample_count // 2
+        if max_threshold_count is None:
+            max_threshold_count = sample_count // 2
         confidence, confidence_indices = torch.sort(confidence)
         probabilities = probabilities[confidence_indices]
         labels = labels[confidence_indices]
-        if reference is None:
-            reference = compute_auroc(probabilities, labels)
+        # if reference is None:
+        #     reference = compute_auroc(probabilities, labels)
 
-        best_auc = reference
-        best_index = 0
-        for i in range(1, max_threshold_count):
-            partial_labels = labels[i:]
-            if torch.all(partial_labels) or not torch.any(partial_labels):
-                break
+        # best_auc = reference
+        # best_index = 0
+        # for i in range(1, max_threshold_count):
+        #     partial_labels = labels[i:]
+        #     if torch.all(partial_labels) or not torch.any(partial_labels):
+        #         break
 
-            partial_auc = compute_auroc(probabilities[i:], partial_labels)
-            if partial_auc > best_auc:
-                best_auc = partial_auc
-                best_index = i
+        #     partial_auc = compute_auroc(probabilities[i:], partial_labels)
+        #     if partial_auc > best_auc:
+        #         best_auc = partial_auc
+        #         best_index = i
 
-        return confidence[best_index], best_auc
+        confidence, aurocs = ConfidenceThreshold.compute_partial_aurocs(probabilities, labels, confidence, max_threshold_count)
+        best_index = aurocs.argmax()
+        best_auroc = aurocs[best_index]
+        if (reference is not None) and (reference > best_auroc):
+            best_auroc, best_index = reference, 0
+        best_confidence = confidence[best_index]
+        return best_confidence, best_auroc
 
 
 # endregion
