@@ -240,7 +240,9 @@ class SwinEncoder(nn.Module):
             x = self.norm(x)
 
         if self.project_outputs:
-            x = self.linear(x)
+            x_t = x.permute(0, 2, 1)
+            x_t = self.linear(x_t)
+            x = x_t.permute(0, 2, 1)
 
         return x
 
