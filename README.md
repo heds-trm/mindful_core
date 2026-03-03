@@ -23,7 +23,7 @@ Below you will find an overview of the structure of the project.
 ### main.py
 This is the main entry point of the project and will start a series of experiments based on the configuration file. (see [Experiments](#experiments))
 
-### Experiments
+### Experiments ([🔝](#mindful-core))
 To automate experiments and fold-by-fold experimentation, experiments use the following hierachy:
 `ExperimentSeries > Experiment > ExperimentRound > ExperimentStage`
 
