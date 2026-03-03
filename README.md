@@ -4,6 +4,22 @@ Medical ImagiNg Data FUsion Lab
 ## Project Structure
 Below you will find an overview of the structure of the project.
 
+### Table of Content
+- [main.py](#mainpy)
+  - Entry point
+- [Experiments](#experiments)
+  - Functional heart of the project
+- [Models](#models)
+  - Models, architecture and losses 
+- [Data](#data)
+  - Data folds and pipelines 
+- [Analysis](#analysis)
+  - Statistics and interpretability
+- [Scripts](#scripts)
+  - Auxiliary scripts (data preparation, bootstrapping, ...)
+- [Utils](#utils)
+  - Utility functions used across the project
+
 ### main.py
 This is the main entry point of the project and will start a series of experiments based on the configuration file. (see [Experiments](#experiments))
 
