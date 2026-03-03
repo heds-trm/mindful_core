@@ -96,7 +96,9 @@ class DifficultySampler(Sampler):
                                 predictions_ratio_other_label).sum(dim=1))
 
         difficulty: torch.Tensor = unlearning_difficulty + learning_difficulty
-        self.weights = difficulty / difficulty.sum()
+        total_difficulty = difficulty.sum()
+        new_weights = difficulty / (total_difficulty + 1e-5)
+        self.weights = new_weights
         self.history.append(predictions)
 
     def get_predictions(self):
