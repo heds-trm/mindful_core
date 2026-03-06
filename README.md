@@ -99,15 +99,47 @@ At the moment, the only working subclass of AbstractSegmentationModel is [Segmen
 
 ### Data ([🔝](#mindful-core))
 
-#### 1. Transforms
+#### 1. MindfulDataset and DataFold ([🔝](#data-))
+MindfulDataset relies on the DataFold class to provide the list of samples and their associated fold. 
+DataFold - and its child class PresetFold - load and list samples, which include their ID, image path(s), label, scalar data, categorical data, ...
 
-#### 2. Pipelines
+Using a sampling strategy, its samples and a [Pipeline](#3-pipeline-), a MindfulDataset builds a DataLoader - a PyTorch object - used for training, testing, and various cases where data has to be loaded.
+
+#### 2. Transform ([🔝](#data-))
+Transforms are a collection of classes used for processing data.
+Transforms can either be unimodal or multimodal.
+Some transforms will expect specific modalities (e.g. transforms in data/transforms/imaging.py usually expect images).
+Transforms can either be deterministic or stochastic (in this later case, transforms are seeded).
+
+The [SerializableTransform](data/transforms/serializable_transform.py) class can be easily derived to add new transforms to the project.
+Its abstract methods will ensure transforms will be serializable and therefore can be saved with other logged data.
+SerializableTransform subclasses can also be fitted before training (on the training data), which can be useful to process data based on the population's statistics.
+
+#### 3. Pipeline ([🔝](#data-))
+[Pipeline](data/transforms/pipeline.py) instances are a collection of staged lists of transforms.
+Stages are used to automatically differentiate training, validation and test pipeline.
+Once differentiated, pipelines will run through each transform one by one, updating a dictionary of modalities at each step.
+
+In the special case of multiview pipeline (e.g. for VICReg), some stages will run as many times as the number of views that are expected.
 
 ### Analysis ([🔝](#mindful-core))
 
+#### 1. Statistics
+The role of the [statistics folder](analysis/statistics) is mainly to compute metrics for models, such as AUROC, EER, accuracy, ...
+It also extends these metrics for models with confidence estimation. For default classification metrics, see [AbstractClassifier](models/classification/abstract_classifier.py)'s \_\_init\_\_ function.
+
+For bootstrapped metrics, see the [compute_bootstrapped_metrics.py](scripts/outcomes/compute_bootstrapped_metrics.py) script.
+
+#### 2. Visualization
+The [Visualizer](analysis/visualization/visualizer.py) class and its subclasses are intended for interpretability.
+[VisualizerGroup](analysis/visualization/visualizer_group.py) gives an interface to run multiple visualizers are once.
+
+Visualizers include - for both images and scalar data - attention, occlusion and saliency maps. They also include CAM and segmentation maps for images.
+
+To use, enable the "visualize" ExperimentStage. The default visualizers can be found in [VisualizerGroup](analysis/visualization/visualizer_group.py)'s `get_default_visualizers_config` function.
 
 ### Scripts ([🔝](#mindful-core))
-
+This folder contain all scripts that can be run on their own. See their \_\_main\_\_ function for expected arguments (defined by the argparse library).
 
 ### Utils ([🔝](#mindful-core))
-
+This is a collection of utility code used throughout the project.
