@@ -24,7 +24,7 @@ Below you will find an overview of the structure of the project.
 This is the main entry point of the project and will start a series of experiments based on the configuration file. (see [Experiments](#experiments-))
 
 ### Experiments ([🔝](#mindful-core))
-To automate experiments and fold-by-fold experimentation, experiments use the following hierachy:
+To automate experiments and fold-by-fold experimentation, experiments use the following hierarchy:
 `ExperimentSeries > Experiment > ExperimentRound > ExperimentStage`
 
 #### 1. ExperimentSeries
@@ -41,6 +41,9 @@ To automate experiments and fold-by-fold experimentation, experiments use the fo
 *ExperimentRound is a set of ExperimentStage (N=number of stages in config).*
 
 __[ExperimentRound](experiments/experiment_round.py) is the heart of this project.__ It will create models, data pipelines, load data folds, ... based on the configuration it receives. Most commonly, ExperimentRound will run the training and test stages, as well as run any interpretability or additional stages. 
+
+Here is a diagram of how the project articulates around ExperimentRound:
+![ExperimentRoundDiagram](./doc/ExperimentDiagram.svg)
 
 #### 4. ExperimentStage
 [ExperimentStage](experiments/experiment_stage.py) is only a registry of stages the ExperimentRound must perform and contain very little data by themselves. This class mainly exists for allowing future versions to add data to configure stages.
@@ -95,6 +98,16 @@ Similarly to AbstractClassifier, AbstractSegmentationModel defines the base loss
 At the moment, the only working subclass of AbstractSegmentationModel is [SegmentationUnet](models/segmentation/segmentation_unet.py). This UNet can use either the basic UNet backbone, or the backbone of either UNetr or SWIN-Unet.
 
 ### Data ([🔝](#mindful-core))
+
+#### 1. Transforms
+
+#### 2. Pipelines
+
 ### Analysis ([🔝](#mindful-core))
+
+
 ### Scripts ([🔝](#mindful-core))
+
+
 ### Utils ([🔝](#mindful-core))
+
