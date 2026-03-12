@@ -76,7 +76,7 @@ The encoder architectures available in this project are:
 - [ViTEncoder/SwinEncoder](models/representation/encoders/vit_encoder.py) (unimodal &ndash; images): project 2D or 3D images to a sequence of 1D vectors (or a single vector) using transformer encoders. The SWIN variant is available in the same folder.
 - [VGGEncoder](models/representation/encoders/vgg.py) (unimodal &ndash; images): project 2D or 3D images to a 1D vector. Based on CNNs.
 - [ScalarEncoder](models/representation/encoders/misc/scalar_encoder.py) (unimodal &ndash; scalars): project scalars from input to representation space. Based on MLP with ReLU activations. 
-- [CategoricalEncoder](models/representation/encoders/misc/categorical_encoder.py) (unimodal &ndash; integers): builds and uses a look-up table matching indices to learnt embeddings.  Then proceeds as ScalarEncoder using these embeddings.
+- [CategoricalEncoder](models/representation/encoders/misc/categorical_encoder.py) (unimodal &ndash; integers): builds and uses a look-up table matching indices to learn embeddings.  Then proceeds as ScalarEncoder using these embeddings.
 - [MultiModalEncoder](models/representation/encoders/multimodal/multimodal_encoder.py) (multimodal &ndash; any modality): Uses the specified unimodal encoders to get unimodal representations and then merge these representation with its fusion module (see [FusionModule](models/representation/encoders/multimodal/fusion_module.py) and [FusionTransformer](models/representation/encoders/multimodal/fusion_transformer.py)).
 
 #### 5. AbstractRepresentationModel ([🔝](#models-))
@@ -125,7 +125,7 @@ In the special case of multiview pipeline (e.g. for VICReg), some stages will ru
 ### Analysis ([🔝](#mindful-core))
 
 #### 1. Statistics
-The role of the [statistics folder](analysis/statistics) is mainly to compute metrics for models, such as AUROC, EER, accuracy, ...
+The role of the [statistics folder](analysis/statistics) is mainly to compute metrics for models, such as AUROC, EER, accuracy, etc.
 It also extends these metrics for models with confidence estimation. For default classification metrics, see [AbstractClassifier](models/classification/abstract_classifier.py)'s \_\_init\_\_ function.
 
 For bootstrapped metrics, see the [compute_bootstrapped_metrics.py](scripts/outcomes/compute_bootstrapped_metrics.py) script.
