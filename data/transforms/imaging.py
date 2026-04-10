@@ -123,6 +123,7 @@ class LoadImage4D(LoadImage, SerializableTransform):
                  prune_meta_pattern: str | None = None,
                  prune_meta_sep: str = ".",
                  filename_pattern: str = "phase_*.mha",
+                 filter_slices: list | None = None,
                  *args,
                  **kwargs):
         super(LoadImage4D, self).__init__(reader=reader, image_only=image_only, dtype=dtype,
@@ -130,6 +131,7 @@ class LoadImage4D(LoadImage, SerializableTransform):
                                           prune_meta_pattern=prune_meta_pattern, prune_meta_sep=prune_meta_sep,
                                           *args, **kwargs)
         self.filename_pattern = filename_pattern
+        self.filter_slices = filter_slices
         self.reader = reader if isinstance(reader, str) else None
 
     def __call__(self, folder_path: Sequence[PathLike] | PathLike, reader: ImageReader | None = None):
@@ -149,7 +151,7 @@ class LoadImage4D(LoadImage, SerializableTransform):
         ids = []
         for slice_filename in folder_path.iterdir():
             slice_id = LoadImage4D.get_slice_id(slice_filename)
-            if slice_id is not None:
+            if self.use_slice(slice_id):
                 filenames.append(slice_filename)
                 ids.append(slice_id)
         slices_order = np.argsort(ids)
@@ -171,6 +173,13 @@ class LoadImage4D(LoadImage, SerializableTransform):
 
         slice_id = int("".join(reversed(numbers)))
         return slice_id
+
+    def use_slice(self, slice_id: int | None) -> bool:
+        if slice_id is None:
+            return False
+        if self.filter_slices is None:
+            return True
+        return slice_id in self.filter_slices
 
     @classmethod
     def json_identifier(cls) -> str:
@@ -423,7 +432,6 @@ class StandardizeIntensityD(SerializableTransform):
         }
 
 
-
 class NormalizeIntensity(SerializableTransform):
     backend = [TransformBackends.TORCH]
 
@@ -561,7 +569,6 @@ class ClipIntensity(SerializableTransform):
             "channel_wise": self.channel_wise,
             "spatial_dims": self.spatial_dims,
         }
-    
 
 
 class CenterIntensityBoost(SerializableTransform):
@@ -657,7 +664,7 @@ class PseudoColor(SerializableTransform):
 
         elif image.max() > 255:
             raise ValueError("Unsupported image range: max={}".format(image.max()))
-        
+
         if image.device not in self.color_map_by_device:
             self.color_map_by_device[image.device] = self.color_map_array.to(image.device)
         color_map_array = self.color_map_by_device[image.device]
@@ -677,7 +684,7 @@ class PseudoColor(SerializableTransform):
         image_max = float(image.max())
         if (image_min < 0.0) or (image_max > 255.0):
             raise ValueError("Unsupported image range: min={} and max={}".format(image_min, image_max))
-        
+
         if image_max > 1.0:
             if image_min == image_max:
                 raise ValueError("Only one intensity found in image, could not normalize image for colormapping.")
@@ -695,6 +702,7 @@ class PseudoColor(SerializableTransform):
         return {
             "color_map": self.color_map
         }
+
 
 # endregion
 
@@ -2248,7 +2256,7 @@ class RandSyncedNDAugment(RandomizableTransform, SerializableTransform):
                             lazy=False,
                             transform_info={})
         return image
-    
+
     def translate_image(self,
                         image: torch.Tensor | MetaTensor,
                         modality_spatial_dims: list[int]) -> torch.Tensor | MetaTensor:
