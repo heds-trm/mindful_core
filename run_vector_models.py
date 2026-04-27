@@ -10,7 +10,7 @@ import pandas as pd
 import argparse
 from pathlib import Path
 import os
-from typing import Any, Optional
+from typing import Any
 
 from mindful_core.data import SubsetID
 from mindful_core.data.data_folds import PresetFold
@@ -293,6 +293,27 @@ def train_and_predict(train_inputs: np.ndarray,
         val_proba = model.predict_proba(val_inputs)
         test_proba = model.predict_proba(test_inputs)
 
+    elif method == "OCSVM":
+        model = svm.OneClassSVM(nu=0.1)
+
+        negative_train_inputs = train_inputs[train_labels == 0]
+        model.fit(negative_train_inputs)
+        train_score = - model.decision_function(train_inputs)
+        val_score = - model.decision_function(val_inputs)
+        test_score = - model.decision_function(test_inputs)
+
+        # train_min_score, train_max_score = train_score.min(), train_score.max()
+        val_min_score, val_max_score = val_score.min(), val_score.max()
+
+        def normalize_score(score):
+            score = (score - val_min_score) / (val_max_score - val_min_score)
+            score = np.clip(score, 0.0, 1.0)
+            return score
+
+        train_proba = normalize_score(train_score)
+        val_proba = normalize_score(val_score)
+        test_proba = normalize_score(test_score)
+
     elif method == "RandomForest":
         model = ensemble.RandomForestClassifier()
         model.fit(train_inputs, train_labels)
@@ -321,6 +342,7 @@ def train_and_predict(train_inputs: np.ndarray,
     else:
         raise RuntimeError()
 
+    del model
     return train_proba, val_proba, test_proba
 
 
@@ -495,7 +517,7 @@ def run_experiment_on_fold(fold: PresetFold,
             F1ScoreAverage
         ]
         sensitivity_threshold = None
-    sensitivity_threshold: Optional[type[SensitivityThreshold]]
+    sensitivity_threshold: type[SensitivityThreshold] | None
 
     classification_summary = ClassificationSummary(metrics)
     # passing probabilities as logits since we don't have logits
@@ -534,21 +556,16 @@ def run_experiment_on_dataset(folds: list[PresetFold],
                               labels_ratio=None,
                               positive_class: int = None,
                               keep_featureless=False,
+                              seeds: list[int] | tuple[int, ...] = (3930787959, 3048086154, 1308332165,
+                                                                    4198623908, 2751205564),
                               ) -> tuple[list[pd.DataFrame], list[dict[str, float]]]:
-    seeds = [
-        3930787959,
-        3048086154,
-        1308332165,
-        4198623908,
-        2751205564
-    ]
-
     folds_inferences: list[pd.DataFrame] = []
     folds_metrics: list[dict[str, float]] = []
     for i, fold in enumerate(folds):
         print("-> Running fold n°{}".format(i))
-        set_determinism(seeds[i])
-        seed_everything(seeds[i])
+        seed_index = i % len(seeds)
+        set_determinism(seeds[seed_index])
+        seed_everything(seeds[seed_index])
 
         fold_inferences, fold_metrics = run_experiment_on_fold(fold, method, labels_ratio,
                                                                positive_class, keep_featureless)
@@ -559,35 +576,31 @@ def run_experiment_on_dataset(folds: list[PresetFold],
     return folds_inferences, folds_metrics
 
 
-def get_dataset_folds(folder_path: Path) -> Optional[list[PresetFold]]:
+def get_dataset_folds(folder_path: Path,
+                      fold_path_pattern: str = "*fold_*.csv",
+                      scalar_path_pattern: str = "scalar_features.csv",
+                      categorical_path_pattern: str = "categorical_features.csv",
+                      ) -> list[PresetFold] | None:
     scalars_path = None
     categorical_path = None
-    representations_paths = []
     folds_paths = []
 
     for filepath in folder_path.iterdir():
-        if filepath.match("*fold_*.csv"):
+        if filepath.match(fold_path_pattern):
             folds_paths.append(filepath)
 
-        elif filepath.match("scalar_features.csv"):
+        elif filepath.match(scalar_path_pattern):
             scalars_path = filepath
 
-        elif filepath.match("categorical_features.csv"):
+        elif filepath.match(categorical_path_pattern):
             categorical_path = filepath
 
-        elif filepath.match("representations_*.csv"):
-            representations_paths.append(filepath)
+    if (scalars_path is None) and (categorical_path is None):
+        return None
 
-    folds = None
-    if scalars_path is not None:
-        folds = [PresetFold(filepath, scalar_features_path=scalars_path,
-                            categorical_features_path=categorical_path)
-                 for filepath in folds_paths]
-    elif (len(representations_paths) == len(folds_paths)) and (len(folds_paths) > 0):
-        folds = [PresetFold(filepath, scalar_features_path=representations_path,
-                            categorical_features_path=categorical_path)
-                 for filepath, representations_path in
-                 zip(sorted(folds_paths), sorted(representations_paths))]
+    folds = [PresetFold(filepath, scalar_features_path=scalars_path,
+                        categorical_features_path=categorical_path)
+             for filepath in folds_paths]
 
     return folds
 
@@ -644,13 +657,27 @@ def main():
     arg_parser.add_argument("--labels_ratios", nargs="+")
     arg_parser.add_argument("--keep_featureless", action="store_true")
 
+    arg_parser.add_argument("--fold_pattern", default="*fold_*.csv")
+    arg_parser.add_argument("--scalar_pattern", default="scalar_features.csv")
+    arg_parser.add_argument("--categorical_pattern", default="categorical_features.csv")
+
+    arg_parser.add_argument("--seeds", nargs="+",
+                            default=[3930787959, 3048086154, 1308332165,
+                                     4198623908, 2751205564])
+
     args = arg_parser.parse_args()
     folder = Path(args.folder)
     labels_ratios: list[float | None] = ([float(x) for x in args.labels_ratios]
                                          if args.labels_ratios is not None else None)
     positive_class = int(args.positive_class) if args.positive_class is not None else None
+    path_patterns = {
+        "fold_path_pattern": args.fold_pattern,
+        "scalar_path_pattern": args.scalar_pattern,
+        "categorical_path_pattern": args.categorical_pattern,
+    }
+    seeds = args.seeds
 
-    sub_folders = {sub_folder: get_dataset_folds(sub_folder)
+    sub_folders = {sub_folder: get_dataset_folds(sub_folder, **path_patterns)
                    for sub_folder in folder.iterdir() if sub_folder.is_dir()}
     if labels_ratios is None:
         labels_ratios = [None]
@@ -680,14 +707,15 @@ def main():
                 experiment_name = "{}_{:02d}".format(experiment_name, int(labels_ratio * 100))
             # endregion
 
-            folds = get_dataset_folds(sub_folder)
+            folds = get_dataset_folds(sub_folder, **path_patterns)
             if folds is None:
                 continue
 
             print("Running experiment on {}".format(experiment_name))
             folds_inferences, dataset_metrics = run_experiment_on_dataset(folds, method,
                                                                           labels_ratio, positive_class,
-                                                                          keep_featureless)
+                                                                          keep_featureless,
+                                                                          seeds)
             save_experiment_inferences(folds_inferences, experiment_name, csv_folder, excel_folder)
 
             folds_names = []
