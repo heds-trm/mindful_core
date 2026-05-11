@@ -1,6 +1,7 @@
 import torch
 from monai.transforms import (
     Transform,
+    Lambda,
     LoadImage, EnsureChannelFirst, Orientation, Flip,
     CropForeground, SpatialCrop, CenterSpatialCrop, SpatialPad, ResizeWithPadOrCrop,
     Resize, Spacing, FgBgToIndices,
@@ -11,6 +12,7 @@ from monai.transforms import (
 )
 from monai.transforms import (
     MapTransform,
+    Lambdad,
     LoadImaged, EnsureChannelFirstd, Orientationd, Flipd,
     CropForegroundd, SpatialCropd, CenterSpatialCropd, SpatialPadd, ResizeWithPadOrCropd,
     Resized, Spacingd, FgBgToIndicesd,
@@ -30,7 +32,88 @@ from mindful_core.data import Sample
 
 TransformParameters = dict[str, Any]
 
+from monai.transforms import Transform
+import torch
+import numpy as np
 
+class ToGrayscale(Transform):
+    """
+    Convert image to grayscale by averaging channels.
+
+    Args:
+        channel_first: whether the input image is channel-first.
+            - True:  (C, H, W[, D])
+            - False: (H, W[, D], C)
+
+    Behavior:
+        - If already grayscale (single channel), returns unchanged.
+        - If multi-channel, averages across the channel dimension.
+        - Output preserves the original channel layout convention:
+            - channel_first=True  -> (1, H, W[, D])
+            - channel_first=False -> (H, W[, D], 1)
+    """
+
+    def __init__(self, channel_first: bool = True):
+        self.channel_first = channel_first
+
+    def __call__(self, img):
+        is_numpy = isinstance(img, np.ndarray)
+
+        if is_numpy:
+            img = torch.as_tensor(img)
+
+        if not isinstance(img, torch.Tensor):
+            raise TypeError(f"Unsupported type: {type(img)}")
+
+        if img.ndim < 3:
+            raise ValueError(
+                f"Expected at least 3 dimensions, got shape {tuple(img.shape)}"
+            )
+
+        channel_dim = 0 if self.channel_first else -1
+        n_channels = img.shape[channel_dim]
+
+        if n_channels == 1:
+            out = img
+        else:
+            out = img.mean(dim=channel_dim, keepdim=True)
+
+            if not self.channel_first:
+                # mean(..., keepdim=True) with dim=-1 already keeps channel last
+                pass
+
+        if is_numpy:
+            out = out.numpy()
+
+        return out
+
+
+class ToGrayscaled(MapTransform):
+    """
+    Dictionary-based version of ToGrayscale.
+
+    Args:
+        keys: keys of the items to transform.
+        channel_first: whether the input images are channel-first.
+            - True:  (C, H, W[, D])
+            - False: (H, W[, D], C)
+        allow_missing_keys: do not raise if key is missing.
+    """
+
+    def __init__(
+        self,
+        keys,
+        channel_first: bool = True,
+        allow_missing_keys: bool = False,
+    ):
+        super().__init__(keys, allow_missing_keys)
+        self.converter = ToGrayscale(channel_first=channel_first)
+
+    def __call__(self, data):
+        d = dict(data)
+        for key in self.key_iterator(d):
+            d[key] = self.converter(d[key])
+        return d
 class SerializableTransform(Transform, ABC):
     def __init__(self, **kwargs):
         pass
@@ -72,6 +155,10 @@ class SerializableTransform(Transform, ABC):
                 "simple_keys": transform.simple_keys,
                 "prune_meta_pattern": transform.pattern,
                 "prune_meta_sep": transform.sep,
+            }
+        elif isinstance(transform, ToGrayscale):
+            config = {
+                "channel_first": transform.channel_first
             }
         elif isinstance(transform, EnsureChannelFirst):
             config = {
@@ -252,6 +339,8 @@ class SerializableTransform(Transform, ABC):
         if isinstance(transform, LoadImaged):
             # noinspection PyProtectedMember
             base_transform = transform._loader
+        elif isinstance(transform, ToGrayscaled):
+            base_transform = transform.converter
         elif isinstance(transform, Orientationd):
             base_transform = transform.ornt_transform
         elif isinstance(transform, ScaleIntensityd):
@@ -407,6 +496,7 @@ class SerializableTransform(Transform, ABC):
 
 
 supported_monai_transforms: dict[str, type[Transform] | type[MapTransform]] = {
+    "to_grayscale": ToGrayscale,
     "load_image": LoadImage,
     "ensure_channel_first": EnsureChannelFirst,
     "orientation": Orientation,
@@ -434,6 +524,7 @@ supported_monai_transforms: dict[str, type[Transform] | type[MapTransform]] = {
     "to_device": ToDevice,
     "identity": Identity,
 
+    "to_grayscaled": ToGrayscaled,
     "load_imaged": LoadImaged,
     "ensure_channel_firstd": EnsureChannelFirstd,
     "orientationd": Orientationd,

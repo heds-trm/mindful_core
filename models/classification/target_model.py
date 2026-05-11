@@ -43,6 +43,9 @@ class TargetModel(AbstractClassifier):
                  use_focal_loss=False,
                  optimizer_config: dict[str, dict[str, Any]] = None,
                  **kwargs):
+        # js: Remove duplicate if present
+        kwargs.pop("class_count", None)
+        
         super(TargetModel, self).__init__(class_count=classifier_config["class_count"],
                                           optimizer_config=optimizer_config,
                                           label_smoothing=label_smoothing,

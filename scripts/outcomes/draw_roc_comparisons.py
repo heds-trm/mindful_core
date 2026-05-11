@@ -54,7 +54,9 @@ def load_test_inferences_from_path(path: str | Path) -> pd.DataFrame:
     path = Path(path)
 
     if not path.exists():
-        raise FileNotFoundError(path)
+        #raise FileNotFoundError(path)
+        print(f"Warning {path} does not exist")
+        return None
 
     if path.is_dir():
         path = path / "test_inferences.csv"
@@ -62,7 +64,9 @@ def load_test_inferences_from_path(path: str | Path) -> pd.DataFrame:
     if not path.exists():
         folded_test_inferences = load_folded_test_inferences(path.parent)
         if folded_test_inferences is None:
-            raise FileNotFoundError(path)
+            #raise FileNotFoundError(path)
+            print(f"Warning {path} does not exist")
+            return None
         else:
             folded_test_inferences.to_csv(path)
 
@@ -82,7 +86,25 @@ def load_test_inferences_from_config(config: str | Path | dict[str, Any]) -> dic
     return {exp_id: load_test_inferences_from_path(path)
             for exp_id, path in config.items()
             if not exp_id.startswith("-")}
+    
+def load_test_inferences_from_config_dict(config: dict[str, Any], log_dir: str, skip_exp: bool) -> dict[str, pd.DataFrame]:
+    all_test_inferences = {}
+    for exp_id in config:
+        if (not exp_id.startswith("-")):
+            if skip_exp and "skip" in config[exp_id] and config[exp_id]["skip"] == "yes":
+                test_inferences = None
+            else:
+                test_inferences = load_test_inferences_from_path(Path(log_dir) / Path(exp_id))
+            if test_inferences is not None:
+                all_test_inferences[exp_id] = test_inferences
+    return all_test_inferences
 
+def get_dataset_for_experiments(experiments: dict[str, Any], datasets: dict[dict, Any]) -> dict[str, Path]:
+    d4e = {}
+    for exp_id in experiments:
+        if 'dataset' in experiments[exp_id] and experiments[exp_id]['dataset'] in datasets:
+            d4e[exp_id] = datasets[experiments[exp_id]['dataset']]
+    return d4e            
 
 def get_test_partitions(folds_folder: str) -> list[pd.Index]:
     folds_folder: Path = Path(folds_folder)
@@ -118,6 +140,22 @@ def extract_ground_truth_and_probabilities(test_inferences: dict[str, pd.DataFra
         test_inferences[exp_id] = [get_probabilities(fold_inferences) for fold_inferences in exp_inferences]
     # noinspection PyTypeChecker
     return ground_truth, test_inferences
+
+def extract_ground_truths_and_probabilities_with_datasets(test_inferences: dict[str, pd.DataFrame],
+                                           datasets: dict[str, Any]
+                                           ) -> tuple[list[np.ndarray] | None, dict[str, list[np.ndarray]]]:
+    ground_truths = {}
+    for exp_id in test_inferences:
+        exp_inferences = test_inferences[exp_id]
+        dataset = datasets[exp_id]
+        folds_ids = get_test_partitions(dataset["folds"])
+        exp_inferences = [exp_inferences.loc[fold_ids] for fold_ids in folds_ids]
+        ground_truth = [get_ground_truth(fold_inferences) for fold_inferences in exp_inferences]
+        ground_truths[exp_id] = ground_truth
+        # noinspection PyTypeChecker
+        test_inferences[exp_id] = [get_probabilities(fold_inferences) for fold_inferences in exp_inferences]
+    # noinspection PyTypeChecker
+    return ground_truths, test_inferences
 
 
 def get_ground_truth(experiment_inferences: pd.DataFrame) -> np.ndarray:
@@ -160,10 +198,8 @@ class KFoldROCSummary(object):
         else:
             self.tpr_upper = self.tpr_lower = None
 
-        # using same method as with ClassificationSummary
         aurocs = [compute_auroc(torch.as_tensor(_probabilities), torch.as_tensor(_labels)).numpy() * 100.0
                   for (_labels, _probabilities) in zip(ground_truth, probabilities)]
-        # aurocs = [auc(fpr, tpr) * 100.0 for (fpr, tpr) in self.roc_curves]
         self.auroc_mean, self.auroc_std = round(np.mean(aurocs), 1), round(np.std(aurocs), 1)
 
     def plot_std_area(self, axis: plt.Axes, alpha=0.2) -> None:
@@ -182,6 +218,20 @@ class KFoldROCSummary(object):
     def plot_mean(self, axis: plt.Axes, alpha=1.0) -> None:
         axis.plot(self.fpr_mean, self.tpr_mean, label=self.label, color=self.color, alpha=alpha)
 
+    def add_legend_outside(self, axis: plt.Axes, fontsize: int = 8) -> None:
+        """
+        Place legend outside the plot (right side) to avoid overlap.
+        """
+        axis.legend(
+            loc="center left",
+            bbox_to_anchor=(1, 0.5),
+            fontsize=fontsize
+        )
+
+        # Ensure layout doesn't cut off legend
+        #axis.figure.tight_layout()
+        axis.figure.subplots_adjust(right=0.75)
+
     @property
     def label(self) -> str:
         if self.bootstrapped_auroc is None:
@@ -194,14 +244,19 @@ class KFoldROCSummary(object):
 
 def draw_roc_comparisons(config_path: Path, 
                          n_thresholds: int = 1000, 
-                         sensitivity_thresholds: list[float] = None
+                         sensitivity_thresholds: list[float] = None,
+                         skip_exp = False
                          ) -> Path:
     sensitivity_thresholds = sensitivity_thresholds or []
 
     # region Load
     config = try_load_json(config_path, "ROC Comparison config")
-    folds_ids = get_test_partitions(config["folds"])
-    test_inferences = load_test_inferences_from_config(config["experiments"])
+    #folds_ids = get_test_partitions(config["folds"])
+    #test_inferences = load_test_inferences_from_config(config["experiments"])
+    datasets = get_dataset_for_experiments(config['experiments'], config["datasets"])
+    log_dir = config["log_dir"]
+    test_inferences = load_test_inferences_from_config_dict(config["experiments"], log_dir, skip_exp)
+    
     bootstrapped_aurocs = config.get("bootstrapped_aurocs", {})
     # endregion
 
@@ -209,11 +264,19 @@ def draw_roc_comparisons(config_path: Path,
     color_cycle = ["tab:blue", "tab:orange", "tab:green", "tab:red", "tab:purple",
                    "tab:brown", "tab:pink", "tab:gray", "tab:olive", "tab:cyan"]
 
-    ground_truth, test_probabilities = extract_ground_truth_and_probabilities(test_inferences, folds_ids)
-    summaries = [KFoldROCSummary(ground_truth, exp_probabilities, exp_id, n_thresholds,
-                                 color=color_cycle[i % len(color_cycle)],
-                                 bootstrapped_auroc=bootstrapped_aurocs.get(exp_id))
-                 for i, (exp_id, exp_probabilities) in enumerate(test_probabilities.items())]
+    #ground_truth, test_probabilities = extract_ground_truth_and_probabilities(test_inferences, folds_ids)
+    ground_truths, test_probabilities = extract_ground_truths_and_probabilities_with_datasets(test_inferences, datasets)
+    
+    summaries = []
+    for i, (exp_id, exp_probabilities) in enumerate(test_probabilities.items()):
+        summary = KFoldROCSummary(ground_truths[exp_id], exp_probabilities, exp_id, n_thresholds,
+            color=color_cycle[i % len(color_cycle)],
+            bootstrapped_auroc=bootstrapped_aurocs.get(exp_id))
+        summaries.append(summary)
+    #summaries = [KFoldROCSummary(ground_truth, exp_probabilities, exp_id, n_thresholds,
+    #                             color=color_cycle[i % len(color_cycle)],
+    #                             bootstrapped_auroc=bootstrapped_aurocs.get(exp_id))
+    #             for i, (exp_id, exp_probabilities) in enumerate(test_probabilities.items())]
 
     for summary in summaries:
         summary.plot_std_area(axis, alpha=0.1)
@@ -229,11 +292,14 @@ def draw_roc_comparisons(config_path: Path,
                   [sensitivity_threshold, sensitivity_threshold],
                   color="red", linestyle="dashed", alpha=0.5,
                   label="{}% sensitivity".format(round(sensitivity_threshold * 100)))
-
-    axis.legend()
+    
+    # NEW: clean legend outside
+    summaries[0].add_legend_outside(axis)    
+    
+    #axis.legend()
 
     save_filepath = config_path.parent / "{}.png".format(config_path.stem)
-    figure.savefig(save_filepath)
+    figure.savefig(save_filepath, bbox_inches="tight")
 
     return save_filepath
 
@@ -243,15 +309,18 @@ def main():
     arg_parser.add_argument("config_paths", type=str, nargs="+")
     arg_parser.add_argument("--n_thresholds", type=int, default=1000)
     arg_parser.add_argument("--sensitivity_thresholds", nargs="+")
+    arg_parser.add_argument("--skip-experiments", action="store_true", help="If enabled, will skip experiments with the skip property set to yes")
+
     args = arg_parser.parse_args()
 
     config_paths = [Path(path) for path in args.config_paths]
     n_thresholds = int(args.n_thresholds)
     sensitivity_thresholds = [float(sensitivity_threshold) for sensitivity_threshold in args.sensitivity_thresholds]
+    skip_exp = args.skip_experiments
 
     output_paths: list[Path] = []
     for config_path in config_paths:
-        output_path = draw_roc_comparisons(config_path, n_thresholds, sensitivity_thresholds)
+        output_path = draw_roc_comparisons(config_path, n_thresholds, sensitivity_thresholds, skip_exp)
         output_paths.append(output_path)
 
     if len(output_paths) > 1:
