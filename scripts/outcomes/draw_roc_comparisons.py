@@ -315,7 +315,10 @@ def main():
 
     config_paths = [Path(path) for path in args.config_paths]
     n_thresholds = int(args.n_thresholds)
-    sensitivity_thresholds = [float(sensitivity_threshold) for sensitivity_threshold in args.sensitivity_thresholds]
+    if args.sensitivity_thresholds:
+        sensitivity_thresholds = [float(sensitivity_threshold) for sensitivity_threshold in args.sensitivity_thresholds]
+    else:
+        sensitivity_thresholds = None
     skip_exp = args.skip_experiments
 
     output_paths: list[Path] = []

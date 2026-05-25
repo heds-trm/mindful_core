@@ -1,0 +1,49 @@
+{
+    "datasets": {
+        "mura_dataset": {
+            "folds": "<folds_dir>"
+        }
+    },
+    "shared": {
+        "default": {
+			"log_monitors": ["validation_loss_epoch"],
+			"save_last": true,
+            "pipeline_config": "<pipelines_dir>/unimodal_mura.json",
+            "batch_size": 32,
+            "num_workers": 0,
+            "accelerator": "gpu",
+            "max_epochs": 20,
+            "devices": 1,
+            "seeds": [
+                3930787959,
+                3048086154,
+                1308332165,
+                4198623908,
+                2751205564
+            ]
+        }
+    },
+    "experiments": {
+        "unimodal_densenet121_mura": {
+            "skip": "no",
+            "model": {
+                "class_name": "densenet121",
+                "hparams": "<models_dir>/densenet121_hparams.json"
+            },
+            "dataset": "mura_dataset",
+            "folds": "all",
+            "stages": "train test"
+        },
+        "unimodal_densenet121_pt_mura": {
+            "skip": "no",
+            "model": {
+                "class_name": "densenet121",
+                "hparams": "<models_dir>/densenet121_pt_hparams.json"
+            },
+            "dataset": "mura_dataset",
+            "folds": "all",
+            "stages": "train test"
+        }
+    },
+    "log_dir": "<logs_dir>/unimodal_densenet121"
+}

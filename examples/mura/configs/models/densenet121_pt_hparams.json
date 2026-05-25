@@ -1,0 +1,18 @@
+{
+    "model_name": "densenet121",
+    "spatial_dims": 2,
+	"feed_forward": true,
+    "class_count": 2,
+    "yield_confidence": false,
+    "label_smoothing": 0,
+    "backbone_config": {
+        "dropout_prob": 0.0,
+		"pretrained": true
+    },
+    "optimizer_config": {
+        "optimizer": {
+            "optimizer_type": "adam",
+            "lr": 0.0001
+        }
+    }
+}
