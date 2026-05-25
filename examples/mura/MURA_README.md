@@ -5,7 +5,7 @@ The [MURA](https://stanfordmlgroup.github.io/competitions/mura/) dataset is a pu
 ## Preparation
 
 ### MURA dataset download and unzip
-In a folder, which we will referred to as `<mura_data>`, unzip the archive `MURA-v1.1.zip` from the [link](https://stanfordaimi.azurewebsites.net/datasets/3e00d84b-d86e-4fed-b2a4-bfe3effd661b) provided in the "Downloading the Dataset (v1.0) section" of MURA dataset [homepage](https://stanfordmlgroup.github.io/competitions/mura/), adapt it if it has changed. This will result in `train` and `valid` folders.
+In a folder, which we will refer to as `<mura_data>`, unzip the archive `MURA-v1.1.zip` from the [link](https://stanfordaimi.azurewebsites.net/datasets/3e00d84b-d86e-4fed-b2a4-bfe3effd661b) provided in the "Downloading the Dataset (v1.0) section" of MURA dataset [homepage](https://stanfordmlgroup.github.io/competitions/mura/), adapt it if it has changed. This will result in `train` and `valid` folders.
 
 Also create a folder for the experiments, referred to as `<exp_data>`.
 
