@@ -19,6 +19,8 @@ Below you will find an overview of the structure of the project.
   - Auxiliary scripts (data preparation, bootstrapping, ...)
 - [Utils](#utils-)
   - Utility functions used across the project
+- [Examples](#examples-)
+  - Examples of application of the project, will be updated over time
 
 ### main.py
 This is the main entry point of the project and will start a series of experiments based on the configuration file. (see [Experiments](#experiments-))
@@ -143,3 +145,6 @@ This folder contain all scripts that can be run on their own. See their \_\_main
 
 ### Utils ([🔝](#mindful-core))
 This is a collection of utility code used throughout the project.
+
+### Examples ([🔝](#mindful-core))
+This is a collection of examples using the library. For instance, it showcases a classification on the MURA database.
