@@ -1,6 +1,6 @@
 # Introduction
 
-The [MURA](https://stanfordmlgroup.github.io/competitions/mura/) dataset is a publicly available collection of X-Ray images of upper extremities classified as "positive" or "negative", positive indicating the presence of pathological signs.
+The [MURA](https://stanfordmlgroup.github.io/competitions/mura/) dataset is a publicly available collection of X-Ray images of upper extremities classified as "positive" or "negative", positive indicating the presence of abnormal, pathological signs.
 
 ## Preparation
 
