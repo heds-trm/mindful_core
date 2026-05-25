@@ -147,4 +147,4 @@ This folder contain all scripts that can be run on their own. See their \_\_main
 This is a collection of utility code used throughout the project.
 
 ### Examples ([🔝](#mindful-core))
-This is a collection of examples using the library. For instance, it showcases a classification on the MURA database.
+This is a collection of [examples](./examples/README.md) using the library.
