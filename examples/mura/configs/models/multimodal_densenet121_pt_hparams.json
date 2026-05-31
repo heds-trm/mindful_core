@@ -1,0 +1,39 @@
+{
+	"class_count": 2,
+	"output_confidence": false,
+	"sieve_mutual_lambda": 4e-1,
+	"sieve_exclusive_lambda": 4e-1,
+    "optimizer_config": {
+        "optimizer": {
+            "optimizer_type": "adam",
+            "lr": 0.0001
+        }
+    },
+    "encoders_config": {
+		"image": {
+			"architecture": "densenet121",
+            "spatial_dims": 2,
+            "in_channels": 1,
+            "output_dimension": 128,
+			"pretrained": true
+		},
+		"categorical_features": {
+			"architecture": "scalar",
+			"input_size": 8,
+			"hidden_sizes": [],
+			"output_dimension": 128
+		}
+	},
+	"sieve_config": {
+		"head_count": 4,
+		"layer_count": 4,
+		"add_position_embeddings": true
+	},
+	"classifier_config": {
+		"head_count": 4,
+		"layer_count": 4,
+		"add_position_embeddings": true,
+		"pre_norm_outputs": true
+	}
+
+}

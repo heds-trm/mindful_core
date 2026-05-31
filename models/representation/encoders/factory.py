@@ -317,6 +317,7 @@ def make_densenet_encoder(in_channels: int,
                           init_features: int = 64,
                           growth_rate: int = 32,
                           block_config: Sequence[int] = (6, 12, 24, 16),
+                          pretrained: bool = False,
                           ) -> DenseNet121:
     return DenseNet121(spatial_dims=spatial_dims,
                        in_channels=in_channels,
@@ -324,7 +325,7 @@ def make_densenet_encoder(in_channels: int,
                        init_features=init_features,
                        growth_rate=growth_rate,
                        block_config=block_config,
-                       pretrained=False,
+                       pretrained=pretrained,
                        progress=False)
 
 

@@ -1,0 +1,137 @@
+{
+    "inputs": {
+        "image": "image",
+        "categorical": "categorical",
+        "label": "label"
+    },
+    "outputs": {
+        "image": "image",
+        "categorical": "categorical",
+        "label": "label"
+    },
+    "stages": {
+        "preprocess": [
+            {
+                "modalities": ["image"],
+                "type": "load_image",
+                "parameters": {
+                    "image_only": true,
+					"ensure_channel_first": true
+                }
+            },
+            {
+                "modalities": ["image"],
+                "type": "to_grayscale",
+                "parameters": {
+                    "channel_first": true
+                }
+            },
+            {
+                "modalities": ["image"],
+                "type": "resize",
+                "parameters": {
+                    "spatial_size": [
+                        512,
+                        512
+                    ],
+					"mode": "trilinear",
+					"anti_aliasing": false
+                }
+            },
+            {
+                "modalities": ["image"],
+                "type": "standardize_intensity",
+                "parameters": {
+                    "channel_wise": false,
+                    "spatial_dims": 2
+                }
+            },
+            {
+                "modalities": ["image"],
+                "type": "ensure_type",
+                "parameters": {
+                    "device": "cpu",
+                    "dtype": "float32"
+                }
+            },
+            {
+                "modalities": ["categorical"],
+                "type": "categorical_preprocess",
+                "parameters": {
+                    "categories": {
+                        "BodyPart": [
+                            "XR_ELBOW",
+                            "XR_FINGER",
+                            "XR_FOREARM",
+                            "XR_HAND",
+                            "XR_HUMERUS",
+                            "XR_SHOULDER",
+                            "XR_WRIST"
+                        ]
+                    },
+                    "one_hot": true
+                }
+            },
+            {
+                "modalities": ["label"],
+                "type": "to_tensor",
+                "parameters": {
+                    "dtype": "float32",
+                    "device": "cpu"
+                }
+            }            
+        ],
+        "shared_augment": [
+            {
+                "modalities": ["categorical"],
+                "type": "rand_dropout",
+                "parameters": {
+                    "prob": 0.05,
+                    "feature_prob": 1.0
+                }
+            }
+        ],
+        "view_augment": [
+            {
+                "modalities": ["image"],
+                "type": "rand_flip",
+                "parameters": {"prob": 0.5}
+            },
+            {
+                "modalities": ["image"],
+                "type": "rand_rotate",
+                "parameters": {
+                    "prob": 0.8,
+                    "range_x": 0.34,
+                    "range_y": 0.34,
+                    "padding_mode": "zeros"
+                }
+            },
+            {
+                "modalities": ["image"],
+                "type": "rand_affine",
+                "parameters": {
+                    "prob": 0.5,
+                    "translate_range": [2, 2],
+                    "padding_mode": "border"
+                }
+            },
+			{
+				"modalities": ["image"],
+				"type": "rand_salt_pepper_noise",
+				"parameters": {
+					"prob": 0.8,
+					"ratio": 0.1
+				}
+			},
+            {
+                "modalities": ["image"],
+                "type": "rand_gaussian_noise",
+                "parameters": {
+                    "prob": 0.2,
+                    "std": 0.01
+                }
+            }
+        ]
+    }
+}

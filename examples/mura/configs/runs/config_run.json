@@ -1,18 +1,18 @@
 {
     "datasets": {
         "mura_dataset": {
-            "folds": "<folds_dir>"
+            "folds": "<folds_dir>",
+            "categorical_features": "<folds_dir>/mura_body_parts.csv"
         }
     },
     "shared": {
         "default": {
 			"log_monitors": ["validation_loss_epoch"],
 			"save_last": true,
-            "pipeline_config": "<pipelines_dir>/unimodal_mura.json",
             "batch_size": 32,
             "num_workers": 0,
             "accelerator": "gpu",
-            "max_epochs": 20,
+            "max_epochs": 1,
             "devices": 1,
             "seeds": [
                 3930787959,
@@ -25,25 +25,51 @@
     },
     "experiments": {
         "unimodal_densenet121_mura": {
-            "skip": "no",
+            "skip": "yes",
             "model": {
                 "class_name": "densenet121",
                 "hparams": "<models_dir>/densenet121_hparams.json"
             },
+            "pipeline_config": "<pipelines_dir>/unimodal_mura.json",
             "dataset": "mura_dataset",
             "folds": "all",
             "stages": "train test"
         },
         "unimodal_densenet121_pt_mura": {
-            "skip": "no",
+            "skip": "yes",
             "model": {
                 "class_name": "densenet121",
                 "hparams": "<models_dir>/densenet121_pt_hparams.json"
             },
+            "pipeline_config": "<pipelines_dir>/unimodal_mura.json",
             "dataset": "mura_dataset",
             "folds": "all",
             "stages": "train test"
+        },
+        "multimodal_densenet121_mura": {
+            "skip": "yes",
+			"use_imbalanced_sampler": "v2",
+			"dataset": "mura_dataset",
+            "folds": "all",
+			"model": {
+                "class_name": "sieve",
+                "hparams": "<models_dir>/multimodal_densenet121_hparams.json"
+            },
+            "pipeline_config": "<pipelines_dir>/multimodal_mura.json",
+            "stages": "train test"
+        },
+        "multimodal_densenet121_pt_mura": {
+            "skip": "no",
+			"use_imbalanced_sampler": "v2",
+			"dataset": "mura_dataset",
+            "folds": "all",
+			"model": {
+                "class_name": "sieve",
+                "hparams": "<models_dir>/multimodal_densenet121_pt_hparams.json"
+            },
+            "pipeline_config": "<pipelines_dir>/multimodal_mura.json",
+            "stages": "train test"
         }
     },
-    "log_dir": "<logs_dir>/unimodal_densenet121"
+    "log_dir": "<logs_dir>"
 }
