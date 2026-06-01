@@ -1,8 +1,7 @@
 {
     "datasets": {
         "mura_dataset": {
-            "folds": "<folds_dir>",
-            "categorical_features": "<folds_dir>/mura_body_parts.csv"
+            "folds": "<folds_dir>"
         }
     },
     "shared": {
@@ -44,30 +43,6 @@
             "pipeline_config": "<pipelines_dir>/unimodal_mura.json",
             "dataset": "mura_dataset",
             "folds": "all",
-            "stages": "train test"
-        },
-        "multimodal_densenet121_mura": {
-            "skip": "yes",
-			"use_imbalanced_sampler": "v2",
-			"dataset": "mura_dataset",
-            "folds": "all",
-			"model": {
-                "class_name": "sieve",
-                "hparams": "<models_dir>/multimodal_densenet121_hparams.json"
-            },
-            "pipeline_config": "<pipelines_dir>/multimodal_mura.json",
-            "stages": "train test"
-        },
-        "multimodal_densenet121_pt_mura": {
-            "skip": "no",
-			"use_imbalanced_sampler": "v2",
-			"dataset": "mura_dataset",
-            "folds": "all",
-			"model": {
-                "class_name": "sieve",
-                "hparams": "<models_dir>/multimodal_densenet121_pt_hparams.json"
-            },
-            "pipeline_config": "<pipelines_dir>/multimodal_mura.json",
             "stages": "train test"
         }
     },
