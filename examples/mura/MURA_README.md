@@ -1,6 +1,6 @@
 # Introduction
 
-The [MURA](https://stanfordmlgroup.github.io/competitions/mura/) dataset is a publicly available collection of X-Ray images of upper extremities classified as "positive" or "negative", positive indicating the presence of abnormal, pathological signs.
+The [MURA](https://stanfordmlgroup.github.io/competitions/mura/) dataset is a publicly available collection of X-Ray images of upper extremities classified as "positive" or "negative", positive indicating the presence of abnormal, pathological signs. This example illustrates how mindful can be used to perform image classification. It is not designed to be efficient in terms of performance.
 
 ## Preparation
 
@@ -47,17 +47,19 @@ python -m mindful_core.main --config <exp_data>/config/runs/config_run.json
 
 You must run it in the folder containing the folder `mindful_core` (which contains `main.py`). 
 
-Main config file `config_run.json` states which experiments are set to be run if their `skip` flag is set to `no`. Currently two experiments are proposed:
+Main config file `config_run.json` states which experiments are set to be run if their `skip` flag is set to `no` (default). Currently two experiments are proposed:
 - _unimodal_densenet121_mura_: 5-fold classification of positive and negative samples using a Densenet 121 model.
 - _unimodal_densenet121_pt_mura_: same but using a pretrained Densenet model. 
 
-Both experiments are mostly identical, with the only difference that we must specify the use of pretraining in the second one. This is done by specifying different hyper parameters for the model in the experiment section of `config_run.json`: 
+Both experiments are mostly identical, with the only difference that we must specify the use of pretraining in the second one. This is done by specifying different config file for hyper parameters for the model in the experiment section of `config_run.json`: 
 
 ```
 "hparams": "<models_dir>/densenet121_hparams.json"
                       -vs-
 "hparams": "<models_dir>/densenet121_pt_hparams.json"
 ```
+
+where `"pretrained": true` can be found in `<models_dir>/densenet121_pt_hparams.json`.
 
 Produced training files (tensorboard files, `.ckpt` checkpoints, etc.) will be placed in `<exp_data>/logs/<experiment_name>`. 
 
@@ -85,4 +87,4 @@ This script must be called from the folder containing the `mindful_core`director
 
 Solid line is the average over the folds, while the transparent area indicates the variation around the average.
 
-The dashed line at 90% sensitivity can be removed in the command line if necessary. By default this command will include all experiments in the ROC curve, regardless their `skip` value in the config file. To fix that, use the `--skip-experiments` option in the command line. 
+The dashed line at 90% sensitivity can be removed in the command line if necessary. By default this command will include all experiments in the ROC figure, regardless their `skip` value in the config file. To change that, use the `--skip-experiments` option in the command line. 
