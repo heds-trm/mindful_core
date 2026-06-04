@@ -15,8 +15,8 @@ poetry --version
 ## Clone the Repository
 
 ```bash
-git clone <repository-url>
-cd <repository-name>
+git clone https://github.com/heds-trm/mindful_core.git
+cd mindful_core
 ```
 
 ## Install Dependencies
