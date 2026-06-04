@@ -41,7 +41,7 @@ For example:
 poetry run python main.py
 ```
 
-## Optional: Activate the Virtual Environment
+## Recommended: Activate the Virtual Environment
 
 To work directly inside the virtual environment:
 
