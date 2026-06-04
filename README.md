@@ -7,8 +7,10 @@ Powered by [![PyTorch](https://img.shields.io/badge/PyTorch-ee4c2c?logo=pytorch&
 [![SimpleITK](https://img.shields.io/badge/SimpleITK-blue?logo=github)](https://github.com/SimpleITK/SimpleITK)
 [![MONAI](https://img.shields.io/badge/MONAI-green?logo=github)](https://github.com/project-monai/monai)
 
+## Project installation
+Follow instructions in `INSTALL.md`. See the [Examples](#examples-) section to test your environment.
+
 ## Project Structure
-Below you will find an overview of the structure of the project.
 
 ### Table of Content
 - [main.py](#mainpy)
@@ -155,7 +157,13 @@ This is a collection of utility code used throughout the project.
 ### Examples ([🔝](#mindful-core))
 This is a collection of [examples](./examples/README.md) using the library.
 
-## Funding
+## Contributors and roles ([🔝](#mindful-core))
+
+Contributor metadata is available in:
+- `CITATION.cff` for citation metadata
+- `CONTRIBUTORS.md` for detailed roles and contributions
+
+## Funding ([🔝](#mindful-core))
 
 This project has been funded by: 
 - HES-SO R&I - Open Research Data call 138082/RI-STRATEGIE25-03)
