@@ -1,0 +1,37 @@
+# This CITATION.cff file was generated with cffinit.
+# Visit https://bit.ly/cffinit to generate yours today!
+
+cff-version: 1.2.0
+title: Mindful-core
+message: >-
+  If you use this software, please cite it using the
+  metadata from this file.
+type: software
+authors:
+  - orcid: 'https://orcid.org/0000-0002-8714-9355'
+    given-names: Valentin
+    family-names: Durand de Gevigney
+  - given-names: Jérôme
+    family-names: Schmid
+    email: jerome.schmid@hesge.ch
+    affiliation: Geneva School of Health Sciences (HEdS)
+    orcid: 'https://orcid.org/0000-0003-2464-8971'
+  - given-names: Belinda
+    family-names: Lokaj
+    email: belinda.lokaj@hesge.ch
+    affiliation: Geneva School of Health Sciences
+    orcid: 'https://orcid.org/0009-0001-7498-9830'
+repository-code: 'https://github.com/heds-trm/mindful_core'
+abstract: >-
+  A reproducible and extensible framework for medical
+  imaging AI, supporting classification and segmentation
+  tasks with JSON-configurable experiments and
+  cross-validation-based evaluation.
+keywords:
+  - medical imaging
+  - classification
+  - segmentation
+  - cross-validation
+  - deep learning
+  - artificial intelligence
+license: Apache-2.0
