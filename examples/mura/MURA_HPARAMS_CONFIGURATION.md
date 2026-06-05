@@ -1,4 +1,4 @@
-# DenseNet121 Hyperparameter Configuration
+# Hyperparameter Configuration
 
 This configuration defines a DenseNet121-based image classification model for binary classification. It specifies the network architecture, training behavior, and optimizer settings. This configuration file is used in the [MURA example](./MURA_README.md).
 
