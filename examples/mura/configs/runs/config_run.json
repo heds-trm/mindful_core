@@ -11,7 +11,7 @@
             "batch_size": 32,
             "num_workers": 0,
             "accelerator": "gpu",
-            "max_epochs": 1,
+            "max_epochs": 20,
             "devices": 1,
             "seeds": [
                 3930787959,
