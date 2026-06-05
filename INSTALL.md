@@ -15,8 +15,8 @@ poetry --version
 ## Clone the Repository
 
 ```bash
-git clone <repository-url>
-cd <repository-name>
+git clone https://github.com/heds-trm/mindful_core.git
+cd mindful_core
 ```
 
 ## Install Dependencies
@@ -41,7 +41,7 @@ For example:
 poetry run python main.py
 ```
 
-## Optional: Activate the Virtual Environment
+## Recommended: Activate the Virtual Environment
 
 To work directly inside the virtual environment:
 
