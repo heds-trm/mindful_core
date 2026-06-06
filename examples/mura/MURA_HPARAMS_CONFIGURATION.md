@@ -50,10 +50,10 @@ The backbone configuration defines architecture-specific settings, these paramet
 | `dropout_prob` | Dropout probability applied within the network, refer to corresponding MONAI documentation. |
 | `pretrained` | Whether pretrained weights are used to initialize the model. Often this is only available for 2D image models. |
 
-### Notes
-
-- `pretrained: true` initializes DenseNet121 using pretrained weights.
-- Transfer learning often improves convergence speed and performance when training datasets are limited.
+> [!NOTE]
+> 
+> - `pretrained: true` initializes DenseNet121 using pretrained weights.
+> - Transfer learning often improves convergence speed and performance when training datasets are limited.
 
 ---
 
@@ -83,10 +83,10 @@ The optimizer configuration specifies how model parameters are updated during tr
   look at `make_optimizer` function in [models/module.py](../../models/module.py), which are based on MONAI optimizers.
 </details>
 
-### Notes
-
-- The Adam optimizer is used for gradient-based optimization.
-- The learning rate is set to **1e-4**, a commonly used value for fine-tuning pretrained convolutional neural networks.
+> [!NOTE]
+> 
+> - The Adam optimizer is used for gradient-based optimization.
+> - The learning rate is set to **1e-4**, a commonly used value for fine-tuning pretrained convolutional neural networks.
 
 ---
 
