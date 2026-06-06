@@ -163,6 +163,22 @@ Contributor metadata is available in:
 - `CITATION.cff` for citation metadata
 - `CONTRIBUTORS.md` for detailed roles and contributions
 
+## Versioning ([🔝](#mindful-core))
+
+This project follows [Semantic Versioning 2.0.0](https://semver.org/).
+
+Given a version number MAJOR.MINOR.PATCH:
+
+- MAJOR version for incompatible API changes.
+- MINOR version for backward-compatible functionality.
+- PATCH version for backward-compatible bug fixes.
+
+To get the current version in your code:
+```
+import mindful_core
+print(mindful_core.__version__)
+```
+
 ## Funding ([🔝](#mindful-core))
 
 This project has been funded by: 
