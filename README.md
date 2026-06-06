@@ -179,6 +179,9 @@ import mindful_core
 print(mindful_core.__version__)
 ```
 
+> [!NOTE]
+> The version is written in `version.py` by maintainers at every release from the `pyproject.toml` file.
+
 ## Funding ([🔝](#mindful-core))
 
 This project has been funded by: 
