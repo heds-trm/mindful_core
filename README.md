@@ -1,7 +1,7 @@
 # Mindful-Core
 Medical ImagiNg Data FUsion Lab
 
-[![DOI](https://zenodo.org/badge/1000200086.svg)](https://zenodo.org/badge/latestdoi/1000200086)
+[![DOI](https://img.shields.io/badge/DOI-10.5281/zenodo.20579796-blue.svg)](https://doi.org/10.5281/zenodo.20579796)
 
 Mindful is a library mainly built on top of PyTorch, SimpleITK and MONAI to built classification and segmentation models of medical images. Mindful is a modular and reproducible framework for AI experimentation in medical imaging, supporting both classification and segmentation tasks. The platform serializes all experiment settings (models, preprocessing, datasets, random seeds, etc.) to ensure reproducibility, provides cross-validation-based evaluation, and enables experiment configuration through simple JSON files. Its extensible architecture allows rapid integration of new models, training methods, preprocessing pipelines, and evaluation metrics with minimal code changes.
 
