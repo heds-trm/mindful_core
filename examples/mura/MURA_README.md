@@ -74,7 +74,12 @@ The log folder will also contain information on the testing phase of the experim
 - Sensitivity at EER: 66.9 +/- 0.3%
 - Specificity at EER: 67.0 +/- 0.3%
 
-Results also highlight that the pretrained model has better performance with an AUC of 83.1 +/- 0.6%.
+Results also highlight that the pretrained model has better performance with an AUC of 83.1 +/- 0.6%. 
+
+> [!NOTE]
+> Results of all experiments are available [here](./doc/unimodal_formatted_summary.csv) in case you would like to compare your training with ours.
+> Despite you use our configuration files to ensure a deterministic behaviour of the training, we found that software updates in e.g. PyTorch or MONAI
+> could lead to differences, hopefully not significant.
 
 EER stands for "Equal Error Rate", and it means that metrics were computed with a decision thresholds were specificity and sensitivity are almost equal.
 
