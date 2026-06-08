@@ -1,0 +1,125 @@
+{
+    "@context": {
+        "schema": "https://schema.org/",
+        "bs": "https://bioschemas.org/terms/",
+        "codemeta": "https://w3id.org/codemeta/",
+        "rdf": "https://www.w3.org/1999/02/22-rdf-syntax-ns#",
+        "rdfs": "https://www.w3.org/2000/01/rdf-schema#",
+        "maSMP": "https://discovery.biothings.io/view/maSMP/"
+    },
+    "@type": "schema:SoftwareApplication",
+    "schema:applicationSubcategory": [
+        "edam:topic_3384",
+        "edam:topic_3382",
+        "edam:topic_3474"
+    ],
+    "schema:additionalType": [
+        "lib"
+    ],
+    "schema:name": "mindful_core",
+    "@id": "https://openebench.bsc.es/bioschemas/tools/observatory:mindful_core:['v0.1.2', 'v0.1.1', 'v0.1.0']/['lib']",
+    "schema:description": "Medical ImagiNg Data FUsion Lab",
+    "schema:applicationCategory": [
+        "lib"
+    ],
+    "schema:operatingSystem": [
+        "Windows",
+        "MacOs",
+        "Linux"
+    ],
+    "schema:license": [
+        {
+            "@type": "schema:CreativeWork",
+            "schema:name": "Apache License 2.0",
+            "schema:url": "http://choosealicense.com/licenses/apache-2.0/"
+        },
+        {
+            "@type": "schema:CreativeWork",
+            "schema:name": "Apache-2.0"
+        }
+    ],
+    "schema:author": [
+        {
+            "@type": "schema:Person",
+            "schema:name": "Valentin Durand de Gevigney"
+        },
+        {
+            "@type": "schema:Person",
+            "schema:name": "Jérôme Schmid",
+            "schema:email": "jerome.schmid@hesge.ch"
+        },
+        {
+            "@type": "schema:Person",
+            "schema:name": "Belinda Lokaj",
+            "schema:email": "belinda.lokaj@hesge.ch"
+        }
+    ],
+    "schema:softwareVersion": [
+        "v0.1.2",
+        "v0.1.1",
+        "v0.1.0"
+    ],
+    "schema:codeRepository": [
+        "https://github.com/heds-trm/mindful_core"
+    ],
+    "schema:featureList": [
+        "edam:operation_2990",
+        "edam:operation_0226",
+        "edam:operation_2428"
+    ],
+    "bioschemas:input": [
+        {
+            "@type": "https://bioschemas.org/FormatParameter",
+            "bioschemas:encodingFormat": "edam:format_3547"
+        },
+        {
+            "@type": "https://bioschemas.org/FormatParameter",
+            "bioschemas:encodingFormat": "edam:format_3752"
+        },
+        {
+            "@type": "https://bioschemas.org/FormatParameter",
+            "bioschemas:encodingFormat": "edam:format_3464"
+        }
+    ],
+    "bioschemas:output": [
+        {
+            "@type": "https://bioschemas.org/FormatParameter",
+            "bioschemas:encodingFormat": "edam:format_3464"
+        },
+        {
+            "@type": "https://bioschemas.org/FormatParameter",
+            "bioschemas:encodingFormat": "edam:format_3752"
+        },
+        {
+            "@type": "https://bioschemas.org/FormatParameter",
+            "bioschemas:encodingFormat": "edam:format_3547"
+        },
+        {
+            "@type": "https://bioschemas.org/FormatParameter",
+            "bioschemas:encodingFormat": "edam:format_3750"
+        },
+        {
+            "@type": "https://bioschemas.org/FormatParameter",
+            "bioschemas:encodingFormat": "edam:format_3653"
+        }
+    ],
+    "schema:softwareHelp": [
+        {
+            "@id": "https://github.com/heds-trm/mindful_core/blob/main/CONTRIBUTORS.md"
+        },
+        {
+            "@id": "https://github.com/heds-trm/mindful_core/blob/main/INSTALL.md"
+        },
+        {
+            "@id": "https://github.com/heds-trm/mindful_core/blob/main/LICENSE.md"
+        },
+        {
+            "@id": "https://github.com/heds-trm/mindful_core/blob/main/README.md"
+        }
+    ],
+    "schema:requirements": [
+        "pyproject.toml"
+    ],
+    "schema:dateModified": "2026-06-08T20:23:35Z",
+    "codemeta:readme": "https://github.com/heds-trm/mindful_core/blob/main/README.md"
+}
