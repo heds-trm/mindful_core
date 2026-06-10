@@ -1,59 +1,59 @@
 {
-    "@context": "https://doi.org/10.5063/schema/codemeta-2.0",
-    "type": "SoftwareSourceCode",
-    "applicationCategory": "Medical Imaging Analysis",
-    "author": [
-        {
-            "id": "https://orcid.org/0000-0002-8714-9355",
-            "type": "Person",
-            "familyName": "Durand de Gevigney",
-            "givenName": "Valentin"
-        },
-        {
-            "id": "https://orcid.org/0009-0001-7498-9830",
-            "type": "Person",
-            "affiliation": {
-                "type": "Organization",
-                "name": "Geneva School of Health Sciences, HES-SO University of Applied Sciences and Arts Western Switzerland"
-            },
-            "email": "belinda.lokaj@hesge.ch",
-            "familyName": "Lokaj-Mataj",
-            "givenName": "Belinda"
-        },
-        {
-            "id": "https://orcid.org/0000-0003-2464-8971",
-            "type": "Person",
-            "affiliation": {
-                "type": "Organization",
-                "name": "Geneva School of Health Sciences, HES-SO University of Applied Sciences and Arts Western Switzerland"
-            },
-            "email": "jerome.schmid@hesge.ch",
-            "familyName": "Schmid",
-            "givenName": "Jérôme"
-        }
-    ],
-    "codeRepository": "https://github.com/heds-trm/mindful_core.git",
-    "dateCreated": "2025-06-11",
-    "datePublished": "2026-06-07",
-    "description": "Core component of the Mindful library mainly built on top of PyTorch, SimpleITK and MONAI to built classification and segmentation models of medical images. Mindful is a modular and reproducible framework for AI experimentation in medical imaging, supporting both classification and segmentation tasks. The platform serializes all experiment settings (models, preprocessing, datasets, random seeds, etc.) to ensure reproducibility, provides cross-validation-based evaluation, and enables experiment configuration through simple JSON files. Its extensible architecture allows rapid integration of new models, training methods, preprocessing pipelines, and evaluation metrics with minimal code changes.",
-    "downloadUrl": "https://doi.org/10.5281/zenodo.20579796",
-    "funder": {
-        "type": "Organization",
-        "name": "HES-SO FRI ORD"
+  "@context": "https://doi.org/10.5063/schema/codemeta-2.0",
+  "type": "SoftwareSourceCode",
+  "applicationCategory": "Medical Imaging Analysis",
+  "author": [
+    {
+      "id": "https://orcid.org/0000-0002-8714-9355",
+      "type": "Person",
+      "familyName": "Durand de Gevigney",
+      "givenName": "Valentin"
     },
-    "identifier": "10.5281/zenodo.20579796",
-    "keywords": [
-        "deep learning",
-        "medical imaging",
-        "classification",
-        "segmentation",
-        "Artificial Intelligence"
-    ],
-    "license": "https://spdx.org/licenses/Apache-2.0",
-    "name": "mindful_core",
-    "programmingLanguage": "Python 3",
-    "version": "v0.1.1",
-    "developmentStatus": "active",
-    "funding": "138082/RI-STRATEGIE25-03",
-    "issueTracker": "https://github.com/heds-trm/mindful_core/issues"
+    {
+      "id": "https://orcid.org/0009-0001-7498-9830",
+      "type": "Person",
+      "affiliation": {
+        "type": "Organization",
+        "name": "Geneva School of Health Sciences, HES-SO University of Applied Sciences and Arts Western Switzerland"
+      },
+      "email": "belinda.lokaj@hesge.ch",
+      "familyName": "Lokaj-Mataj",
+      "givenName": "Belinda"
+    },
+    {
+      "id": "https://orcid.org/0000-0003-2464-8971",
+      "type": "Person",
+      "affiliation": {
+        "type": "Organization",
+        "name": "Geneva School of Health Sciences, HES-SO University of Applied Sciences and Arts Western Switzerland"
+      },
+      "email": "jerome.schmid@hesge.ch",
+      "familyName": "Schmid",
+      "givenName": "Jérôme"
+    }
+  ],
+  "codeRepository": "https://github.com/heds-trm/mindful_core.git",
+  "dateCreated": "2025-06-11",
+  "datePublished": "2026-06-07",
+  "description": "Core component of the Mindful library mainly built on top of PyTorch, SimpleITK and MONAI to built classification and segmentation models of medical images. Mindful is a modular and reproducible framework for AI experimentation in medical imaging, supporting both classification and segmentation tasks. The platform serializes all experiment settings (models, preprocessing, datasets, random seeds, etc.) to ensure reproducibility, provides cross-validation-based evaluation, and enables experiment configuration through simple JSON files. Its extensible architecture allows rapid integration of new models, training methods, preprocessing pipelines, and evaluation metrics with minimal code changes.",
+  "downloadUrl": "https://doi.org/10.5281/zenodo.20579796",
+  "funder": {
+    "type": "Organization",
+    "name": "HES-SO FRI ORD"
+  },
+  "identifier": "10.5281/zenodo.20579796",
+  "keywords": [
+    "deep learning",
+    "medical imaging",
+    "classification",
+    "segmentation",
+    "Artificial Intelligence"
+  ],
+  "license": "https://spdx.org/licenses/Apache-2.0",
+  "name": "mindful_core",
+  "programmingLanguage": "Python 3",
+  "version": "0.1.4",
+  "developmentStatus": "active",
+  "funding": "138082/RI-STRATEGIE25-03",
+  "issueTracker": "https://github.com/heds-trm/mindful_core/issues"
 }
