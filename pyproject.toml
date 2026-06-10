@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "Mindful-Core"
-version = "0.1.0"
+version = "0.1.4"
 description = "Python code core for the deep learning projects leveraging multimodal fusion at the HedS"
 authors = ["Valentin Durand de Gevigney", "Jérôme Schmid", "Belinda Mataj-Lokaj"]
 readme = "README.md"
