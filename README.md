@@ -190,7 +190,7 @@ print(mindful_core.__version__)
 ## Funding ([🔝](#mindful-core))
 
 This project has been funded by: 
-- HES-SO R&I - Open Research Data call 138082/RI-STRATEGIE25-03)
+- HES-SO R&I - Open Research Data call (138082/RI-STRATEGIE25-03)
 - [Geneva Health Innovation Technologies (Geneva HIT)](https://www.hesge.ch/heds/geneva-health-innovation-technologies-hit) with the support of [Geneva School of Health Sciences (HEdS)](https://www.hesge.ch/heds/) and the [University of Applied Sciences and Arts Western Switzerland (HES-SO) - Geneva](https://www.hesge.ch/geneve/en)
 
 ![FundingBanner](./doc/funding.png)
