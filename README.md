@@ -10,6 +10,8 @@ Powered by:
 - [![SimpleITK](https://img.shields.io/badge/SimpleITK-blue?logo=github)](https://github.com/SimpleITK/SimpleITK) ([![License](https://img.shields.io/badge/License-Apache_2.0-blue.svg)](https://opensource.org/licenses/Apache-2.0))
 - [![MONAI](https://img.shields.io/badge/MONAI-green?logo=github)](https://github.com/project-monai/monai) ([![License](https://img.shields.io/badge/License-Apache_2.0-blue.svg)](https://opensource.org/licenses/Apache-2.0))
 
+Looking for the Mindful extension for the **SUBREAM** project? check it out [here](https://github.com/heds-trm/mindful_subream)!
+
 ## Project installation
 Follow instructions in `INSTALL.md`. See the [Examples](#examples-) section to test your environment.
 
