@@ -2419,8 +2419,12 @@ class TakeSlice(SerializableTransform):
         self.slice_index = slice_index
 
     def __call__(self, data: torch.Tensor | MetaTensor) -> torch.Tensor | MetaTensor:
-        indices = [self.slice_index if (i == self.axis) else slice(None) for i in range(len(data.shape))]
+        indices = self.make_slice_indices(self.slice_index, self.axis, len(data.shape))
         return data[indices]
+    
+    @staticmethod
+    def make_slice_indices(slice_index: int, axis: int, ndim: int) -> list[int | slice]:
+        return [slice_index if (i == axis) else slice(None) for i in range(ndim)]
 
     @classmethod
     def json_identifier(cls) -> str:
@@ -2432,6 +2436,49 @@ class TakeSlice(SerializableTransform):
             "slice_index": self.slice_index,
         }
 
+
+class SliceRepeatAndMask(SerializableTransform):
+    def __init__(self,
+                 repeats: list[int],
+                 slices: list[int] | None = None,
+                 axis: int = 0,
+                 slice_mask = 1.0,
+                 repeat_mask = 0.0,
+                 ):
+        super().__init__()
+        self.repeats = repeats
+        self.slices = slices
+        self.axis = axis
+        self.slice_mask = slice_mask
+        self.repeat_mask = repeat_mask
+
+    def __call__(self, data: torch.Tensor | MetaTensor) -> tuple:
+        ndim = len(data.shape)
+        slices = self.slices or list(range(data.shape[self.axis]))
+        slices_indices = [TakeSlice.make_slice_indices(slices[i], self.axis, ndim) for i in slices]
+        data_slices = [data[slice_index] for slice_index in slices_indices]
+
+        repeats_indices = [TakeSlice.make_slice_indices(repeat_index, self.axis, ndim) 
+                           for repeat_index in self.repeats]
+        data_repeats = [data[repeat_indices] for repeat_indices in repeats_indices]
+
+        mask = [self.slice_mask] * len(data_slices) + [self.repeat_mask] * len(data_repeats)
+        mask = torch.as_tensor(mask, dtype=torch.float32, device=data.device)
+
+        return tuple([*data_slices, *data_repeats, mask])
+
+    @classmethod
+    def json_identifier(cls) -> str:
+        return "slice_repeat_and_mask"
+
+    def to_json(self) -> TransformParameters:
+        return {
+            "repeats": self.repeats,
+            "slices": self.slices,
+            "axis": self.axis,
+            "slice_mask": self.slice_mask,
+            "repeat_mask": self.repeat_mask,
+        }
 
 class MaximumIntensityProjection(SerializableTransform):
     def __init__(self,
