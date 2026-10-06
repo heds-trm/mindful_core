@@ -1,4 +1,4 @@
-from monai.data import MetaTensor
+from monai.data.meta_tensor import MetaTensor
 
 from mindful_core.data.transforms import SerializableTransform
 

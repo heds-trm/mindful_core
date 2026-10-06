@@ -1,12 +1,19 @@
 import itertools
-from typing import Hashable, Mapping, TypeVar, Iterable
+from collections.abc import Iterable, Iterator, KeysView, ValuesView, ItemsView, Mapping, Hashable
+from typing import TypeVar
 
 _KT = TypeVar("_KT", bound=Hashable)
 _VT = TypeVar("_VT")
 
 
 class AliasDict(Mapping[_KT, _VT]):
+    """
+        A dict that allows multiple keys per item.
+        Keys are composed of a main key and its aliases.
+    """
     def __init__(self, **kwargs):
+        # todo: add a "strict" mode that prevents accidental overwrites
+        # todo: change `**kwargs` to `initial: Mapping[_KT, _VT] | None`
         self._aliases: dict[_KT, _KT] = {}
         self._values: dict[_KT, _VT] = {}
         for key, value in kwargs.items():
@@ -59,10 +66,10 @@ class AliasDict(Mapping[_KT, _VT]):
     def __len__(self) -> int:
         return len(self._values)
 
-    def __iter__(self) -> Iterable[_KT]:
+    def __iter__(self) -> Iterator[_KT]:
         return iter(self._values)
 
-    def keys(self) -> Iterable[_KT]:
+    def keys(self) -> KeysView[_KT]:
         return self._values.keys()
 
     def aliases(self) -> Iterable[_KT]:
@@ -71,10 +78,10 @@ class AliasDict(Mapping[_KT, _VT]):
     def keys_and_aliases(self) -> Iterable[_KT]:
         return itertools.chain(self.keys(), self.aliases())
 
-    def values(self) -> Iterable[_VT]:
+    def values(self) -> ValuesView[_VT]:
         return self._values.values()
 
-    def items(self) -> Iterable[tuple[_KT, _VT]]:
+    def items(self) -> ItemsView[_KT, _VT]:
         return self._values.items()
 
     def keys_to_aliases(self) -> dict[_KT, list[_KT]]:
@@ -92,8 +99,8 @@ class AliasDict(Mapping[_KT, _VT]):
         key_aliases_representations = []
         for key in self._values:
             if (key in keys_to_aliases) and (len(keys_to_aliases[key]) > 0):
-                aliases_rep = ", ".join(keys_to_aliases[key])
-                key_repr = "{} (aliases: {})".format(key, aliases_rep)
+                aliases_rep = [repr(alias) for alias in keys_to_aliases[key]]
+                key_repr = "{} (aliases: {})".format(key, ", ".join(aliases_rep))
             else:
                 key_repr = key
             key_aliases_representations.append(key_repr)

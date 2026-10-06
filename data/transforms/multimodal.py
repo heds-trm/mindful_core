@@ -1,7 +1,7 @@
 import torch
-from monai.config.type_definitions import NdarrayOrTensor
-from monai.config import DtypeLike
-from monai.transforms import RandFlip, RandomizableTransform
+from monai.config.type_definitions import NdarrayOrTensor, DtypeLike
+from monai.transforms.spatial.array import RandFlip
+from monai.transforms.transform import RandomizableTransform
 from monai.transforms.utils import map_spatial_axes
 import numpy as np
 from typing import Any, Sequence
@@ -128,7 +128,6 @@ class InferModalityMask(SerializableTransform):
 
     # endregion
 
-
 class RandModalityMask(RandDropout):
     def __init__(self,
                  prob: float = 0.2,
@@ -166,7 +165,6 @@ class RandModalityMask(RandDropout):
                              else self.feature_prob),
             "dtype": str(self.dtype)
         }
-
 
 class RandMultimodalFlip(RandFlip, SerializableTransform):
     """

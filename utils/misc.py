@@ -5,10 +5,9 @@ import importlib.util
 import json
 from json.decoder import JSONDecodeError
 import sys
-from contextlib import contextmanager
 import importlib.util
 from abc import ABCMeta
-from typing import TypeVar, Any, Type
+from typing import TypeVar, Any
 
 _T = TypeVar("_T")
 
@@ -18,7 +17,7 @@ def find_all_subclasses(cls: type[_T]) -> set[type[_T]]:
                                             for sub_sub_class in find_all_subclasses(sub_class)])
 
 
-def get_abstract_methods(obj: Type[Type[ABCMeta]]) -> list[str]:
+def get_abstract_methods(obj: ABCMeta) -> list[str]:
     if not isinstance(obj, type):
         raise ValueError("`obj` is not a type, got {}".format(type(obj)))
 
@@ -135,6 +134,7 @@ def load_table(table_path: TablePath | None,
     if suffix == ".csv":
         table = pd.read_csv(table_path, index_col=index_col)
     elif suffix == ".xlsx":
+        # noinspection bad-argument-type
         table = pd.read_excel(table_path, index_col=index_col, sheet_name=sheet_name)
     else:
         raise ValueError("Unsupported extension `{}` for filepath `{}`".
