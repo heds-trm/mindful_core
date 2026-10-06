@@ -10,6 +10,8 @@ Powered by:
 - [![SimpleITK](https://img.shields.io/badge/SimpleITK-blue?logo=github)](https://github.com/SimpleITK/SimpleITK) ([![License](https://img.shields.io/badge/License-Apache_2.0-blue.svg)](https://opensource.org/licenses/Apache-2.0))
 - [![MONAI](https://img.shields.io/badge/MONAI-green?logo=github)](https://github.com/project-monai/monai) ([![License](https://img.shields.io/badge/License-Apache_2.0-blue.svg)](https://opensource.org/licenses/Apache-2.0))
 
+Looking for the Mindful extension for the **SUBREAM** project? check it out [here](https://github.com/heds-trm/mindful_subream)!
+
 ## Project installation
 Follow instructions in `INSTALL.md`. See the [Examples](#examples-) section to test your environment.
 
@@ -188,7 +190,7 @@ print(mindful_core.__version__)
 ## Funding ([🔝](#mindful-core))
 
 This project has been funded by: 
-- HES-SO R&I - Open Research Data call 138082/RI-STRATEGIE25-03)
+- HES-SO R&I - Open Research Data call (138082/RI-STRATEGIE25-03)
 - [Geneva Health Innovation Technologies (Geneva HIT)](https://www.hesge.ch/heds/geneva-health-innovation-technologies-hit) with the support of [Geneva School of Health Sciences (HEdS)](https://www.hesge.ch/heds/) and the [University of Applied Sciences and Arts Western Switzerland (HES-SO) - Geneva](https://www.hesge.ch/geneve/en)
 
 ![FundingBanner](./doc/funding.png)

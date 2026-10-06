@@ -94,7 +94,7 @@ Experiments are uniquely defined by a name, here "unimodal_densenet121_mura":
 |------------|-------------|
 | `skip` | Whether the experiment should be skipped. |
 | `dataset` | Dataset identifier defined in the `datasets` section. |
-| `folds` | Folds to evaluate provided as a 0-based integer, a list of integers of `all` that includes all available folds. |
+| `folds` | Folds to evaluate provided as a 0-based integer, a list of integers, or `all` to include all available folds. |
 | `model.class_name` | Model architecture to instantiate. |
 | `model.hparams` | Model hyperparameter [configuration file](./MURA_HPARAMS_CONFIGURATION.md). |
 | `pipeline_config` | Data processing and training [pipeline definition](./MURA_PIPELINE_CONFIGURATION.md). |
