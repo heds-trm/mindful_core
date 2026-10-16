@@ -10,8 +10,5 @@
 # PyC
 *.pyc
 
-# Poetry
-poetry.lock
-
 # Code sink
 _sink

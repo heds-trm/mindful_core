@@ -27,7 +27,7 @@ This configuration defines a DenseNet121-based image classification model for bi
 <details>
 <summary>Which models are currently supported?</summary>
 
-  look at `SUPPORTED_BACKBONES` list in [models/classification/monai_classifier.py](../../models/classification/monai_classifier.py), which are based on MONAI models.
+  look at `SUPPORTED_BACKBONES` list in [models/classification/monai_classifier.py](../../src/mindful_core/models/classification/monai_classifier.py), which are based on MONAI models.
 </details>
 
 ---
@@ -80,7 +80,7 @@ The optimizer configuration specifies how model parameters are updated during tr
 <details>
 <summary>Which optimizers are currently supported?</summary>
 
-  look at `make_optimizer` function in [models/module.py](../../models/module.py), which are based on MONAI optimizers.
+  look at `make_optimizer` function in [models/module.py](../../src/mindful_core/models/module.py), which are based on MONAI optimizers.
 </details>
 
 > [!NOTE]

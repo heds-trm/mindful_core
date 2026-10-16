@@ -4,9 +4,9 @@ import argparse
 
 from mindful_core.utils.misc import try_load_json
 from mindful_core.analysis.statistics.roc_compare import compute_kfolds_delong_roc_test
-from mindful_core.scripts.outcomes.draw_roc_comparisons import (get_test_partitions,
-                                                                extract_ground_truth_and_probabilities,
-                                                                load_test_inferences_from_config)
+from mindful_core.analysis.statistics.test_inferences import (get_test_partitions,
+                                                              extract_ground_truth_and_probabilities,
+                                                              load_test_inferences_from_config)
 
 
 def main():
@@ -27,8 +27,8 @@ def main():
             if i >= j:
                 continue
 
-            (reject, p_values), (reject_corrected, p_values_corrected) = \
-                compute_kfolds_delong_roc_test(ground_truth, exp_probabilities_i, exp_probabilities_j)
+            delong_results = compute_kfolds_delong_roc_test(ground_truth, exp_probabilities_i, exp_probabilities_j)
+            (reject, p_values), (reject_corrected, p_values_corrected) = delong_results
             if exp_id_i not in delong_summary_data:
                 delong_summary_data[exp_id_i] = {}
             # noinspection PyTypeChecker

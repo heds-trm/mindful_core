@@ -37,7 +37,7 @@ from mindful_core.analysis.statistics.classification_summary import (
     SpecificityAverage,
     F1ScoreAverage
 )
-from mindful_core.scripts.outcomes.gather_test_results import (
+from mindful_core.utils.reporting import (
     summarize_experiments,
     sort_experiments_summary_columns,
     format_experiments_summary
@@ -171,7 +171,7 @@ class FeedForwardModel(pl.LightningModule):
         return loss
 
     def compute_loss(self, inputs: torch.Tensor, labels: torch.Tensor) -> torch.Tensor:
-        from utils.tensor_utils import lerp
+        from mindful_core.utils import lerp
 
         logits: torch.Tensor = self.encoder(inputs)
 

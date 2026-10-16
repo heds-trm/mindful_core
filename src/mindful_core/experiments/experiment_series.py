@@ -4,10 +4,10 @@ import warnings
 from typing import TypedDict, Literal, Any
 
 from mindful_core.utils.misc import try_load_json
+from mindful_core.utils.reporting import gather_test_results
 from mindful_core.models.index import ModuleConfig
 from mindful_core.data.datasets.protoset import AbstractProtoSet, get_proto_datasets
 from mindful_core.experiments.experiment import Experiment
-from mindful_core.scripts.outcomes.gather_test_results import gather_test_results
 
 
 # TODO: Improve dataset configs so that merged dataset have their own name and can reference and be built upon single

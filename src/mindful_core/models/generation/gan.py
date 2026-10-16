@@ -1,4 +1,4 @@
-from models.generation.abstract_generator import AbstractGenerator
+from src.mindful_core.models.generation.abstract_generator import AbstractGenerator
 
 
 class GAN(AbstractGenerator):

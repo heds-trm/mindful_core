@@ -38,7 +38,13 @@ poetry run python <script>.py
 For example:
 
 ```bash
-poetry run python main.py
+poetry run python -m mindful_core config.json
+```
+
+or
+
+```bash
+poetry run python __main__.py config.json
 ```
 
 ## Recommended: Activate the Virtual Environment

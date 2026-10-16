@@ -21,7 +21,7 @@ from mindful_core.analysis.statistics.classification_summary import (
     SensitivityAtSensitivity,
     SpecificityAtSensitivity,
 )
-from mindful_core.scripts.outcomes.gather_test_results import summarize_experiments
+from mindful_core.utils.reporting import summarize_experiments
 
 
 def make_classification_summary(sensitivity_thresholds: list[float]

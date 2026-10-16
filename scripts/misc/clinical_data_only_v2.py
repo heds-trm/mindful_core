@@ -13,7 +13,7 @@ import os
 from typing import Any, Optional
 
 from mindful_core.data.subset_id import SubsetID
-from mindful_core.data.data_folds  import PresetFold
+from mindful_core.data.data_folds import PresetFold
 from mindful_core.data.transforms.vector_data import ScalarPreprocess, CategoricalPreprocess
 from mindful_core.analysis.statistics.classification_summary import (
     ClassificationSummary,
@@ -37,7 +37,7 @@ from mindful_core.analysis.statistics.classification_summary import (
     SpecificityAverage,
     F1ScoreAverage
 )
-from mindful_core.scripts.outcomes.gather_test_results import (
+from mindful_core.utils.reporting import (
     summarize_experiments,
     sort_experiments_summary_columns,
     format_experiments_summary

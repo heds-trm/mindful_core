@@ -66,51 +66,51 @@ Here is a diagram of how the project articulates around ExperimentRound:
 ### Models ([🔝](#mindful-core))
 
 #### 1. MindfulModule ([🔝](#models-))
-[MindfulModule](models/module.py) is an abstract class and the root of any model class supported by this project. It will mainly configure handles for the loss function and optimizers.
+[MindfulModule](src/mindful_core/models/module.py) is an abstract class and the root of any model class supported by this project. It will mainly configure handles for the loss function and optimizers.
 By themselves, MindfulModule do not define any architecture, task or expected inputs/outputs and can therefore be derived for any use.
 
 Classes that inherit from MindfulModule also benefit from being added to a registry, which allows the project to automatically recognize any class/model imported in the project as a valid model to create or load.
 
 #### 2. ModelOutput ([🔝](#models-))
-[ModelOutput](models/model_output.py) defines all the supported model outputs (classification, segmentation, bounding boxes, ...) and gives an interface to help manipulate these outputs.
+[ModelOutput](src/mindful_core/models/model_output.py) defines all the supported model outputs (classification, segmentation, bounding boxes, ...) and gives an interface to help manipulate these outputs.
 
 #### 3. AbstractClassifier ([🔝](#models-))
-[AbstractClassifier](models/classification/abstract_classifier.py) is an abstract class and the root of any classification model. 
+[AbstractClassifier](src/mindful_core/models/classification/abstract_classifier.py) is an abstract class and the root of any classification model. 
 AbstractClassifier defines the base classification by itself, depending on the arguments used to build the instance.
 The architecture and the forward function are left to subclasses. The forward function of subclasses must return a valid ClassifierOutput instance (see [ModelOutput](#2-modeloutput-)).
 
 The classification models available in this project are:
-- [MonaiClassifier](models/classification/monai_classifier.py): a basic bridge between the Mindful project and MONAI. See the `make_monai_classifier` method for supported architectures.
-- [TargetModel](models/classification/target_model.py): a classification model in two parts. The first part is any encoder that output a 1D representation and the second an MLP projecting the representation to class logits.
-- [EnsembleClassifier](models/classification/ensemble/ensemble_classifier.py): an ensemble model aggregating the logits of multiple models.
+- [MonaiClassifier](src/mindful_core/models/classification/monai_classifier.py): a basic bridge between the Mindful project and MONAI. See the `make_monai_classifier` method for supported architectures.
+- [TargetModel](src/mindful_core/models/classification/target_model.py): a classification model in two parts. The first part is any encoder that output a 1D representation and the second an MLP projecting the representation to class logits.
+- [EnsembleClassifier](src/mindful_core/models/classification/ensemble/ensemble_classifier.py): an ensemble model aggregating the logits of multiple models.
 
 The TargetModel is the main way to customize the model's architecture through its representation model.
 
 #### 4. Encoders ([🔝](#models-))
 The encoder architectures available in this project are:
-- [ViTEncoder/SwinEncoder](models/representation/encoders/vit_encoder.py) (unimodal &ndash; images): project 2D or 3D images to a sequence of 1D vectors (or a single vector) using transformer encoders. The SWIN variant is available in the same folder.
-- [VGGEncoder](models/representation/encoders/vgg.py) (unimodal &ndash; images): project 2D or 3D images to a 1D vector. Based on CNNs.
-- [ScalarEncoder](models/representation/encoders/misc/scalar_encoder.py) (unimodal &ndash; scalars): project scalars from input to representation space. Based on MLP with ReLU activations. 
-- [CategoricalEncoder](models/representation/encoders/misc/categorical_encoder.py) (unimodal &ndash; integers): builds and uses a look-up table matching indices to learn embeddings.  Then proceeds as ScalarEncoder using these embeddings.
-- [MultiModalEncoder](models/representation/encoders/multimodal/multimodal_encoder.py) (multimodal &ndash; any modality): Uses the specified unimodal encoders to get unimodal representations and then merge these representation with its fusion module (see [FusionModule](models/representation/encoders/multimodal/fusion_module.py) and [FusionTransformer](models/representation/encoders/multimodal/fusion_transformer.py)).
+- [ViTEncoder/SwinEncoder](src/mindful_core/models/representation/encoders/vit_encoder.py) (unimodal &ndash; images): project 2D or 3D images to a sequence of 1D vectors (or a single vector) using transformer encoders. The SWIN variant is available in the same folder.
+- [VGGEncoder](src/mindful_core/models/representation/encoders/vgg.py) (unimodal &ndash; images): project 2D or 3D images to a 1D vector. Based on CNNs.
+- [ScalarEncoder](src/mindful_core/models/representation/encoders/misc/scalar_encoder.py) (unimodal &ndash; scalars): project scalars from input to representation space. Based on MLP with ReLU activations. 
+- [CategoricalEncoder](src/mindful_core/models/representation/encoders/misc/categorical_encoder.py) (unimodal &ndash; integers): builds and uses a look-up table matching indices to learn embeddings.  Then proceeds as ScalarEncoder using these embeddings.
+- [MultiModalEncoder](src/mindful_core/models/representation/encoders/multimodal/multimodal_encoder.py) (multimodal &ndash; any modality): Uses the specified unimodal encoders to get unimodal representations and then merge these representation with its fusion module (see [FusionModule](src/mindful_core/models/representation/encoders/multimodal/fusion_module.py) and [FusionTransformer](src/mindful_core/models/representation/encoders/multimodal/fusion_transformer.py)).
 
 #### 5. AbstractRepresentationModel ([🔝](#models-))
-[AbstractRepresentationModel](models/representation/abstract_representation_model.py) is an abstract class and the root of any representation model.
+[AbstractRepresentationModel](src/mindful_core/models/representation/abstract_representation_model.py) is an abstract class and the root of any representation model.
 Contrarily to its AbstractClassifier counterpart, it does not define a base loss but provide a Variance/Covariance loss function originally defined in the VICReg paper.
 Subclasses must also implement the forward function, which must return a RepresentationOutput instance (see [ModelOutput](#2-modeloutput-)).
 
 AbstractRepresentationModel can be used for training encoders using SSL (either as a pre-training phase, or for extracting representations).
 
 The representation models available in this project are:
-- [DINO](models/representation/dino.py): based on the paper `Emerging Properties in Self-Supervised Vision Transformers`. DINO stands for "self-distillation with no labels". DINO uses two sub-models, the student encoder we're training and a teacher network with the same architecture whose parameters are computed as the Exponential Moving Average of the student encoder. The student is trained to make predictions similar to the teacher's predictions.
-- [VICReg](models/representation/vicreg.py): based on the paper `VICReg: Variance-Invariance-Covariance Regularization for Self-Supervised Learning`. The model is trained to produce the same representation for two views of the same input. Variance forces representation within a single batch to be different. Invariance attracts representation to be the same for the same input. Covariance decorrelates variables of each representation to prevent information collapse.
+- [DINO](src/mindful_core/models/representation/dino.py): based on the paper `Emerging Properties in Self-Supervised Vision Transformers`. DINO stands for "self-distillation with no labels". DINO uses two sub-models, the student encoder we're training and a teacher network with the same architecture whose parameters are computed as the Exponential Moving Average of the student encoder. The student is trained to make predictions similar to the teacher's predictions.
+- [VICReg](src/mindful_core/models/representation/vicreg.py): based on the paper `VICReg: Variance-Invariance-Covariance Regularization for Self-Supervised Learning`. The model is trained to produce the same representation for two views of the same input. Variance forces representation within a single batch to be different. Invariance attracts representation to be the same for the same input. Covariance decorrelates variables of each representation to prevent information collapse.
 
 
 #### 6. AbstractSegmentationModel ([🔝](#models-))
-[AbstractSegmentationModel](models/segmentation/abstract_segmentation_model.py) is an abstract class and the root of any segmentation model.
+[AbstractSegmentationModel](src/mindful_core/models/segmentation/abstract_segmentation_model.py) is an abstract class and the root of any segmentation model.
 Similarly to AbstractClassifier, AbstractSegmentationModel defines the base loss function and leaves the forward function to subclasses. The forward function must return a SegmentationOutput instance.
 
-At the moment, the only working subclass of AbstractSegmentationModel is [SegmentationUnet](models/segmentation/segmentation_unet.py). This UNet can use either the basic UNet backbone, or the backbone of either UNetr or SWIN-Unet.
+At the moment, the only working subclass of AbstractSegmentationModel is [SegmentationUnet](src/mindful_core/models/segmentation/segmentation_unet.py). This UNet can use either the basic UNet backbone, or the backbone of either UNetr or SWIN-Unet.
 
 ### Data ([🔝](#mindful-core))
 
@@ -141,7 +141,7 @@ In the special case of multiview pipeline (e.g. for VICReg), some stages will ru
 
 #### 1. Statistics
 The role of the [statistics folder](analysis/statistics) is mainly to compute metrics for models, such as AUROC, EER, accuracy, etc.
-It also extends these metrics for models with confidence estimation. For default classification metrics, see [AbstractClassifier](models/classification/abstract_classifier.py)'s \_\_init\_\_ function.
+It also extends these metrics for models with confidence estimation. For default classification metrics, see [AbstractClassifier](src/mindful_core/models/classification/abstract_classifier.py)'s \_\_init\_\_ function.
 
 For bootstrapped metrics, see the [compute_bootstrapped_metrics.py](scripts/outcomes/compute_bootstrapped_metrics.py) script.
 
@@ -185,7 +185,7 @@ print(mindful_core.__version__)
 ```
 
 > [!NOTE]
-> The version is written in `version.py` by maintainers at every release from the `pyproject.toml` file.
+> The version is written in `src/mindful_core/version.py` by maintainers at every release from the `pyproject.toml` file.
 
 ## Funding ([🔝](#mindful-core))
 

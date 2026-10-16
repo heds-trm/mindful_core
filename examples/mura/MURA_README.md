@@ -48,7 +48,7 @@ Experiments can be run with the following command line:
 python -m mindful_core.main --config <exp_data>/config/runs/config_run.json
 ```
 
-You must run it in the folder containing the folder `mindful_core` (which contains `main.py`). 
+You must run it in the folder containing the folder `mindful_core` (which contains `../../src/mindful_core/__main__.py`). 
 
 Main config file `config_run.json` states which experiments are set to be run if their `skip` flag is set to `no` (default). Currently two experiments are proposed:
 - _unimodal_densenet121_mura_: 5-fold classification of positive and negative samples using a Densenet 121 model.
@@ -86,10 +86,10 @@ EER stands for "Equal Error Rate", and it means that metrics were computed with 
 If you would like to produce ROC curves for your experiments, you can use the script [draw_roc_comparisons.py](../../scripts/outcomes/draw_roc_comparisons.py):
 
 ```
-python -m mindful_core.scripts.outcomes.draw_roc_comparisons <exp_path>/config/runs/config_run.json --sensitivity_thresholds 0.9 
+python scripts/outcomes/compare_experiments_delong.py <exp_path>/config/runs/config_run.json --sensitivity_thresholds 0.9 
 ```
 
-This script must be called from the folder containing the `mindful_core`directory. Curves of chosen experiments will be output in a same ROC figure located in the config folder and named after the config filename. For instance:
+This script must be called from the folder containing the `mindful_core` directory. Curves of chosen experiments will be output in a same ROC figure located in the config folder and named after the config filename. For instance:
 
 ![ROC curve](./doc/mura_roc_curve.png)
 
